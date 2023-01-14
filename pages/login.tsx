@@ -78,6 +78,10 @@ export default function Home() {
     onSuccess: data => {
       console.log('in on success')
       if (data) {
+        console.log(data)
+        setIsVerified(true)
+        setIsGenerated(true)
+        setIsGenerating(false)
         setDomain(`${data}`)
       }
     }
@@ -238,21 +242,50 @@ export default function Home() {
     worker.onmessage = async function (e) {
       const { proof, publicSignals } = e.data
       console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
-      setIsGenerated(true)
-      setIsGenerating(false)
+
       setProof(proof)
       setPublicSignals(publicSignals)
       // Verify proofs
       setIsVerifying(true)
-      const verifyWorker = new Worker('./worker-verify.js')
+      console.log('before worker')
+      const worker = new Worker('./worker-generate.js')
       const proofFastFile = { type: 'mem', data: proof }
       const publicSignalsFastFile = { type: 'mem', data: publicSignals }
-      verifyWorker.postMessage([vkey, proofFastFile, publicSignalsFastFile])
-      verifyWorker.onmessage = async function (e) {
-        const isVerified = e.data
-        console.log('PROOF SUCCESSFULLY VERIFIED: ', isVerified)
-        setIsVerified(isVerified)
-        setIsVerifying(false)
+      worker.postMessage([proofFastFile, publicSignalsFastFile])
+      worker.onmessage = async function (e) {
+        const tokens = e.data
+          .replace(/["[\]\s]/g, '')
+          .split(',')
+          .map((x: any) => BigNumber.from(x).toHexString())
+        const [a1, a2, b1, b2, b3, b4, c1, c2, ...inputs] = tokens
+        const a = [a1, a2]
+        const b = [
+          [b1, b2],
+          [b3, b4]
+        ]
+        const c = [c1, c2]
+
+        console.log(a)
+        console.log(b)
+        console.log(c)
+        console.log(inputs)
+        const data = await blind
+          ?.add(a as any, b as any, c as any, inputs, {
+            gasLimit: 2000000 as any
+          })
+          .then(res => {
+            setIsVerifying(false)
+            return res
+          })
+        console.log('🚀 ~ data', data)
+        if (data?.hash) {
+          console.log('hash exists')
+          setHash(data?.hash as any)
+        }
+
+        // setIsVerified(true)
+        // setIsGenerated(true)
+        // setIsGenerating(false)
       }
     }
   }
@@ -318,7 +351,7 @@ export default function Home() {
             </Button>
             {isGenerated && isVerified && (
               <>
-                <p>Authenticated with domain: {domainStr}</p>
+                <p>Authenticated with domain: {domain}</p>
                 <Button
                   className={font.className}
                   rightIcon={<ArrowForwardIcon />}
