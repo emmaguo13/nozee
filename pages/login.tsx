@@ -8,11 +8,18 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import Confetti from 'react-confetti'
 import { useWindowSize } from 'usehooks-ts'
-import { useAccount, useContractRead, useWaitForTransaction } from 'wagmi'
+import {
+  useAccount,
+  useContractRead,
+  useWaitForTransaction,
+  useSigner,
+  useContract
+} from 'wagmi'
 import { abi } from '../constants/abi'
 import inputs from '../inputs.json'
 import { downloadFromFilename } from '../utils/utils'
 import vkey from '../utils/verification_key.json'
+import { BigNumber } from 'ethers'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 
@@ -32,19 +39,28 @@ export default function Home() {
   const toast = useToast()
   const { isSuccess: txSuccess } = useWaitForTransaction({
     // confirmations: 5,
-    hash,
-    enabled: !!hash
+    hash: '0x72434908108ad351b430d00f588891f7efc31d603756b837b047ebf098d6ff26',
+    enabled: true
   })
 
   const formattedAddr = address ? address : '0x'
 
+  const { data: signer } = useSigner()
+
+  const blind = useContract({
+    address: '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF',
+    abi,
+    signerOrProvider: signer
+  })
+
   const { data: domainStr } = useContractRead({
-    address: '0x04dc2484cc09c2E1c7496111A18b30878b7d14B2',
+    address: '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF',
     abi,
     functionName: 'get',
     args: [formattedAddr],
     enabled: txSuccess,
     onSuccess: data => {
+      console.log('in on success')
       if (data) {
         setDomain(`${data}`)
       }
@@ -80,21 +96,47 @@ export default function Home() {
 
   const handleVerifyContract = useCallback(async () => {
     setIsVerifying(true)
+    console.log('before worker')
     const worker = new Worker('./worker-generate.js')
     const proofFastFile = { type: 'mem', data: proof }
     const publicSignalsFastFile = { type: 'mem', data: publicSignals }
-
+    worker.postMessage([proofFastFile, publicSignalsFastFile])
     worker.onmessage = async function (e) {
-      console.log(e)
+      const tokens = e.data
+        .replace(/["[\]\s]/g, '')
+        .split(',')
+        .map((x: any) => BigNumber.from(x).toHexString())
+      const [a1, a2, b1, b2, b3, b4, c1, c2, ...inputs] = tokens
+      const a = [a1, a2]
+      const b = [
+        [b1, b2],
+        [b3, b4]
+      ]
+      const c = [c1, c2]
+
+      console.log(a)
+      console.log(b)
+      console.log(c)
+      console.log(inputs)
+      const data = await blind
+        ?.add(a as any, b as any, c as any, inputs, {
+          gasLimit: 2000000 as any
+        })
+        .then(res => {
+          setIsVerifying(false)
+          return res
+        })
+      console.log('🚀 ~ data', data)
+      if (data?.hash) {
+        console.log('hash exists')
+        setIsVerified(true)
+        // setHash(data?.hash as any)
+        const domain = await blind?.get(address as any)
+        console.log(domain)
+        setDomain(domain as string)
+      }
     }
 
-    // const data = await contract.add(
-    //   calldata.a,
-    //   calldata.b,
-    //   calldata.c,
-    //   calldata.inputs,
-    //   { gasLimit: 2000000 }
-    // )
     // console.log('🚀 ~ data', data)
     // res.status(200).json({ hash: data.hash })
 
@@ -131,6 +173,9 @@ export default function Home() {
       setPublicSignals(publicSignals)
     }
   }, [])
+
+  console.log(hash)
+  console.log(!!hash)
 
   return (
     <>
@@ -204,7 +249,7 @@ export default function Home() {
                 <p>
                   {isGenerated &&
                     isVerified &&
-                    `Proved you belong domain: ${domainStr}`}
+                    `Proved you belong domain: ${domain}`}
                 </p>
                 <Button
                   className={font.className}
