@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="options.css" />
+    <title>JWT Inspector Options</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>
+          <label for="header_name"> HTTP Header name: </label>
+        </td>
+        <td>
+          <input type="text" id="header_name" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="header_prefix"> Prefix: </label>
+        </td>
+        <td>
+          <input type="text" id="header_prefix" /><br />
+          (More than one? Use , between them)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="copy_prefix"> Copy prefix to clipboard </label>
+        </td>
+        <td>
+          <input type="checkbox" id="copy_prefix" />
+        </td>
+      </tr>
+    </table>
+
+    <div id="status"></div>
+    <button id="save">Save</button>
+    <button id="reset">Reset</button>
+
+    <script src="options.js"></script>
+  </body>
+</html>

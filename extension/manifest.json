@@ -1,0 +1,15 @@
+{
+  "name": "nozee JWT",
+  "version": "0.0.1",
+  "description": "nozee JWT",
+  "homepage_url": "https://nozee.xyz",
+  "icons": { "128": "icon128.png", "48": "icon48.png" },
+  "devtools_page": "devtools.html",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "permissions": ["storage"],
+  "incognito": "split",
+  "manifest_version": 3
+}

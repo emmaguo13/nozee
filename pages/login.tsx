@@ -16,8 +16,7 @@ import {
   useContract
 } from 'wagmi'
 import { abi } from '../constants/abi'
-import inputs from '../inputs.json'
-import { downloadFromFilename } from '../utils/utils'
+import { generate_inputs } from '../helpers/generate_input'
 import vkey from '../utils/verification_key.json'
 import { BigNumber } from 'ethers'
 
@@ -155,6 +154,10 @@ export default function Home() {
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true)
+    if (!address) {
+      console.log('need address')
+      return
+    }
     const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
     if (!zkeyDb) {
       throw new Error('zkey was not found in the database')
@@ -163,6 +166,14 @@ export default function Home() {
     const zkeyRawData = new Uint8Array(zkeyDb)
     const zkeyFastFile = { type: 'mem', data: zkeyRawData }
     const worker = new Worker('./worker.js')
+    const splitToken = token.split('.')
+    console.log('🚀 ~ handleGenerate ~ splitToken', splitToken)
+    const inputs = await generate_inputs(
+      splitToken[2],
+      splitToken[0] + '.' + splitToken[1],
+      address
+    )
+    console.log('🚀 ~ handleGenerate ~ inputs', inputs)
     worker.postMessage([inputs, zkeyFastFile])
     worker.onmessage = async function (e) {
       const { proof, publicSignals } = e.data
@@ -172,7 +183,7 @@ export default function Home() {
       setProof(proof)
       setPublicSignals(publicSignals)
     }
-  }, [])
+  }, [address, token])
 
   console.log(hash)
   console.log(!!hash)
@@ -235,7 +246,7 @@ export default function Home() {
             <Button
               backgroundColor="#992870"
               //   onClick={handleVerify}
-              onClick={handleVerifyContract}
+              onClick={handleVerify}
               variant="solid"
               isLoading={isVerifying}
               loadingText="Verifying"
