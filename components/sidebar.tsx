@@ -86,12 +86,11 @@ export const Sidebar = () => {
       as={Flex}
       centerContent
       maxH="400"
-      height="250"
       bg="#1E1E38"
       borderRadius="10"
       w="200px"
       p={4}
-      gap="4"
+      gap="2"
       color="white"
       className={font.className}
       position="fixed"
@@ -99,7 +98,7 @@ export const Sidebar = () => {
       marginTop={'366px'}
       /*half the width*/>
         <Button 
-
+        width='100%'
         backgroundColor={'#644CFB'}
         onClick={() => setIsPlaying(!isPlaying)}> 
         {isPlaying ? 'Stop' : 'Play no-fi'}</Button>
@@ -110,8 +109,7 @@ export const Sidebar = () => {
     <Image    
       borderRadius='12'
       marginTop='2'
-      width='160'
-      height='160'
+      width='100%'
       src='https://i.imgur.com/njB8Qmx.png'
       alt='lofi raccoon'/>
     </Container>
