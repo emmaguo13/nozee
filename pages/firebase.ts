@@ -37,6 +37,13 @@ export async function getPosts() {
   return snapshot.docs.map(doc => doc.data())
 }
 
+export async function getPost(id: string) {
+  const ref = db.collection("posts")
+  const query = ref.where("id", "==", id)
+  const snapshot = await query.get()
+  return snapshot.docs.map(doc => doc.data()) 
+}
+
 export async function getPostsFilterDomain(company:string) {
   // Create a reference to the cities collection
   const ref = db.collection("posts");

@@ -4,6 +4,7 @@ import { ethers } from 'ethers'
 import { useContract, useSigner } from 'wagmi'
 import { abi } from '../constants/abi'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -12,7 +13,7 @@ const Post = ({
   k,
   msg,
   signature,
-  company, 
+  company
 }: {
   k: any
   msg: string
@@ -26,9 +27,6 @@ const Post = ({
     signerOrProvider: signer
   })
   const toast = useToast()
-  
-  console.log(k)
-  console.log(msg)
 
   const router = useRouter()
   const cutMsg = msg.substring(0, 575) + (msg.length > 575 ? '...' : '')
@@ -39,7 +37,6 @@ const Post = ({
     if (!blind || !signingAddr) return
     const domain = await blind.get(signingAddr as `0x${string}`)
     if (domain) {
-      console.log('verified')
       toast({
         title: 'Message verified.',
         description: "We've verified the sender's signature for you",
@@ -48,7 +45,6 @@ const Post = ({
         isClosable: true
       })
     } else {
-      console.log('not verified')
       toast({
         title: 'Message not verified.',
         description: 'This signer is not a valid poster.',
@@ -79,8 +75,12 @@ const Post = ({
           boxShadow:
             '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
         }}
-
-        onClick={() => router.push("/post/" + k)}
+        onClick={() =>
+          router.push({
+            pathname: '/post/[pid]',
+            query: { pid: k }
+          })
+        }
       >
         <Flex justifyContent="space-between" w="100%">
           <Box
@@ -98,16 +98,21 @@ const Post = ({
               signature.length - 5
             )}`}
           </Text> */}
-            <Tooltip placement='top' 
+          <Tooltip
+            placement="top"
             openDelay={500}
             maxW={230}
-            textAlign='center'
-            label='Verify message was signed by authenticated user'>
-              <Button onClick={verifySig} className={font.className} variant="link">
+            textAlign="center"
+            label="Verify message was signed by authenticated user"
+          >
+            <Button
+              onClick={verifySig}
+              className={font.className}
+              variant="link"
+            >
               Verify
             </Button>
-            </Tooltip>
-
+          </Tooltip>
         </Flex>
         <Text
           display="block"
