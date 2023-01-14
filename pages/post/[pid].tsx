@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { getPost, getPosts, getPostsFilterDomain } from '../../utils/firebase'
+import { getPost, getPosts, getPostsFilterDomain, updateComment } from '../../utils/firebase'
 import { Karla, Silkscreen } from '@next/font/google'
 import { useContract, useSigner } from 'wagmi'
 import { abi } from '../../constants/abi'
@@ -22,8 +22,8 @@ import { ethers } from 'ethers'
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
-type Comment = {
-  id: string
+export type Comment = {
+  epoch: string
   comment: string
   company: string
 }
@@ -43,6 +43,7 @@ const FullPost = () => {
   const router = useRouter()
   const [post, setPost] = useState<Post[]>([])
   const [comment, setComment] = useState('')
+  const [comments, setComments] = useState<Comment[]>([])
   const { pid } = router.query
 
   useEffect(() => {
@@ -62,17 +63,25 @@ const FullPost = () => {
   }, [pid])
 
   // new comment
-  async function handleNewComment() {
+  async function handleNewComment(newComment: string) {
     // to implement
+    if (!newComment || !pid) return
+    const comment = {
+      comment: newComment,
+      company: '',
+      epoch: Date.now().toString()
+    }
+    comments.push(comment)
+    await updateComment(comments, pid.toString()) 
   }
 
   // load in values
-  let signature, msg, company, comments
+  let signature, msg, company
   if (post[0] !== undefined) {
     signature = post[0].signature
     msg = post[0].msg
     company = post[0].company
-    comments = post[0].comments
+    setComments(post[0].comments)
   }
   const { data: signer } = useSigner()
 
@@ -173,7 +182,7 @@ const FullPost = () => {
         Comments
         {/* TODO: style comments */}
         {comments?.map(c => (
-          <Box key={c.id}>
+          <Box key={c.epoch}>
             {c.comment}
             {c.company}
           </Box>
@@ -187,7 +196,7 @@ const FullPost = () => {
             onChange={e => setComment(e.target.value)}
           />
           <InputRightElement width="4.5rem" marginRight={0.5}>
-            <Button h="1.75rem" size="sm" onClick={handleNewComment}>
+            <Button h="1.75rem" size="sm" onClick={() => handleNewComment(comment)}>
               {'Post'}
             </Button>
           </InputRightElement>

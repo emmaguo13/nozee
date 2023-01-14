@@ -78,7 +78,6 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
       signedMessage as string,
       title as string
     )
-    // }
   }
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

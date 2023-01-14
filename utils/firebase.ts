@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import localforage from 'localforage'
 import firebase from 'firebase/app'
+import { Comment } from '../pages/post/[pid]'
 import 'firebase/firestore'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -35,6 +36,16 @@ const db = firebase.firestore()
 export async function getPosts() {
   const snapshot = await db.collection('posts').get()
   return snapshot.docs.map(doc => doc.data())
+}
+
+export async function updateComment(comments: Comment[], id: string) {
+  db.collection('posts')
+    .doc(id).update({"comments": comments}).then(docRef => {
+      console.log('Comment updated: ', docRef)
+    })
+    .catch(error => {
+      console.error('Error adding comment: ', error)
+    })
 }
 
 export async function getPost(id: string) {
