@@ -24,16 +24,16 @@ const Home = () => {
 
   return (
     <>
-      <Container
-        as={Flex}
-        centerContent
+      <Flex
+        direction="column"
+        pl="224px"
         gap="4"
-        padding="4"
-        justifyContent="center"
-        minH="100vh"
-        margin="0"
-        minW="800px"
-        maxW="800px"
+        // padding="0 4"
+        // justifyContent="center"
+        // minH="100vh"
+        // margin="0"
+        // minW="800px"
+        // maxW="800px"
       >
         {posts.map(p => (
           <Post
@@ -44,7 +44,7 @@ const Home = () => {
             company={p.company}
           />
         ))}
-      </Container>
+      </Flex>
     </>
   )
 }

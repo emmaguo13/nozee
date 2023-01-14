@@ -18,7 +18,10 @@ import '../styles/globals.css'
 import { downloadFromFilename } from '../utils/utils'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 
-const { chains, provider } = configureChains([goerli], [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API as any })])
+const { chains, provider } = configureChains(
+  [goerli],
+  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API as any })]
+)
 
 const { connectors } = getDefaultWallets({
   appName: 'zk blind',
@@ -66,14 +69,24 @@ export default function App({ Component, pageProps }: AppProps) {
         <ChakraProvider theme={theme}>
           <Footer />
           <Flex
-            justifyContent="center"
-            flexDirection="row"
+            position="absolute"
+            bottom="0"
+            top="56px"
+            left="0"
+            right="0"
+            // justifyContent="center"
+            // flexDirection="row"
+            // margin="0 auto"
+            // gap="4"
+            // padding="8"
+            maxWidth="1200px"
             margin="0 auto"
-            gap="4"
-            padding="8"
+            // position="relative"
           >
+            <Flex position="relative">
               {pathname !== '/login' && <Sidebar />}
-            <Component {...pageProps} />
+              <Component {...pageProps} />
+            </Flex>
           </Flex>
         </ChakraProvider>
       </RainbowKitProvider>

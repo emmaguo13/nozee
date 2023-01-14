@@ -120,6 +120,7 @@ const Post = ({
           color="#F5F5F4"
           fontSize="16"
           overflow="hidden"
+          lineHeight={1.5}
         >
           {cutMsg}
         </Text>

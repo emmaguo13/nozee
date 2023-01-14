@@ -15,6 +15,7 @@ export const Footer = () => {
       textAlign="center"
       height="56px"
       backdropFilter="blur(10px)"
+      zIndex={9}
     >
       nozee
     </Flex>
