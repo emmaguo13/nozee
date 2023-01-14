@@ -26,7 +26,15 @@ export async function generate_inputs(
   const pubkey = fs.readFileSync(
     '/Users/kayleegeorge/code/zk/zk-blind-www/pages/api/helpers/public_key.pem'
   )
-  const pubKeyData = pki.publicKeyFromPem(pubkey.toString())
+  const pubKeyData = pki.publicKeyFromPem(`-----BEGIN PUBLIC KEY-----
+  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27rOErDOPvPc3mOADYtQ
+  BeenQm5NS5VHVaoO/Zmgsf1M0Wa/2WgLm9jX65Ru/K8Az2f4MOdpBxxLL686ZS+K
+  7eJC/oOnrxCRzFYBqQbYo+JMeqNkrCn34yed4XkX4ttoHi7MwCEpVfb05Qf/ZAmN
+  I1XjecFYTyZQFrd9LjkX6lr05zY6aM/+MCBNeBWp35pLLKhiq9AieB1wbDPcGnqx
+  lXuU/bLgIyqUltqLkr9JHsf/2T4VrXXNyNeQyBq5wjYlRkpBQDDDNOcdGpx1buRr
+  Z2hFyYuXDRrMcR6BQGC0ur9hI5obRYlchDFhlb0ElsJ2bshDDGRk5k3doHqbhj2I
+  gQIDAQAB
+  -----END PUBLIC KEY-----`)
 
   const modulus = BigInt(pubKeyData.n.toString())
   const fin_result = await getCircuitInputs(

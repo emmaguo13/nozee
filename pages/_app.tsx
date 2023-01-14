@@ -43,6 +43,9 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     const fetchZkey = async () => {
       const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
+      if (!zkeyDb) {
+        await downloadFromFilename()
+      }
       if (zkeyDb) {
         console.log('zkey already exists')
         return
@@ -51,7 +54,6 @@ export default function App({ Component, pageProps }: AppProps) {
       if (zkeyDB && new Uint8Array(zkeyDb).byteLength !== 606835450) {
         console.log('Malformed zkey, clear application cache and reload')
       }
-      await downloadFromFilename()
     }
     fetchZkey()
   }, [])
