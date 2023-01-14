@@ -4,6 +4,7 @@ import { ethers } from 'ethers'
 import { useContract, useSigner } from 'wagmi'
 import { abi } from '../constants/abi'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -19,6 +20,7 @@ const Post = ({
   signature: string
   company: string
 }) => {
+  
   const { data: signer } = useSigner()
   const blind = useContract({
     address: '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF',
@@ -26,9 +28,6 @@ const Post = ({
     signerOrProvider: signer
   })
   const toast = useToast()
-  
-  console.log(k)
-  console.log(msg)
 
   const router = useRouter()
   const cutMsg = msg.substring(0, 575) + (msg.length > 575 ? '...' : '')
@@ -80,7 +79,10 @@ const Post = ({
             '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
         }}
 
-        onClick={() => router.push("/post/" + k)}
+        onClick={() => router.push({
+          pathname: '/post/[pid]',
+          query: { pid: k },
+        })}
       >
         <Flex justifyContent="space-between" w="100%">
           <Box
