@@ -63,6 +63,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains} theme={darkTheme()}>
         <ChakraProvider theme={theme}>
+          <Footer />
           <Flex
             justifyContent="center"
             flexDirection="row"
@@ -75,7 +76,6 @@ export default function App({ Component, pageProps }: AppProps) {
           </Flex>
         </ChakraProvider>
       </RainbowKitProvider>
-      <Footer />
     </WagmiConfig>
   )
 }
