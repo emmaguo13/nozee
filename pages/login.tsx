@@ -38,8 +38,8 @@ export default function Home() {
   const toast = useToast()
   const { isSuccess: txSuccess } = useWaitForTransaction({
     // confirmations: 5,
-    hash: '0x72434908108ad351b430d00f588891f7efc31d603756b837b047ebf098d6ff26',
-    enabled: true
+    hash: hash,
+    enabled: !!hash
   })
 
   const formattedAddr = address ? address : '0x'
@@ -129,10 +129,10 @@ export default function Home() {
       if (data?.hash) {
         console.log('hash exists')
         setIsVerified(true)
-        // setHash(data?.hash as any)
-        const domain = await blind?.get(address as any)
-        console.log(domain)
-        setDomain(domain as string)
+        setHash(data?.hash as any)
+        // const domain = await blind?.get(address as any)
+        // console.log(domain)
+        // setDomain(domain as string)
       }
     }
 
@@ -246,7 +246,7 @@ export default function Home() {
             <Button
               backgroundColor="#992870"
               //   onClick={handleVerify}
-              onClick={handleVerify}
+              onClick={handleVerifyContract}
               variant="solid"
               isLoading={isVerifying}
               loadingText="Verifying"
@@ -260,7 +260,7 @@ export default function Home() {
                 <p>
                   {isGenerated &&
                     isVerified &&
-                    `Proved you belong domain: ${domain}`}
+                    `Proved you belong domain: ${domainStr}`}
                 </p>
                 <Button
                   className={font.className}

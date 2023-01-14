@@ -15,8 +15,9 @@ import { Footer } from '../components/footer'
 import { Sidebar } from '../components/sidebar'
 import '../styles/globals.css'
 import { downloadFromFilename } from '../utils/utils'
+import { alchemyProvider } from 'wagmi/providers/alchemy'
 
-const { chains, provider } = configureChains([goerli], [publicProvider()])
+const { chains, provider } = configureChains([goerli], [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API as any })])
 
 const { connectors } = getDefaultWallets({
   appName: 'zk blind',
