@@ -79,17 +79,35 @@ export default function Home() {
 
   const handleVerifyContract = useCallback(async () => {
     setIsVerifying(true)
-    const res = await fetch('http://localhost:3000/api/contract', {
-      method: 'POST',
-      body: JSON.stringify({ proof, publicSignals })
-    }).then(res => {
-      setIsVerifying(false)
-      return res.json()
-    })
-    if (res.hash) {
-      setIsVerified(true)
-      setHash(res.hash)
+    const worker = new Worker('./worker-generate.js')
+    const proofFastFile = { type: 'mem', data: proof }
+    const publicSignalsFastFile = { type: 'mem', data: publicSignals }
+
+    worker.onmessage = async function (e) {
+      console.log(e)
     }
+
+    // const data = await contract.add(
+    //   calldata.a,
+    //   calldata.b,
+    //   calldata.c,
+    //   calldata.inputs,
+    //   { gasLimit: 2000000 }
+    // )
+    // console.log('🚀 ~ data', data)
+    // res.status(200).json({ hash: data.hash })
+
+    // const res = await fetch('http://localhost:3000/api/contract', {
+    //   method: 'POST',
+    //   body: JSON.stringify({ proof, publicSignals })
+    // }).then(res => {
+    //   setIsVerifying(false)
+    //   return res.json()
+    // })
+    // if (res.hash) {
+    //   setIsVerified(true)
+    //   setHash(res.hash)
+    // }
   }, [proof, publicSignals])
 
   const handleGenerate = useCallback(async () => {
@@ -171,7 +189,7 @@ export default function Home() {
             <Button
               backgroundColor="#992870"
               //   onClick={handleVerify}
-              onClick={handleVerify}
+              onClick={handleVerifyContract}
               variant="solid"
               isLoading={isVerifying}
               loadingText="Verifying"
