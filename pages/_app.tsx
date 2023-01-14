@@ -29,17 +29,17 @@ const wagmiClient = createClient({
   provider
 })
 
-const theme = extendTheme({
-  styles: {
-    global: () => ({
-      body: {
-        bg: '#131322'
-      }
-    })
-  }
-})
-
 export default function App({ Component, pageProps }: AppProps) {
+  const { pathname } = useRouter()
+  const theme = extendTheme({
+    styles: {
+      global: () => ({
+        body: {
+          bg: pathname === '/login' ? '#000000' : '#131322'
+        }
+      })
+    }
+  })
   useEffect(() => {
     const fetchZkey = async () => {
       const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
@@ -57,7 +57,6 @@ export default function App({ Component, pageProps }: AppProps) {
     }
     fetchZkey()
   }, [])
-  const { pathname } = useRouter()
 
   return (
     <WagmiConfig client={wagmiClient}>
