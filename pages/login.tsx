@@ -180,7 +180,7 @@ export default function Home() {
     //   setIsVerified(true)
     //   setHash(res.hash)
     // }
-  }, [proof, publicSignals])
+  }, [blind, proof, publicSignals])
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true)
