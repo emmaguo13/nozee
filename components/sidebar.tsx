@@ -109,6 +109,7 @@ export const Sidebar = () => {
     <Image    
       borderRadius='12'
       marginTop='2'
+      style={{ filter: !isPlaying ? 'grayscale(1)' :  'none' }}
       width='100%'
       src='https://i.imgur.com/njB8Qmx.png'
       alt='lofi raccoon'/>
