@@ -13,6 +13,7 @@ import { configureChains, createClient, goerli, WagmiConfig } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
 import { Footer } from '../components/footer'
 import { Sidebar } from '../components/sidebar'
+
 import '../styles/globals.css'
 import { downloadFromFilename } from '../utils/utils'
 
@@ -70,7 +71,7 @@ export default function App({ Component, pageProps }: AppProps) {
             gap="4"
             padding="8"
           >
-            {pathname !== '/login' && <Sidebar />}
+              {pathname !== '/login' && <Sidebar />}
             <Component {...pageProps} />
           </Flex>
         </ChakraProvider>

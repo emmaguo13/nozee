@@ -1,16 +1,19 @@
-import { Button, Container, Flex, useDisclosure } from '@chakra-ui/react'
+import { Box, Button, Container, Flex, keyframes, useDisclosure, Image } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Create from '../pages/create'
 import { getPosts } from '../pages/firebase'
+import Sound from 'react-sound'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
+
 export const Sidebar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const router = useRouter()
   const [domains, setDomains] = useState([])
+  const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -28,13 +31,14 @@ export const Sidebar = () => {
   }, [])
 
   return (
-    <Flex p="4">
+    <Flex p="4" direction={'column'} alignItems='center'>
+      <>
       <Create isOpen={isOpen} onClose={onClose} />
       <Container
         as={Flex}
         centerContent
         maxH="400"
-        height="300"
+        height="350"
         bg="#1E1E38"
         borderRadius="10"
         w="200px"
@@ -76,6 +80,45 @@ export const Sidebar = () => {
           )
         })}
       </Container>
+      </>
+      <>
+      <Container 
+      as={Flex}
+      centerContent
+      maxH="400"
+      height="250"
+      bg="#1E1E38"
+      borderRadius="10"
+      w="200px"
+      p={4}
+      gap="4"
+      color="white"
+      className={font.className}
+      position="fixed"
+      marginLeft= "-200px"
+      marginTop={'366px'}
+      /*half the width*/>
+        <Button 
+
+        backgroundColor={'#644CFB'}
+        onClick={() => setIsPlaying(!isPlaying)}> 
+        {isPlaying ? 'Stop' : 'Play no-fi'}</Button>
+      <Sound 
+        url={'https://www.dropbox.com/s/0xf3visaht4e8l6/lofi.mp3?raw=1'}
+        playStatus={isPlaying ? 'PLAYING' : 'STOPPED'}/>
+
+    <Image    
+      borderRadius='12'
+      marginTop='2'
+      width='160'
+      height='160'
+      src='https://i.imgur.com/njB8Qmx.png'
+      alt='lofi raccoon'/>
+    </Container>
+
+
+
+    </>
     </Flex>
   )
 }
