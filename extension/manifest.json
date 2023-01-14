@@ -1,0 +1,15 @@
+{
+  "name": "JWT for ZK Blind",
+  "version": "0.0.1",
+  "description": "JWT extraction for ZK blind",
+  "homepage_url": "https://zkemail.xyz",
+  "icons": { "128": "icon128.png", "48": "icon48.png" },
+  "devtools_page": "devtools.html",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "permissions": ["storage"],
+  "incognito": "split",
+  "manifest_version": 2
+}
