@@ -1,4 +1,4 @@
-import { Container, Flex, Box, Button, Text, useToast, Tooltip } from '@chakra-ui/react'
+import { Container, Flex, Box, Button, Text, useToast, Tooltip, Textarea, Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getPost, getPosts, getPostsFilterDomain } from '../firebase'
@@ -22,6 +22,7 @@ type Post = {
 const FullPost = () => {
   const router = useRouter()
   const [post, setPost] = useState<Post[]>([])
+  const [comment, setComment] = useState('')
   const { pid } = router.query
   
   useEffect(() => {
@@ -39,6 +40,11 @@ const FullPost = () => {
     }
     fetchPost()
   }, [pid])
+
+  // new comment
+  async function handleNewComment() {
+    // to implement
+  }
 
   // load in values 
   let signature, msg, company
@@ -84,7 +90,7 @@ const FullPost = () => {
   }
 
   return (
-    <>
+    <Flex direction='column' gap='4'>
        <Flex
         direction="column"
         backgroundColor="#1E1E38"
@@ -135,7 +141,32 @@ const FullPost = () => {
           {msg && msg}
         </Text>
       </Flex>
-    </>
+      <Flex 
+      padding='8'
+      borderRadius="10"
+      backgroundColor='#1E1E38'
+      direction={'column'}
+      gap='4'
+      marginBottom='8'
+      className={font.className}
+      >
+        Comments
+        <InputGroup size='md'>
+        <Input className={bodyFont.className} variant='filled'
+          placeholder='Add New Comment'
+          value={comment}
+          onChange={e => setComment(e.target.value)}
+          />
+        <InputRightElement width='4.5rem' marginRight={0.5}>
+        <Button h='1.75rem' size='sm' onClick={handleNewComment}>
+          {'Post'}
+        </Button>
+      </InputRightElement>
+        </InputGroup>
+      
+      </Flex>
+
+    </Flex>
   )
 }
 
