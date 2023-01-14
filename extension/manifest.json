@@ -11,5 +11,5 @@
   },
   "permissions": ["storage"],
   "incognito": "split",
-  "manifest_version": 2
+  "manifest_version": 3
 }

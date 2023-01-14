@@ -1,3 +1,7 @@
+# Nozee JWT
+
+Nozee JWT is an adapted version of JWT Inspector that is tailored for Nozee.
+
 # JWT Inspector
 
 JWT Inspector is a Chrome extension which makes it easy to inspect the content of

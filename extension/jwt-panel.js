@@ -65,7 +65,7 @@ function updateCopyButton(p, tok) {
 
 function openZKblind() {
   var token = this.dataset.token
-  var url = 'http://localhost:3000/login?msg=' + token
+  var url = 'https://nozee.xyz/login?msg=' + token
   window.open(url)
   // copyTextToClipboard(t);
 }
