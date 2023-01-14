@@ -9,6 +9,13 @@ import { ethers } from 'ethers'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })  
+
+type Comment = {
+  id: string,
+  comment: string,
+  company: string
+}
+
 type Post = {
   company: string,
   id: string,
@@ -16,7 +23,8 @@ type Post = {
   pubkey: string,
   sig: string, 
   signature: string,
-  title: string
+  title: string,
+  comments: Comment[]
 }
 
 const FullPost = () => {
@@ -47,11 +55,12 @@ const FullPost = () => {
   }
 
   // load in values 
-  let signature, msg, company
+  let signature, msg, company, comments
   if (post[0] !== undefined) {
     signature = post[0].signature
     msg = post[0].msg
     company = post[0].company
+    comments = post[0].comments
   }
   const { data: signer } = useSigner()
 
@@ -102,13 +111,6 @@ const FullPost = () => {
         borderRadius="10"
         minW="800px"
         maxW="800px"
-        // maxH="190px"
-        // _hover={{
-        //   cursor: 'pointer',
-        //   backgroundColor: '#262645',
-        //   boxShadow:
-        //     '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
-        // }}
       >
         <Flex justifyContent="space-between" w="100%">
           <Box
@@ -142,15 +144,23 @@ const FullPost = () => {
         </Text>
       </Flex>
       <Flex 
-      padding='8'
-      borderRadius="10"
-      backgroundColor='#1E1E38'
-      direction={'column'}
-      gap='4'
-      marginBottom='8'
-      className={font.className}
-      >
+        padding='8'
+        borderRadius="10"
+        backgroundColor='#1E1E38'
+        direction={'column'}
+        gap='4'
+        marginBottom='8'
+        className={font.className}
+        >
         Comments
+
+        {/* TODO: style comments */}
+        {comments?.map(c => <Box
+        key = {c.id}
+        >
+          {c.comment}
+          {c.company}
+        </Box>)}
         <InputGroup size='md'>
         <Input className={bodyFont.className} variant='filled'
           placeholder='Add New Comment'
