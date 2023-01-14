@@ -19,7 +19,7 @@ import {
 } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { abi } from '../constants/abi'
-import { createPost, getPosts } from './firebase'
+import { createPost, getPosts } from '../utils/firebase'
 import {
   Modal,
   ModalOverlay,
@@ -30,10 +30,9 @@ import {
   ModalCloseButton
 } from '@chakra-ui/react'
 
-import {ethers} from 'ethers'
+import { ethers } from 'ethers'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
-
 
 const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
   const [title, setTitle] = useState('')
@@ -83,23 +82,19 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
   }
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay backdropBlur='10px'/>
-      <ModalContent backgroundColor='#1E1E38' maxW ='600px'>
+      <ModalOverlay backdropBlur="10px" />
+      <ModalContent backgroundColor="#1E1E38" maxW="600px">
         <ModalHeader className={font.className}>Create Post</ModalHeader>
         <ModalCloseButton />
-        <ModalBody >
-          <Flex
-            direction="column"
-            gap="2"
-            borderRadius="10"
-          >
+        <ModalBody>
+          <Flex direction="column" gap="2" borderRadius="10">
             {/* <> // taking out title for now
               <Text>Title</Text>
               <Input onChange={e => setTitle(e.target.value)} value={title} />
             </> */}
             <>
               <Textarea
-              backgroundColor='#2C2C54'
+                backgroundColor="#2C2C54"
                 onChange={e => setMessage(e.target.value)}
                 value={message}
               />

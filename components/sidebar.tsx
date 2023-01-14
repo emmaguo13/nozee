@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Sound from 'react-sound'
 import Create from '../pages/create'
-import { getPosts } from '../pages/firebase'
+import { getPosts } from '../utils/firebase'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })

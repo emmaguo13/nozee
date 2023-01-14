@@ -3,7 +3,7 @@ import { Container, Flex } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Post from '../components/Post'
-import { getPosts, getPostsFilterDomain } from './firebase'
+import { getPosts, getPostsFilterDomain } from '../utils/firebase'
 
 const Home = () => {
   const router = useRouter()

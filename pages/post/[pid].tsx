@@ -1,29 +1,41 @@
-import { Container, Flex, Box, Button, Text, useToast, Tooltip, Textarea, Input, InputGroup, InputRightElement } from '@chakra-ui/react'
+import {
+  Container,
+  Flex,
+  Box,
+  Button,
+  Text,
+  useToast,
+  Tooltip,
+  Textarea,
+  Input,
+  InputGroup,
+  InputRightElement
+} from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { getPost, getPosts, getPostsFilterDomain } from '../firebase'
+import { getPost, getPosts, getPostsFilterDomain } from '../../utils/firebase'
 import { Karla, Silkscreen } from '@next/font/google'
 import { useContract, useSigner } from 'wagmi'
 import { abi } from '../../constants/abi'
 import { ethers } from 'ethers'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
-const bodyFont = Karla({ subsets: ['latin'], weight: '400' })  
+const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 type Comment = {
-  id: string,
-  comment: string,
+  id: string
+  comment: string
   company: string
 }
 
 type Post = {
-  company: string,
-  id: string,
-  msg: string,
-  pubkey: string,
-  sig: string, 
-  signature: string,
-  title: string,
+  company: string
+  id: string
+  msg: string
+  pubkey: string
+  sig: string
+  signature: string
+  title: string
   comments: Comment[]
 }
 
@@ -32,7 +44,7 @@ const FullPost = () => {
   const [post, setPost] = useState<Post[]>([])
   const [comment, setComment] = useState('')
   const { pid } = router.query
-  
+
   useEffect(() => {
     const fetchPost = async () => {
       console.log('id', pid)
@@ -54,7 +66,7 @@ const FullPost = () => {
     // to implement
   }
 
-  // load in values 
+  // load in values
   let signature, msg, company, comments
   if (post[0] !== undefined) {
     signature = post[0].signature
@@ -70,9 +82,9 @@ const FullPost = () => {
     signerOrProvider: signer
   })
   const toast = useToast()
-  const sig = signature ? ethers.utils.splitSignature(signature as any) : ""
-  const signingAddr = msg ? ethers.utils.verifyMessage(msg, sig) : ""
-  
+  const sig = signature ? ethers.utils.splitSignature(signature as any) : ''
+  const signingAddr = msg ? ethers.utils.verifyMessage(msg, sig) : ''
+
   async function verifySig() {
     if (!blind || !signingAddr) return
     const domain = await blind.get(signingAddr as `0x${string}`)
@@ -99,8 +111,8 @@ const FullPost = () => {
   }
 
   return (
-    <Flex direction='column' gap='4'>
-       <Flex
+    <Flex direction="column" gap="4">
+      <Flex
         direction="column"
         backgroundColor="#1E1E38"
         alignItems="center"
@@ -122,14 +134,20 @@ const FullPost = () => {
           >
             {company && company}
           </Box>
-          <Tooltip placement='top' 
+          <Tooltip
+            placement="top"
             openDelay={500}
             maxW={230}
-            textAlign='center'
-            label='Verify message was signed by authenticated user'>
-          <Button onClick={verifySig} className={font.className} variant="link">
-            Verify
-          </Button>
+            textAlign="center"
+            label="Verify message was signed by authenticated user"
+          >
+            <Button
+              onClick={verifySig}
+              className={font.className}
+              variant="link"
+            >
+              Verify
+            </Button>
           </Tooltip>
         </Flex>
         <Text
@@ -143,39 +161,38 @@ const FullPost = () => {
           {msg && msg}
         </Text>
       </Flex>
-      <Flex 
-        padding='8'
+      <Flex
+        padding="8"
         borderRadius="10"
-        backgroundColor='#1E1E38'
+        backgroundColor="#1E1E38"
         direction={'column'}
-        gap='4'
-        marginBottom='8'
+        gap="4"
+        marginBottom="8"
         className={font.className}
-        >
+      >
         Comments
-
         {/* TODO: style comments */}
-        {comments?.map(c => <Box
-        key = {c.id}
-        >
-          {c.comment}
-          {c.company}
-        </Box>)}
-        <InputGroup size='md'>
-        <Input className={bodyFont.className} variant='filled'
-          placeholder='Add New Comment'
-          value={comment}
-          onChange={e => setComment(e.target.value)}
+        {comments?.map(c => (
+          <Box key={c.id}>
+            {c.comment}
+            {c.company}
+          </Box>
+        ))}
+        <InputGroup size="md">
+          <Input
+            className={bodyFont.className}
+            variant="filled"
+            placeholder="Add New Comment"
+            value={comment}
+            onChange={e => setComment(e.target.value)}
           />
-        <InputRightElement width='4.5rem' marginRight={0.5}>
-        <Button h='1.75rem' size='sm' onClick={handleNewComment}>
-          {'Post'}
-        </Button>
-      </InputRightElement>
+          <InputRightElement width="4.5rem" marginRight={0.5}>
+            <Button h="1.75rem" size="sm" onClick={handleNewComment}>
+              {'Post'}
+            </Button>
+          </InputRightElement>
         </InputGroup>
-      
       </Flex>
-
     </Flex>
   )
 }
