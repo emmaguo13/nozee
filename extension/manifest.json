@@ -1,8 +1,8 @@
 {
-  "name": "JWT for ZK Blind",
+  "name": "nozee JWT",
   "version": "0.0.1",
-  "description": "JWT extraction for ZK blind",
-  "homepage_url": "https://zkemail.xyz",
+  "description": "nozee JWT",
+  "homepage_url": "https://nozee.xyz",
   "icons": { "128": "icon128.png", "48": "icon48.png" },
   "devtools_page": "devtools.html",
   "options_ui": {
