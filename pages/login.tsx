@@ -401,7 +401,7 @@ export default function Home() {
                 <h2>
                   <AccordionButton>
                     <Box as="span" flex="1" textAlign="left">
-                      Grab JWT from OpenAI ChatGPT
+                      2. Grab JWT from OpenAI ChatGPT
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
@@ -420,7 +420,7 @@ export default function Home() {
                 <h2>
                   <AccordionButton>
                     <Box as="span" flex="1" textAlign="left">
-                      Download zkeys & generate proof!
+                      3. Login by proof generation & verification!
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
