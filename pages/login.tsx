@@ -16,7 +16,7 @@ import {
   useToast,
   Box
 } from '@chakra-ui/react'
-import { Silkscreen } from '@next/font/google'
+import { Karla, Silkscreen } from '@next/font/google'
 import localforage from 'localforage'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -36,6 +36,7 @@ import vkey from '../utils/verification_key.json'
 import { BigNumber } from 'ethers'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
+const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 export default function Home() {
   const { address } = useAccount()
@@ -307,6 +308,7 @@ export default function Home() {
           gap="6"
           justifyContent="center"
           maxW="2xl"
+          className={bodyFont.className}
         >
           <Flex
             direction="column"
@@ -316,7 +318,7 @@ export default function Home() {
             borderRadius="10"
             flex={1}
           >
-            <Heading className={font.className}>Sign in</Heading>
+            <Text fontSize='40' className={font.className}>Sign in</Text>
             <Spacer />
             <Textarea
               value={token}
@@ -370,7 +372,7 @@ export default function Home() {
             borderRadius="10"
             flex={1}
           >
-            <Accordion>
+            <Accordion width={'400px'}>
               <AccordionItem>
                 <h2>
                   <AccordionButton>
@@ -382,6 +384,7 @@ export default function Home() {
                 </h2>
                 <AccordionPanel pb={4}>
                   {`a) “Manage Extensions —> Switch on Develop Mode in upper-right corner”`}
+                  
                   {`b) “Press load unpacked —> select JWT Extension file from downloads”`}
                 </AccordionPanel>
               </AccordionItem>
