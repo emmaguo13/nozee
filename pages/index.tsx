@@ -1,13 +1,14 @@
 //@ts-nocheck
 import { Container, Flex } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Post from '../components/Post'
 import { getPosts, getPostsFilterDomain } from '../utils/firebase'
 
 const Home = () => {
   const router = useRouter()
   const [posts, setPosts] = useState([])
+  console.log('🚀 ~ Home ~ posts', posts)
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -22,6 +23,13 @@ const Home = () => {
     fetchPosts()
   }, [router.query.domain])
 
+  const showPosts = useMemo(() => {
+    const p = [...posts]
+    p.reverse()
+    return p
+  }, [posts])
+  console.log('🚀 ~ Home ~ showPosts', showPosts)
+
   return (
     <>
       <Flex
@@ -35,7 +43,7 @@ const Home = () => {
         // minW="800px"
         // maxW="800px"
       >
-        {posts.map(p => (
+        {showPosts.map(p => (
           <Post
             key={p.id}
             k={p.id}
