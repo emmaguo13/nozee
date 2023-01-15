@@ -27,7 +27,7 @@ const Home = () => {
       <Flex
         direction="column"
         pl="224px"
-        gap="4"
+        gap="6"
         // padding="0 4"
         // justifyContent="center"
         // minH="100vh"

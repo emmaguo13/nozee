@@ -34,42 +34,34 @@ export const Sidebar = () => {
     <>
       <Create isOpen={isOpen} onClose={onClose} />
       <Flex
-        // p="4"
         direction={'column'}
         gap="6"
-        // alignItems="center"
         justifyContent="space-between"
         position="fixed"
         maxW="200px"
       >
         <Flex
           flexDirection="column"
-          // maxH="400"
-          // height="350"
+          alignItems="flex-start"
           bg="#1E1E38"
           borderRadius="10"
-          // w="200px"
           p={4}
           gap="4"
           color="white"
-          className={font.className}
-          // position="fixed"
-          // left="0"
-          // left= "50%"
-          // marginLeft="-200px" /*half the width*/
+          className={bodyFont.className}
         >
           <Button
             backgroundColor="#4C82FB"
-            // w="100%"
             onClick={() => router.push('/')}
             size="md"
+            width="100%"
           >
             Home
           </Button>
           <Button
+            width="100%"
             size="md"
             backgroundColor="#4C82FB"
-            // w="100%"
             onClick={() => onOpen()}
           >
             New Post
@@ -87,6 +79,7 @@ export const Sidebar = () => {
                   })
                 }
                 variant="link"
+                style={{ textTransform: 'capitalize' }}
               >
                 {e}
               </Button>
@@ -95,21 +88,14 @@ export const Sidebar = () => {
         </Flex>
         <Flex
           direction="column"
-          // maxH="400"
           bg="#1E1E38"
           borderRadius="10"
-          // w="200px"
           p={4}
           gap="2"
           color="white"
           className={font.className}
-          // position="fixed"
-          // marginLeft="-200px"
-          // marginTop={'366px'}
-          /*half the width*/
         >
           <Button
-            // width="100%"
             backgroundColor={'#644CFB'}
             onClick={() => setIsPlaying(!isPlaying)}
           >
