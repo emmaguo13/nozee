@@ -16,7 +16,7 @@ import {
   useToast,
   Box
 } from '@chakra-ui/react'
-import { Silkscreen } from '@next/font/google'
+import { Karla, Silkscreen } from '@next/font/google'
 import localforage from 'localforage'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -34,8 +34,10 @@ import { abi } from '../constants/abi'
 import { generate_inputs } from '../helpers/generate_input'
 import vkey from '../utils/verification_key.json'
 import { BigNumber } from 'ethers'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
+const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 export default function Home() {
   const { address } = useAccount()
@@ -300,24 +302,28 @@ export default function Home() {
       </Head>
       <main>
         {isVerified && <Confetti width={width} height={height} />}
-        <Container
-          as={Flex}
-          centerContent
+        <Text className={font.className} color='#992870' fontSize='50' textAlign="center">
+          Sign in
+        </Text>
+        <Spacer />
+        <Flex
+          margin="0 auto"
           flexDirection="row"
-          gap="6"
-          justifyContent="center"
-          maxW="2xl"
+          // gap="6"
+          justifyContent="space-evenly"
+          // minW="100%"
+          // width="100%"
+          width="1200px"
+          className={bodyFont.className}
         >
           <Flex
             direction="column"
-            alignItems="center"
-            padding="8"
             gap="4"
             borderRadius="10"
-            flex={1}
+            justifyContent="center"
           >
-            <Heading className={font.className}>Sign in</Heading>
             <Spacer />
+            <ConnectButton />
             <Textarea
               value={token}
               onChange={e => setToken(e.target.value)}
@@ -364,14 +370,17 @@ export default function Home() {
           </Flex>
           <Flex
             direction="column"
-            alignItems="center"
-            padding="8"
+            // alignItems="center"
+            // padding="8"
             gap="4"
             borderRadius="10"
-            flex={1}
+            justifyContent="center"
           >
-            <Accordion>
-              <AccordionItem>
+            <Accordion w="400px" allowToggle>
+              <AccordionItem _hover={{
+                cursor: 'pointer',
+                backgroundColor: '#0A0A12',
+              }}>
                 <h2>
                   <AccordionButton>
                     <Box as="span" flex="1" textAlign="left">
@@ -381,46 +390,48 @@ export default function Home() {
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  {`a) “Manage Extensions —> Switch on Develop Mode in upper-right corner”`}
-                  {`b) “Press load unpacked —> select JWT Extension file from downloads”`}
+                  Manage Extensions & switch on Develop Mode in upper-right corner. Press load unpacked & select JWT Extension file from downloads.
                 </AccordionPanel>
               </AccordionItem>
 
-              <AccordionItem>
+              <AccordionItem _hover={{
+                cursor: 'pointer',
+                backgroundColor: '#0A0A12',
+              }}>
                 <h2>
                   <AccordionButton>
                     <Box as="span" flex="1" textAlign="left">
-                      Grab JWT from OpenAI ChatGPT
+                      2. Grab JWT from OpenAI ChatGPT
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  *before*: “Before you go, make sure you are signed into OpenAI
+                  Before you go, make sure you are signed into OpenAI
                   with your work email. Open your developer tools and select
                   “JWT”. You might have to refresh or send a prompt to activate
-                  your JWT. Press ‘Go to ZK Blind’ button to login.”
+                  your JWT. Press ‘Go to nozee’ button to login.
                 </AccordionPanel>
               </AccordionItem>
-              <AccordionItem>
+              <AccordionItem _hover={{
+                cursor: 'pointer',
+                backgroundColor: '#0A0A12',
+              }}>
                 <h2>
                   <AccordionButton>
                     <Box as="span" flex="1" textAlign="left">
-                      Download zkeys
+                      3. Login by proof generation & verification!
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  *before*: “Before you go, make sure you are signed into OpenAI
-                  with your work email. Open your developer tools and select
-                  “JWT”. You might have to refresh or send a prompt to activate
-                  your JWT. Press ‘Go to ZK Blind’ button to login.”
+                  Wait for zkeys to be downloaded and generate your authentication proof — all client-side! We do not take or store any data.
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
           </Flex>
-        </Container>
+        </Flex>
       </main>
     </>
   )
