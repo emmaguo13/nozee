@@ -1,8 +1,9 @@
-import { Button, Flex, Image, useDisclosure } from '@chakra-ui/react'
+import { Button, Flex, Image, Text, useDisclosure } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Sound from 'react-sound'
+import { useAccount } from 'wagmi'
 import Create from '../pages/create'
 import { getPosts } from '../utils/firebase'
 
@@ -14,6 +15,7 @@ export const Sidebar = () => {
   const router = useRouter()
   const [domains, setDomains] = useState([])
   const [isPlaying, setIsPlaying] = useState(false)
+  const { address } = useAccount()
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -29,6 +31,10 @@ export const Sidebar = () => {
     }
     fetchPosts()
   }, [])
+
+  const formattedAccount = address
+    ? `${address.slice(0, 6)}...${address.slice(-4)}`
+    : 'Connect Wallet'
 
   return (
     <>
@@ -66,6 +72,7 @@ export const Sidebar = () => {
           >
             New Post
           </Button>
+          <Text>Address: {formattedAccount}</Text>
           Domains
           {domains.map((e, i) => {
             return (
