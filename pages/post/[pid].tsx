@@ -44,6 +44,9 @@ const FullPost = () => {
   const [post, setPost] = useState<Post[]>([])
   const [comment, setComment] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
+  const [signature, setSignature] = useState("")
+  const [msg, setMsg] = useState("")
+  const [company, setCompany] = useState("")
   const { pid } = router.query
 
   useEffect(() => {
@@ -51,12 +54,21 @@ const FullPost = () => {
       console.log('id', pid)
       if (pid != undefined) {
         const res = await getPost(pid?.toString())
-        //console.log('p', res)
+        console.log('p', res)
         setPost(res as Post[])
-      } else {
+          // load in values
+        if (post[0] !== undefined) {
+          setSignature(post[0].signature)
+          setMsg(post[0].msg)
+          setCompany(post[0].company)
+          setComments(post[0].comments)
+        }
+
+      } 
+      else {
         const res = await getPosts()
         //console.log(res)
-        setPost(res as Post[])
+        // setPost(res as Post[])
       }
     }
     fetchPost()
@@ -74,15 +86,6 @@ const FullPost = () => {
     comments.push(comment)
     await updateComment(comments, pid.toString()) 
   }
-
-  // load in values
-  let signature, msg, company
-  if (post[0] !== undefined) {
-    signature = post[0].signature
-    msg = post[0].msg
-    company = post[0].company
-    setComments(post[0].comments)
-  }
   const { data: signer } = useSigner()
 
   const blind = useContract({
@@ -91,10 +94,10 @@ const FullPost = () => {
     signerOrProvider: signer
   })
   const toast = useToast()
-  const sig = signature ? ethers.utils.splitSignature(signature as any) : ''
-  const signingAddr = msg ? ethers.utils.verifyMessage(msg, sig) : ''
 
   async function verifySig() {
+    const sig = signature ? ethers.utils.splitSignature(signature as any) : ''
+    const signingAddr = msg ? ethers.utils.verifyMessage(msg, sig) : ''
     if (!blind || !signingAddr) return
     const domain = await blind.get(signingAddr as `0x${string}`)
     if (domain) {
@@ -180,7 +183,6 @@ const FullPost = () => {
         className={font.className}
       >
         Comments
-        {/* TODO: style comments */}
         {comments?.map(c => (
           <Box key={c.epoch}>
             {c.comment}
