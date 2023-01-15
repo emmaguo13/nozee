@@ -349,7 +349,6 @@ export default function Home() {
             <Button
               onClick={handleLogin}
               variant="solid"
-              backgroundColor= {isGenerated ? '#992870' : ''}
               // isLoading={isGenerating}
               // loadingText="Generating"
               // isDisabled={isGenerated}
@@ -363,6 +362,7 @@ export default function Home() {
                   className={font.className}
                   rightIcon={<ArrowForwardIcon />}
                   onClick={() => router.push('/')}
+                  backgroundColor='#992870'
                 >
                   nozee
                 </Button>
