@@ -41,7 +41,7 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
   const formattedAddr = address ? address : '0x'
   const [enabled, setEnabled] = useState(false)
   const { data: domainStr } = useContractRead({
-    address: enabled ? '0x13e4E0a14729d9b7017E77ebbDEad05cb8ad1540' : '0x',
+    address: enabled ? '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF' : '0x',
     abi,
     functionName: 'get',
     args: [formattedAddr]
@@ -64,6 +64,8 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
   // });
 
   async function handleCreatePost() {
+
+    console.log(domainStr)
     // sign message
     if (!domainStr) return
     const signedMessage = await signer?.signMessage(message)
@@ -78,6 +80,8 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
       signedMessage as string,
       title as string
     )
+
+    console.log(post)
   }
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
