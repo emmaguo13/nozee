@@ -59,8 +59,8 @@ const Post = ({
     <>
       <Flex
         direction="column"
+        alignItems="flex-start"
         backgroundColor="#1E1E38"
-        alignItems="center"
         padding="8"
         // paddingTop="8"
         // paddingBottom="8"
@@ -108,7 +108,8 @@ const Post = ({
             </Button>
           </Tooltip>
         </Flex>
-        <div
+        <Flex
+          justifyContent="flex-start"
           onClick={() =>
             router.push({
               pathname: '/post/[pid]',
@@ -123,10 +124,11 @@ const Post = ({
             fontSize="16"
             overflow="hidden"
             lineHeight={1.5}
+            align="left"
           >
             {cutMsg}
           </Text>
-        </div>
+        </Flex>
       </Flex>
     </>
   )
