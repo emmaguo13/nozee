@@ -1,5 +1,6 @@
 import { Button, Flex, Image, Text, useDisclosure } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Sound from 'react-sound'
@@ -54,7 +55,7 @@ export const Sidebar = () => {
           p={4}
           gap="4"
           color="white"
-          className={bodyFont.className}
+          className={font.className}
         >
           <Button
             backgroundColor="#4C82FB"
@@ -72,7 +73,7 @@ export const Sidebar = () => {
           >
             New Post
           </Button>
-          <Text>Address: {formattedAccount}</Text>
+          <ConnectButton showBalance={false} />
           Domains
           {domains.map((e, i) => {
             return (

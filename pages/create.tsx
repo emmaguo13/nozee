@@ -64,7 +64,6 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
   // });
 
   async function handleCreatePost() {
-
     console.log(domainStr)
     // sign message
     if (!domainStr) return
