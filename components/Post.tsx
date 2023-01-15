@@ -112,8 +112,8 @@ const Post = ({
           justifyContent="flex-start"
           onClick={() =>
             router.push({
-              pathname: '/post/[pid]',
-              query: { pid: k }
+              pathname: `/post/${k}`
+              // query: { pid: k }
             })
           }
         >

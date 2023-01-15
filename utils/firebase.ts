@@ -40,7 +40,9 @@ export async function getPosts() {
 
 export async function updateComment(comments: Comment[], id: string) {
   db.collection('posts')
-    .doc(id).update({"comments": comments}).then(docRef => {
+    .doc(id)
+    .update({ comments: comments })
+    .then(docRef => {
       console.log('Comment updated: ', docRef)
     })
     .catch(error => {
@@ -49,18 +51,18 @@ export async function updateComment(comments: Comment[], id: string) {
 }
 
 export async function getPost(id: string) {
-  const ref = db.collection("posts")
-  const query = ref.where("id", "==", id)
+  const ref = db.collection('posts')
+  const query = ref.where('id', '==', id)
   const snapshot = await query.get()
-  return snapshot.docs.map(doc => doc.data()) 
+  return snapshot.docs.map(doc => doc.data())
 }
 
-export async function getPostsFilterDomain(company:string) {
+export async function getPostsFilterDomain(company: string) {
   // Create a reference to the cities collection
-  const ref = db.collection("posts");
+  const ref = db.collection('posts')
 
   // Create a query against the collection.
-  const query = ref.where("company", "==", company);
+  const query = ref.where('company', '==', company)
   const snapshot = await query.get()
   return snapshot.docs.map(doc => doc.data())
 }
@@ -80,7 +82,8 @@ export async function createPost(
       company: company,
       msg: msg,
       pubkey: pubkey,
-      signature: signature
+      signature: signature,
+      id
     })
     .then(docRef => {
       console.log('Document written with ID: ', docRef)

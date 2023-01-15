@@ -131,7 +131,7 @@ const FullPost = () => {
       <Flex
         direction="column"
         backgroundColor="#1E1E38"
-        alignItems="center"
+        alignItems="flex-start"
         padding="8"
         // paddingBottom="8"
         gap="4"
@@ -167,6 +167,7 @@ const FullPost = () => {
         </Flex>
         <Text
           alignContent="start"
+          textAlign="left"
           display="block"
           className={bodyFont.className}
           color="#F5F5F4"
