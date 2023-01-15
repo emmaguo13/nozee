@@ -337,6 +337,7 @@ export default function Home() {
               isLoading={isGenerating}
               loadingText="Generating"
               isDisabled={isGenerated}
+              onClick={() =>  window.open('https://zkjwt-zkey-chunks.s3.amazonaws.com/extension.zip')}
             >
               Download extension
             </Button>
@@ -391,7 +392,7 @@ export default function Home() {
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  Manage Extensions & switch on Develop Mode in upper-right corner. Press load unpacked & select JWT Extension file from downloads.
+                  Unzip the file. Then, go to Manage Extensions & switch on Develop Mode in upper-right corner. Press load unpacked & select JWT Extension file from downloads.
                 </AccordionPanel>
               </AccordionItem>
 
