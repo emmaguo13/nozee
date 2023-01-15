@@ -112,6 +112,7 @@ export const Sidebar = () => {
           <Sound
             url={'https://www.dropbox.com/s/0xf3visaht4e8l6/lofi.mp3?raw=1'}
             playStatus={isPlaying ? 'PLAYING' : 'STOPPED'}
+            playFromPosition={200}
           />
           <Image
             borderRadius="12"
