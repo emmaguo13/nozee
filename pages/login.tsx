@@ -349,6 +349,7 @@ export default function Home() {
             <Button
               onClick={handleLogin}
               variant="solid"
+              backgroundColor= {isGenerated ? '#992870' : ''}
               // isLoading={isGenerating}
               // loadingText="Generating"
               // isDisabled={isGenerated}
