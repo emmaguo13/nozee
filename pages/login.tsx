@@ -34,6 +34,7 @@ import { abi } from '../constants/abi'
 import { generate_inputs } from '../helpers/generate_input'
 import vkey from '../utils/verification_key.json'
 import { BigNumber } from 'ethers'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -301,25 +302,27 @@ export default function Home() {
       </Head>
       <main>
         {isVerified && <Confetti width={width} height={height} />}
-        <Container
-          as={Flex}
-          centerContent
+        <Heading className={font.className} textAlign="center">
+          Sign in
+        </Heading>
+        <Spacer />
+        <Flex
+          margin="0 auto"
           flexDirection="row"
-          gap="6"
-          justifyContent="center"
-          maxW="2xl"
-          className={bodyFont.className}
+          // gap="6"
+          justifyContent="space-evenly"
+          // minW="100%"
+          // width="100%"
+          width="1200px"
         >
           <Flex
             direction="column"
-            alignItems="center"
-            padding="8"
             gap="4"
             borderRadius="10"
-            flex={1}
+            justifyContent="center"
           >
-            <Text fontSize='40' className={font.className}>Sign in</Text>
             <Spacer />
+            <ConnectButton />
             <Textarea
               value={token}
               onChange={e => setToken(e.target.value)}
@@ -366,13 +369,13 @@ export default function Home() {
           </Flex>
           <Flex
             direction="column"
-            alignItems="center"
-            padding="8"
+            // alignItems="center"
+            // padding="8"
             gap="4"
             borderRadius="10"
-            flex={1}
+            justifyContent="center"
           >
-            <Accordion width={'400px'}>
+            <Accordion maxW="300px">
               <AccordionItem>
                 <h2>
                   <AccordionButton>
@@ -384,7 +387,7 @@ export default function Home() {
                 </h2>
                 <AccordionPanel pb={4}>
                   {`a) “Manage Extensions —> Switch on Develop Mode in upper-right corner”`}
-                  
+
                   {`b) “Press load unpacked —> select JWT Extension file from downloads”`}
                 </AccordionPanel>
               </AccordionItem>
@@ -423,7 +426,7 @@ export default function Home() {
               </AccordionItem>
             </Accordion>
           </Flex>
-        </Container>
+        </Flex>
       </main>
     </>
   )
