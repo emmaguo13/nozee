@@ -55,6 +55,7 @@ const FullPost = () => {
   const { pid } = router.query
 
   useEffect(() => {
+    if (post[0]) return
     const fetchPost = async () => {
       console.log('id', pid)
       if (pid != undefined) {
@@ -146,7 +147,7 @@ const FullPost = () => {
             px="3"
             style={{ textTransform: 'capitalize' }}
           >
-            {company}
+            {post[0]?.company}
           </Box>
           <Tooltip
             placement="top"
@@ -173,7 +174,7 @@ const FullPost = () => {
           overflow="hidden"
           lineHeight={1.5}
         >
-          {msg}
+          {post[0]?.msg}
         </Text>
       </Flex>
       <Flex
