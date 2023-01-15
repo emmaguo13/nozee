@@ -13,7 +13,12 @@ import {
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { getPost, getPosts, getPostsFilterDomain, updateComment } from '../../utils/firebase'
+import {
+  getPost,
+  getPosts,
+  getPostsFilterDomain,
+  updateComment
+} from '../../utils/firebase'
 import { Karla, Silkscreen } from '@next/font/google'
 import { useContract, useSigner } from 'wagmi'
 import { abi } from '../../constants/abi'
@@ -44,9 +49,9 @@ const FullPost = () => {
   const [post, setPost] = useState<Post[]>([])
   const [comment, setComment] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
-  const [signature, setSignature] = useState("")
-  const [msg, setMsg] = useState("")
-  const [company, setCompany] = useState("")
+  const [signature, setSignature] = useState('')
+  const [msg, setMsg] = useState('')
+  const [company, setCompany] = useState('')
   const { pid } = router.query
 
   useEffect(() => {
@@ -56,23 +61,21 @@ const FullPost = () => {
         const res = await getPost(pid?.toString())
         console.log('p', res)
         setPost(res as Post[])
-          // load in values
+        // load in values
         if (post[0] !== undefined) {
           setSignature(post[0].signature)
           setMsg(post[0].msg)
           setCompany(post[0].company)
           setComments(post[0].comments)
         }
-
-      } 
-      else {
+      } else {
         const res = await getPosts()
         //console.log(res)
         // setPost(res as Post[])
       }
     }
     fetchPost()
-  }, [pid])
+  }, [pid, post])
 
   // new comment
   async function handleNewComment(newComment: string) {
@@ -84,7 +87,7 @@ const FullPost = () => {
       epoch: Date.now().toString()
     }
     comments.push(comment)
-    await updateComment(comments, pid.toString()) 
+    await updateComment(comments, pid.toString())
   }
   const { data: signer } = useSigner()
 
@@ -123,13 +126,12 @@ const FullPost = () => {
   }
 
   return (
-    <Flex direction="column" gap="4">
+    <Flex direction="column" gap="4" pl="224px">
       <Flex
         direction="column"
         backgroundColor="#1E1E38"
         alignItems="center"
         padding="8"
-        marginTop="4"
         // paddingBottom="8"
         gap="4"
         borderRadius="10"
@@ -144,7 +146,7 @@ const FullPost = () => {
             px="3"
             style={{ textTransform: 'capitalize' }}
           >
-            {company && company}
+            {company}
           </Box>
           <Tooltip
             placement="top"
@@ -169,8 +171,9 @@ const FullPost = () => {
           color="#F5F5F4"
           fontSize="16"
           overflow="hidden"
+          lineHeight={1.5}
         >
-          {msg && msg}
+          {msg}
         </Text>
       </Flex>
       <Flex
@@ -198,7 +201,11 @@ const FullPost = () => {
             onChange={e => setComment(e.target.value)}
           />
           <InputRightElement width="4.5rem" marginRight={0.5}>
-            <Button h="1.75rem" size="sm" onClick={() => handleNewComment(comment)}>
+            <Button
+              h="1.75rem"
+              size="sm"
+              onClick={() => handleNewComment(comment)}
+            >
               {'Post'}
             </Button>
           </InputRightElement>
