@@ -302,9 +302,9 @@ export default function Home() {
       </Head>
       <main>
         {isVerified && <Confetti width={width} height={height} />}
-        <Heading className={font.className} textAlign="center">
+        <Text className={font.className} color='#992870' fontSize='50' textAlign="center">
           Sign in
-        </Heading>
+        </Text>
         <Spacer />
         <Flex
           margin="0 auto"
@@ -314,6 +314,7 @@ export default function Home() {
           // minW="100%"
           // width="100%"
           width="1200px"
+          className={bodyFont.className}
         >
           <Flex
             direction="column"
@@ -375,8 +376,11 @@ export default function Home() {
             borderRadius="10"
             justifyContent="center"
           >
-            <Accordion maxW="300px">
-              <AccordionItem>
+            <Accordion w="400px" allowToggle>
+              <AccordionItem _hover={{
+                cursor: 'pointer',
+                backgroundColor: '#0A0A12',
+              }}>
                 <h2>
                   <AccordionButton>
                     <Box as="span" flex="1" textAlign="left">
@@ -386,13 +390,14 @@ export default function Home() {
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  {`a) “Manage Extensions —> Switch on Develop Mode in upper-right corner”`}
-
-                  {`b) “Press load unpacked —> select JWT Extension file from downloads”`}
+                  Manage Extensions & switch on Develop Mode in upper-right corner. Press load unpacked & select JWT Extension file from downloads.
                 </AccordionPanel>
               </AccordionItem>
 
-              <AccordionItem>
+              <AccordionItem _hover={{
+                cursor: 'pointer',
+                backgroundColor: '#0A0A12',
+              }}>
                 <h2>
                   <AccordionButton>
                     <Box as="span" flex="1" textAlign="left">
@@ -402,26 +407,26 @@ export default function Home() {
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  *before*: “Before you go, make sure you are signed into OpenAI
+                  Before you go, make sure you are signed into OpenAI
                   with your work email. Open your developer tools and select
                   “JWT”. You might have to refresh or send a prompt to activate
-                  your JWT. Press ‘Go to ZK Blind’ button to login.”
+                  your JWT. Press ‘Go to nozee’ button to login.
                 </AccordionPanel>
               </AccordionItem>
-              <AccordionItem>
+              <AccordionItem _hover={{
+                cursor: 'pointer',
+                backgroundColor: '#0A0A12',
+              }}>
                 <h2>
                   <AccordionButton>
                     <Box as="span" flex="1" textAlign="left">
-                      Download zkeys
+                      Download zkeys & generate proof!
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  *before*: “Before you go, make sure you are signed into OpenAI
-                  with your work email. Open your developer tools and select
-                  “JWT”. You might have to refresh or send a prompt to activate
-                  your JWT. Press ‘Go to ZK Blind’ button to login.”
+                  Wait for zkeys to be downloaded and generate your authentication proof — all client-side! We do not take or store any data.
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
