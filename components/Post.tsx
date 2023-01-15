@@ -75,12 +75,6 @@ const Post = ({
           boxShadow:
             '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
         }}
-        onClick={() =>
-          router.push({
-            pathname: '/post/[pid]',
-            query: { pid: k }
-          })
-        }
       >
         <Flex justifyContent="space-between" w="100%">
           <Box
@@ -114,16 +108,25 @@ const Post = ({
             </Button>
           </Tooltip>
         </Flex>
-        <Text
-          display="block"
-          className={bodyFont.className}
-          color="#F5F5F4"
-          fontSize="16"
-          overflow="hidden"
-          lineHeight={1.5}
+        <div
+          onClick={() =>
+            router.push({
+              pathname: '/post/[pid]',
+              query: { pid: k }
+            })
+          }
         >
-          {cutMsg}
-        </Text>
+          <Text
+            display="block"
+            className={bodyFont.className}
+            color="#F5F5F4"
+            fontSize="16"
+            overflow="hidden"
+            lineHeight={1.5}
+          >
+            {cutMsg}
+          </Text>
+        </div>
       </Flex>
     </>
   )
