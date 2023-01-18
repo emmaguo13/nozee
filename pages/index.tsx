@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Container, Flex } from '@chakra-ui/react'
+import { Container, Flex, Progress } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import Post from '../components/Post'

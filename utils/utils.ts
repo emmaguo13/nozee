@@ -10,7 +10,7 @@ export async function downloadFromFilename() {
     if (zkeyBuff.byteLength == 0) {
       console.log('Not saving file')
     } else {
-      console.log('20: Got file', 'jwt_single-real.zkey')
+      console.log('Got file', 'jwt_single-real.zkey')
     }
     await localforage.setItem('jwt_single-real.zkey', zkeyBuff)
     console.log(`Storage of jwt_single-real.zkey successful!`)

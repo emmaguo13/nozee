@@ -5,18 +5,15 @@ import {
   RainbowKitProvider
 } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
-import localforage from 'localforage'
 import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { configureChains, createClient, goerli, WagmiConfig } from 'wagmi'
-import { publicProvider } from 'wagmi/providers/public'
 import { Footer } from '../components/footer'
 import { Sidebar } from '../components/sidebar'
 
-import '../styles/globals.css'
-import { downloadFromFilename } from '../utils/utils'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
+import { AppProvider } from '../contexts/AppProvider'
+import '../styles/globals.css'
 
 const { chains, provider } = configureChains(
   [goerli],
@@ -40,54 +37,39 @@ export default function App({ Component, pageProps }: AppProps) {
     styles: {
       global: () => ({
         body: {
-          bg: pathname === '/login' ? '#000000' : '#131322'
+          bg: '#131322'
         }
       })
     }
   })
-  useEffect(() => {
-    const fetchZkey = async () => {
-      const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
-      if (!zkeyDb) {
-        await downloadFromFilename()
-      }
-      if (zkeyDb) {
-        console.log('zkey already exists')
-        return
-      }
-      //@ts-ignore
-      if (zkeyDB && new Uint8Array(zkeyDb).byteLength !== 606835450) {
-        console.log('Malformed zkey, clear application cache and reload')
-      }
-    }
-    fetchZkey()
-  }, [])
-
   return (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains} theme={darkTheme()}>
         <ChakraProvider theme={theme}>
-          <Footer />
-          <Flex
-            position="absolute"
-            bottom="0"
-            top="56px"
-            left="0"
-            right="0"
-            // justifyContent="center"
-            // flexDirection="row"
-            // margin="0 auto"
-            // gap="4"
-            // padding="8"
-            maxWidth="1200px"
-            margin="0 auto"
-            // position="relative"
-          >
-            <Flex position="relative">
+          <AppProvider>
+            <Footer />
+            <Flex
+              position="absolute"
+              bottom="0"
+              // top="56px"
+              top="0"
+              left="0"
+              right="0"
+              // justifyContent="center"
+              // flexDirection="row"
+              // margin="0 auto"
+              // gap="4"
+              // padding="8"
+              // maxWidth="1200px"
+              // margin="0 auto"
+              // position="relative"
+            >
+              {/* <Flex position="relative"> */}
               {pathname !== '/login' && <Sidebar />}
               <Component {...pageProps} />
+              {/* </Flex> */}
             </Flex>
-          </Flex>
+          </AppProvider>
         </ChakraProvider>
       </RainbowKitProvider>
     </WagmiConfig>
