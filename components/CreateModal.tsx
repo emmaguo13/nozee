@@ -34,7 +34,13 @@ import { ethers } from 'ethers'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 
-const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
+const CreateModal = ({
+  isOpen,
+  onClose
+}: {
+  isOpen: boolean
+  onClose: any
+}) => {
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
   const { address } = useAccount()
@@ -63,7 +69,7 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
   //   signerOrProvider: signer,
   // });
 
-  async function handleCreatePost() {
+  async function handleCreateModalModalPost() {
     console.log(domainStr)
     // sign message
     if (!domainStr) return
@@ -86,7 +92,9 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay backdropBlur="10px" />
       <ModalContent backgroundColor="#1E1E38" maxW="600px">
-        <ModalHeader className={font.className}>Create Post</ModalHeader>
+        <ModalHeader className={font.className}>
+          CreateModalModal Post
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Flex direction="column" gap="2" borderRadius="10">
@@ -109,11 +117,11 @@ const Create = ({ isOpen, onClose }: { isOpen: boolean; onClose: any }) => {
           {/* <Button mr={3} onClick={onClose}>
             Close // backgroundColor="#4C82FB" 
           </Button> */}
-          <Button onClick={handleCreatePost}>Post</Button>
+          <Button onClick={handleCreateModalModalPost}>Post</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
   )
 }
 
-export default Create
+export default CreateModal

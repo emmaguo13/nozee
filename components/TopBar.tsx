@@ -2,7 +2,7 @@ import { Flex } from '@chakra-ui/react'
 import { Silkscreen } from '@next/font/google'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
-export const Footer = () => {
+export const TopBar = () => {
   return (
     <Flex
       alignItems="center"

@@ -9,8 +9,8 @@ import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { configureChains, createClient, goerli, WagmiConfig } from 'wagmi'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
-import { Footer } from '../components/footer'
-import { Sidebar } from '../components/sidebar'
+import { Sidebar } from '../components/Sidebar'
+import { TopBar } from '../components/TopBar'
 import { AppProvider } from '../contexts/AppProvider'
 import '../styles/globals.css'
 
@@ -46,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <RainbowKitProvider chains={chains} theme={darkTheme()}>
         <ChakraProvider theme={theme}>
           <AppProvider>
-            <Footer />
+            <TopBar />
             <Flex
               maxWidth={pathname !== '/login' ? '1200px' : '100%'}
               margin="0 auto"

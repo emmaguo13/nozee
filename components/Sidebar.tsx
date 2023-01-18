@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Sound from 'react-sound'
 import { useAccount } from 'wagmi'
-import Create from '../pages/create'
+import Create from './CreateModal'
 import { getPosts } from '../utils/firebase'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
