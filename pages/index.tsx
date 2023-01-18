@@ -36,7 +36,7 @@ const Home = () => {
           <PostCard
             key={p.id}
             id={p.id}
-            msg={p.message}
+            message={p.message}
             signature={p.signature}
             company={p.company}
           />

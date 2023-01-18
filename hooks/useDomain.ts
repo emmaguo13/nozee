@@ -1,5 +1,5 @@
 import { useAccount, useContractRead } from 'wagmi'
-import { abi } from '../constants/abi'
+import { abi } from '../constants'
 
 function useDomain() {
   const { address } = useAccount()

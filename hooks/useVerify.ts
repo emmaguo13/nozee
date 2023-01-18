@@ -1,7 +1,7 @@
 import { useToast } from '@chakra-ui/react'
 import { utils } from 'ethers'
 import { useContract, useSigner } from 'wagmi'
-import { abi } from '../constants/abi'
+import { abi } from '../constants'
 
 function useVerify(message?: string, signature?: string) {
   const toast = useToast()

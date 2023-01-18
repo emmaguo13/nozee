@@ -1,4 +1,3 @@
-import * as fs from 'fs'
 import { shaHash } from './shaHash'
 import { bytesToBigInt, fromHex, toCircomBigIntBytes } from './binaryFormat'
 import { MAX_HEADER_PADDED_BYTES } from './constants'
