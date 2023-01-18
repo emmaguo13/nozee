@@ -1,4 +1,9 @@
 import { Flex } from '@chakra-ui/react'
+import {
+  GetServerSideProps,
+  GetStaticProps,
+  InferGetStaticPropsType
+} from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -6,7 +11,9 @@ import PostCard from '../components/PostCard'
 import { Post } from '../types'
 import { getPosts, getPostsFilterDomain } from '../utils/firebase'
 
-const Home = () => {
+const Home = ({
+  preloadedPosts
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
 
@@ -23,6 +30,8 @@ const Home = () => {
     fetchPosts()
   }, [router.query.domain])
 
+  const showPosts = posts.length ? posts : preloadedPosts
+
   return (
     <>
       <Head>
@@ -32,7 +41,7 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex direction="column" pl="224px" gap="6" my="56px">
-        {posts.map(p => (
+        {showPosts.map(p => (
           <PostCard
             key={p.id}
             id={p.id}
@@ -44,6 +53,13 @@ const Home = () => {
       </Flex>
     </>
   )
+}
+
+export const getStaticProps: GetStaticProps<{
+  preloadedPosts: Post[]
+}> = async context => {
+  const res = await getPosts()
+  return { props: { preloadedPosts: res } }
 }
 
 export default Home

@@ -9,11 +9,12 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import useVerify from '../../hooks/useVerify'
 import { Post } from '../../types'
-import { getPost, updateComment } from '../../utils/firebase'
+import { getPost, getPosts, updateComment } from '../../utils/firebase'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -24,23 +25,14 @@ export type Comment = {
   company: string
 }
 
-const FullPost = () => {
+const FullPost = ({
+  preloadedPost
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   const router = useRouter()
-  const [post, setPost] = useState<Post>()
+  const [post, setPost] = useState<Post>(preloadedPost)
   const [comment, setComment] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
   const { pid } = router.query
-
-  useEffect(() => {
-    if (post) return
-    const fetchPost = async () => {
-      if (pid) {
-        const res = await getPost(pid.toString())
-        setPost(res)
-      }
-    }
-    fetchPost()
-  }, [pid, post])
 
   // new comment
   async function handleNewComment(newComment: string) {
@@ -55,11 +47,6 @@ const FullPost = () => {
     await updateComment(comments, pid.toString())
   }
   const handleVerify = useVerify(post?.message, post?.signature)
-
-  if (!post?.company) {
-    console.log('no post')
-    return null
-  }
 
   return (
     <Flex as="main" direction="column" gap="6" pl="224px" mt="56px" w="100%">
@@ -79,7 +66,7 @@ const FullPost = () => {
             px="3"
             style={{ textTransform: 'capitalize' }}
           >
-            {post.company}
+            {preloadedPost.company}
           </Box>
           <Tooltip
             placement="top"
@@ -106,7 +93,7 @@ const FullPost = () => {
           fontSize="18px"
           lineHeight={1.5}
         >
-          {post.message}
+          {preloadedPost.message}
         </Text>
       </Flex>
       <Flex
@@ -146,6 +133,25 @@ const FullPost = () => {
       </Flex>
     </Flex>
   )
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const res = await getPosts()
+
+  return {
+    paths: res.map(post => ({
+      params: { pid: post.id }
+    })),
+    fallback: false
+  }
+}
+
+export const getStaticProps: GetStaticProps<{
+  preloadedPost: Post
+}> = async ({ params }) => {
+  const res = await getPost(params?.pid ? params.pid.toString() : '')
+
+  return { props: { preloadedPost: res } }
 }
 
 export default FullPost
