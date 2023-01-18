@@ -70,26 +70,41 @@ export async function getPostsFilterDomain(company: string) {
 export async function createPost({
   id,
   company,
-  msg,
-  pubkey,
+  message,
+  address,
   signature,
   title
 }: Post) {
-  db.collection('posts')
+  return db
+    .collection('posts')
     .doc(id)
     .set({
       title,
       company,
-      msg,
-      pubkey,
+      message,
+      address,
       signature,
       id,
       timestamp: Date.now()
     })
     .then(docRef => {
       console.log('Document written with ID: ', docRef)
+      return docRef
     })
     .catch(error => {
       console.error('Error adding document: ', error)
     })
+}
+
+// iterate through all documents in firebase collection names post
+export async function updateScript() {
+  const snapshot = await db.collection('posts').get()
+  snapshot.forEach(doc => {
+    const data = doc.data()
+    const id = doc.id
+    if (!data.msg || !data.pubkey) return
+    db.collection('posts')
+      .doc(id)
+      .set({ ...data, message: data.msg, address: data.pubkey })
+  })
 }

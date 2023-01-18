@@ -69,9 +69,9 @@ const FullPost = () => {
 
   async function verifySig() {
     if (!blind || !post) return
-    const { msg, signature } = post
+    const { message, signature } = post
     const sig = ethers.utils.splitSignature(signature)
-    const signingAddr = ethers.utils.verifyMessage(msg, sig)
+    const signingAddr = ethers.utils.verifyMessage(message, sig)
     const domain = await blind.get(signingAddr as `0x${string}`)
     if (domain) {
       toast({
@@ -98,7 +98,7 @@ const FullPost = () => {
   }
 
   return (
-    <Flex as="main" direction="column" gap="6" pl="224px" mt="56px">
+    <Flex as="main" direction="column" gap="6" pl="224px" mt="56px" w="100%">
       <Flex
         direction="column"
         backgroundColor="#1E1E38"
@@ -142,7 +142,7 @@ const FullPost = () => {
           fontSize="18px"
           lineHeight={1.5}
         >
-          {post.msg}
+          {post.message}
         </Text>
       </Flex>
       <Flex

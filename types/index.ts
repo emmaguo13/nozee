@@ -7,9 +7,9 @@ export type Comment = {
 export type Post = {
   title: string
   company: string
-  msg: string
-  pubkey: string
+  message: string
+  address: string
   signature: string
   id: string
-  comments: Comment[]
+  comments?: Comment[]
 }
