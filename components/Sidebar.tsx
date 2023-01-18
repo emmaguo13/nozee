@@ -27,6 +27,7 @@ export const Sidebar = () => {
   const router = useRouter()
   const [domains, setDomains] = useState<string[]>()
   const [isPlaying, setIsPlaying] = useState(false)
+  console.log(router.query.domain)
 
   const audioRef = useRef<HTMLAudioElement>()
   useEffect(() => {
@@ -44,7 +45,7 @@ export const Sidebar = () => {
         return post.company
       })
       const uniqueDomains = new Set(allDomains)
-      setDomains(Array.from(uniqueDomains))
+      setDomains(Array.from(uniqueDomains).sort())
     }
     fetchPosts()
   }, [])
@@ -106,8 +107,8 @@ export const Sidebar = () => {
           Domains
           {domains?.map((e, i) => {
             return (
-              <Button
-                size="sm"
+              <Text
+                fontSize="sm"
                 key={i}
                 onClick={() =>
                   router.push({
@@ -115,11 +116,15 @@ export const Sidebar = () => {
                     query: { domain: e }
                   })
                 }
-                variant="link"
                 style={{ textTransform: 'capitalize' }}
+                color={router.query.domain === e ? 'white' : 'whiteAlpha.500'}
+                cursor="pointer"
+                _hover={{
+                  color: 'white'
+                }}
               >
                 {e}
-              </Button>
+              </Text>
             )
           })}
         </Flex>

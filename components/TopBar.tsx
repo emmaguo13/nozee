@@ -1,7 +1,9 @@
-import { Flex } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 import { Silkscreen } from '@next/font/google'
+import Link from 'next/link'
 
-const font = Silkscreen({ subsets: ['latin'], weight: '400' })
+const font = Silkscreen({ subsets: ['latin'], weight: '700' })
+const colors = ['#4C82FB', '#FF5D1F', '#FAD236', '#009965', '#EE404E']
 export const TopBar = () => {
   return (
     <Flex
@@ -15,9 +17,25 @@ export const TopBar = () => {
       textAlign="center"
       height="56px"
       backdropFilter="blur(10px)"
-      zIndex={9}
     >
-      nozee
+      <Link href="/">
+        <Flex>
+          {['n', 'o', 'z', 'e', 'e'].map((letter, index) => (
+            <Text
+              key={index}
+              letterSpacing={4}
+              fontSize="xl"
+              className={font.className}
+              color="white"
+              _hover={{
+                color: colors[index]
+              }}
+            >
+              {letter}
+            </Text>
+          ))}
+        </Flex>
+      </Link>
     </Flex>
   )
 }
