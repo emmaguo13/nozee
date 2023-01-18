@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
-const Post = ({
+const PostCard = ({
   k,
   msg,
   signature,
@@ -134,4 +134,4 @@ const Post = ({
   )
 }
 
-export default Post
+export default PostCard

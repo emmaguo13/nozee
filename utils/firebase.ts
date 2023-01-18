@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
-import localforage from 'localforage'
 import firebase from 'firebase/app'
-import { Comment } from '../pages/post/[pid]'
 import 'firebase/firestore'
+import { Comment } from '../pages/post/[pid]'
+import { Post } from '../types'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -34,8 +34,11 @@ const db = firebase.firestore()
 
 // Get all posts
 export async function getPosts() {
-  const snapshot = await db.collection('posts').get()
-  return snapshot.docs.map(doc => doc.data())
+  const snapshot = await db
+    .collection('posts')
+    .orderBy('timestamp', 'desc')
+    .get()
+  return snapshot.docs.map(doc => doc.data() as Post)
 }
 
 export async function updateComment(comments: Comment[], id: string) {
@@ -54,36 +57,34 @@ export async function getPost(id: string) {
   const ref = db.collection('posts')
   const query = ref.where('id', '==', id)
   const snapshot = await query.get()
-  return snapshot.docs.map(doc => doc.data())
+  return snapshot.docs.map(doc => doc.data())[0] as Post
 }
 
 export async function getPostsFilterDomain(company: string) {
-  // Create a reference to the cities collection
   const ref = db.collection('posts')
-
-  // Create a query against the collection.
-  const query = ref.where('company', '==', company)
+  const query = ref.where('company', '==', company).orderBy('timestamp', 'desc')
   const snapshot = await query.get()
-  return snapshot.docs.map(doc => doc.data())
+  return snapshot.docs.map(doc => doc.data() as Post)
 }
 
-export async function createPost(
-  id: string,
-  company: string,
-  msg: string,
-  pubkey: string,
-  signature: string,
-  title: string
-) {
+export async function createPost({
+  id,
+  company,
+  msg,
+  pubkey,
+  signature,
+  title
+}: Post) {
   db.collection('posts')
     .doc(id)
     .set({
       title,
-      company: company,
-      msg: msg,
-      pubkey: pubkey,
-      signature: signature,
-      id
+      company,
+      msg,
+      pubkey,
+      signature,
+      id,
+      timestamp: Date.now()
     })
     .then(docRef => {
       console.log('Document written with ID: ', docRef)

@@ -1,28 +1,23 @@
 import {
-  Container,
-  Flex,
   Box,
   Button,
-  Text,
-  useToast,
-  Tooltip,
-  Textarea,
+  Flex,
   Input,
   InputGroup,
-  InputRightElement
+  InputRightElement,
+  Text,
+  Tooltip,
+  useToast
 } from '@chakra-ui/react'
+import { Karla, Silkscreen } from '@next/font/google'
+import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import {
-  getPost,
-  getPosts,
-  getPostsFilterDomain,
-  updateComment
-} from '../../utils/firebase'
-import { Karla, Silkscreen } from '@next/font/google'
 import { useContract, useSigner } from 'wagmi'
 import { abi } from '../../constants/abi'
-import { ethers } from 'ethers'
+import useDomain from '../../hooks/useDomain'
+import { Post } from '../../types'
+import { getPost, updateComment } from '../../utils/firebase'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -33,46 +28,19 @@ export type Comment = {
   company: string
 }
 
-type Post = {
-  company: string
-  id: string
-  msg: string
-  pubkey: string
-  sig: string
-  signature: string
-  title: string
-  comments: Comment[]
-}
-
 const FullPost = () => {
   const router = useRouter()
-  const [post, setPost] = useState<Post[]>([])
+  const [post, setPost] = useState<Post>()
   const [comment, setComment] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
-  const [signature, setSignature] = useState('')
-  const [msg, setMsg] = useState('')
-  const [company, setCompany] = useState('')
   const { pid } = router.query
 
   useEffect(() => {
-    if (post[0]) return
+    if (post) return
     const fetchPost = async () => {
-      console.log('id', pid)
-      if (pid != undefined) {
-        const res = await getPost(pid?.toString())
-        console.log('p', res)
-        setPost(res as Post[])
-        // load in values
-        if (post[0] !== undefined) {
-          setSignature(post[0].signature)
-          setMsg(post[0].msg)
-          setCompany(post[0].company)
-          setComments(post[0].comments)
-        }
-      } else {
-        const res = await getPosts()
-        //console.log(res)
-        // setPost(res as Post[])
+      if (pid) {
+        const res = await getPost(pid.toString())
+        setPost(res)
       }
     }
     fetchPost()
@@ -100,12 +68,12 @@ const FullPost = () => {
   const toast = useToast()
 
   async function verifySig() {
-    const sig = signature ? ethers.utils.splitSignature(signature as any) : ''
-    const signingAddr = msg ? ethers.utils.verifyMessage(msg, sig) : ''
-    if (!blind || !signingAddr) return
+    if (!blind || !post) return
+    const { msg, signature } = post
+    const sig = ethers.utils.splitSignature(signature)
+    const signingAddr = ethers.utils.verifyMessage(msg, sig)
     const domain = await blind.get(signingAddr as `0x${string}`)
     if (domain) {
-      console.log('verified')
       toast({
         title: 'Message verified.',
         description: "We've verified the sender's signature for you",
@@ -114,7 +82,6 @@ const FullPost = () => {
         isClosable: true
       })
     } else {
-      console.log('not verified')
       toast({
         title: 'Message not verified.',
         description: 'This signer is not a valid poster.',
@@ -123,21 +90,22 @@ const FullPost = () => {
         isClosable: true
       })
     }
-    // verify that the signingaddr is the same as the addr we want
+  }
+
+  if (!post?.company) {
+    console.log('no post')
+    return null
   }
 
   return (
-    <Flex direction="column" gap="4" pl="224px">
+    <Flex as="main" direction="column" gap="6" pl="224px" mt="56px">
       <Flex
         direction="column"
         backgroundColor="#1E1E38"
         alignItems="flex-start"
         padding="8"
-        // paddingBottom="8"
         gap="4"
         borderRadius="10"
-        minW="800px"
-        maxW="800px"
       >
         <Flex justifyContent="space-between" w="100%">
           <Box
@@ -147,7 +115,7 @@ const FullPost = () => {
             px="3"
             style={{ textTransform: 'capitalize' }}
           >
-            {post[0]?.company}
+            {post.company}
           </Box>
           <Tooltip
             placement="top"
@@ -171,11 +139,10 @@ const FullPost = () => {
           display="block"
           className={bodyFont.className}
           color="#F5F5F4"
-          fontSize="16"
-          overflow="hidden"
+          fontSize="18px"
           lineHeight={1.5}
         >
-          {post[0]?.msg}
+          {post.msg}
         </Text>
       </Flex>
       <Flex

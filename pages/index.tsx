@@ -1,24 +1,23 @@
-//@ts-nocheck
 import { Flex } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import Post from '../components/Post'
+import PostCard from '../components/Post'
+import { Post } from '../types'
 import { getPosts, getPostsFilterDomain } from '../utils/firebase'
 
 const Home = () => {
   const router = useRouter()
-  const [posts, setPosts] = useState([])
-  console.log('🚀 ~ Home ~ posts', posts)
+  const [posts, setPosts] = useState<Post[]>([])
 
   useEffect(() => {
     const fetchPosts = async () => {
       if (router.query.domain != undefined) {
-        const res = await getPostsFilterDomain(router.query.domain)
-        setPosts(res as any)
+        const res = await getPostsFilterDomain(router.query.domain as string)
+        setPosts(res)
       } else {
         const res = await getPosts()
-        setPosts(res as any)
+        setPosts(res)
       }
     }
     fetchPosts()
@@ -26,7 +25,7 @@ const Home = () => {
 
   const showPosts = useMemo(() => {
     const p = [...posts]
-    p.reverse()
+    // p.reverse()
     return p
   }, [posts])
   console.log('🚀 ~ Home ~ showPosts', showPosts)
@@ -39,9 +38,9 @@ const Home = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Flex direction="column" pl="224px" gap="6" mt="56px">
+      <Flex direction="column" pl="224px" gap="6" my="56px">
         {showPosts.map(p => (
-          <Post
+          <PostCard
             key={p.id}
             k={p.id}
             msg={p.msg}
