@@ -1,6 +1,7 @@
-import { Box, Button, Flex, Text, Tooltip } from '@chakra-ui/react'
+import { Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { useRouter } from 'next/router'
+import { FiBriefcase } from 'react-icons/fi'
 import useVerify from '../hooks/useVerify'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
@@ -10,16 +11,19 @@ const PostCard = ({
   id,
   message,
   signature,
-  company
+  company,
+  truncate = false
 }: {
   id: string
   message: string
   signature: string
   company: string
+  truncate?: boolean
 }) => {
   const router = useRouter()
   const cutMsg = message.substring(0, 575) + (message.length > 575 ? '...' : '')
   const handleVerify = useVerify(message, signature)
+  const msg = truncate ? cutMsg : message
 
   return (
     <>
@@ -39,15 +43,19 @@ const PostCard = ({
         }}
       >
         <Flex justifyContent="space-between" w="100%">
-          <Box
-            backgroundColor="#4C82FB"
+          <Flex
+            alignItems="center"
+            // backgroundColor="#4C82FB"
+            border="1px solid #4C82FB"
             className={font.className}
-            borderRadius="4"
+            borderRadius="6"
             px="3"
+            gap="2"
             style={{ textTransform: 'capitalize' }}
           >
+            <Icon as={FiBriefcase} />
             {company}
-          </Box>
+          </Flex>
           <Tooltip
             placement="top"
             openDelay={500}
@@ -77,7 +85,7 @@ const PostCard = ({
             lineHeight={1.5}
             align="left"
           >
-            {cutMsg}
+            {msg}
           </Text>
         </Flex>
       </Flex>

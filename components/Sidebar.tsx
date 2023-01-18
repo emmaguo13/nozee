@@ -1,4 +1,12 @@
-import { Box, Button, Flex, Image, Text, useDisclosure } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Image,
+  Text,
+  useDisclosure
+} from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useRouter } from 'next/router'
@@ -7,6 +15,7 @@ import { useAccount } from 'wagmi'
 import useDomain from '../hooks/useDomain'
 import { getPosts } from '../utils/firebase'
 import Create from './CreateModal'
+import { FiFeather, FiHome, FiPause, FiPlay } from 'react-icons/fi'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -79,18 +88,20 @@ export const Sidebar = () => {
           <Button
             backgroundColor="#4C82FB"
             onClick={() => router.push('/')}
+            leftIcon={<Icon as={FiHome} />}
             size="md"
             width="100%"
           >
             Home
           </Button>
           <Button
+            leftIcon={<Icon as={FiFeather} />}
             width="100%"
             size="md"
             backgroundColor="#4C82FB"
             onClick={() => onOpen()}
           >
-            New Post
+            New
           </Button>
           Domains
           {domains?.map((e, i) => {
@@ -144,8 +155,12 @@ export const Sidebar = () => {
           color="white"
           className={font.className}
         >
-          <Button backgroundColor={'#644CFB'} onClick={handleNofi}>
-            {isPlaying ? 'Stop' : 'Play no-fi'}
+          <Button
+            backgroundColor={'#644CFB'}
+            onClick={handleNofi}
+            leftIcon={<Icon as={isPlaying ? FiPause : FiPlay} />}
+          >
+            {isPlaying ? 'Stop' : 'no-fi'}
           </Button>
           <Image
             borderRadius="12"

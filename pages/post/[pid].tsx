@@ -12,6 +12,7 @@ import { Karla, Silkscreen } from '@next/font/google'
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import PostCard from '../../components/PostCard'
 import useVerify from '../../hooks/useVerify'
 import { Post } from '../../types'
 import { getPost, getPosts, updateComment } from '../../utils/firebase'
@@ -47,55 +48,16 @@ const FullPost = ({
     await updateComment(comments, pid.toString())
   }
   const handleVerify = useVerify(post?.message, post?.signature)
+  const { id, message, signature, company } = preloadedPost
 
   return (
     <Flex as="main" direction="column" gap="6" pl="224px" mt="56px" w="100%">
-      <Flex
-        direction="column"
-        backgroundColor="#1E1E38"
-        alignItems="flex-start"
-        padding="8"
-        gap="4"
-        borderRadius="10"
-      >
-        <Flex justifyContent="space-between" w="100%">
-          <Box
-            backgroundColor="#4C82FB"
-            className={font.className}
-            borderRadius="4"
-            px="3"
-            style={{ textTransform: 'capitalize' }}
-          >
-            {preloadedPost.company}
-          </Box>
-          <Tooltip
-            placement="top"
-            openDelay={500}
-            maxW={230}
-            textAlign="center"
-            label="Verify message was signed by authenticated user"
-          >
-            <Button
-              onClick={handleVerify}
-              className={font.className}
-              variant="link"
-            >
-              Verify
-            </Button>
-          </Tooltip>
-        </Flex>
-        <Text
-          alignContent="start"
-          textAlign="left"
-          display="block"
-          className={bodyFont.className}
-          color="#F5F5F4"
-          fontSize="18px"
-          lineHeight={1.5}
-        >
-          {preloadedPost.message}
-        </Text>
-      </Flex>
+      <PostCard
+        id={id}
+        message={message}
+        signature={signature}
+        company={company}
+      />
       <Flex
         padding="8"
         borderRadius="10"

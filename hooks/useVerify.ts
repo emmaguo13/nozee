@@ -22,7 +22,7 @@ function useVerify(message?: string, signature?: string) {
     if (domain) {
       toast({
         title: 'Message verified.',
-        description: "We've verified the sender's signature for you",
+        description: `This post was signed by someone from ${domain.toUpperCase()}.`,
         status: 'success',
         duration: 9000,
         isClosable: true,
@@ -31,7 +31,7 @@ function useVerify(message?: string, signature?: string) {
     } else {
       toast({
         title: 'Message not verified.',
-        description: 'This signer is not a valid poster.',
+        description: `This post was not signed by someone from ${domain.toUpperCase()}.`,
         status: 'error',
         duration: 9000,
         isClosable: true,

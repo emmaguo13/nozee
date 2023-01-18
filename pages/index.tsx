@@ -19,7 +19,7 @@ const Home = ({
 
   useEffect(() => {
     const fetchPosts = async () => {
-      if (router.query.domain != undefined) {
+      if (router.query.domain) {
         const res = await getPostsFilterDomain(router.query.domain as string)
         setPosts(res)
       } else {
@@ -48,6 +48,7 @@ const Home = ({
             message={p.message}
             signature={p.signature}
             company={p.company}
+            truncate
           />
         ))}
       </Flex>
