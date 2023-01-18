@@ -12,12 +12,12 @@ const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 export const Sidebar = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const router = useRouter()
-  const [domains, setDomains] = useState([])
-  const [isPlaying, setIsPlaying] = useState(false)
   const { address } = useAccount()
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const domain = useDomain()
+  const router = useRouter()
+  const [domains, setDomains] = useState<string[]>()
+  const [isPlaying, setIsPlaying] = useState(false)
 
   const audioRef = useRef<HTMLAudioElement>()
   useEffect(() => {
@@ -34,11 +34,8 @@ export const Sidebar = () => {
       const allDomains = res.map((post: any) => {
         return post.company
       })
-      const uniqueDomains = allDomains.filter(
-        (e: string, i: any) =>
-          allDomains.findIndex((obj: any) => obj === e) === i
-      )
-      setDomains(uniqueDomains as [])
+      const uniqueDomains = new Set(allDomains)
+      setDomains(Array.from(uniqueDomains))
     }
     fetchPosts()
   }, [])
@@ -96,7 +93,7 @@ export const Sidebar = () => {
             New Post
           </Button>
           Domains
-          {domains.map((e, i) => {
+          {domains?.map((e, i) => {
             return (
               <Button
                 size="sm"

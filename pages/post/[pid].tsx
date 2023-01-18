@@ -6,15 +6,12 @@ import {
   InputGroup,
   InputRightElement,
   Text,
-  Tooltip,
-  useToast
+  Tooltip
 } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
-import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { useContract, useSigner } from 'wagmi'
-import { abi } from '../../constants/abi'
+import useVerify from '../../hooks/useVerify'
 import { Post } from '../../types'
 import { getPost, updateComment } from '../../utils/firebase'
 
@@ -57,39 +54,7 @@ const FullPost = () => {
     comments.push(comment)
     await updateComment(comments, pid.toString())
   }
-  const { data: signer } = useSigner()
-
-  const blind = useContract({
-    address: '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF',
-    abi,
-    signerOrProvider: signer
-  })
-  const toast = useToast()
-
-  async function verifySig() {
-    if (!blind || !post) return
-    const { message, signature } = post
-    const sig = ethers.utils.splitSignature(signature)
-    const signingAddr = ethers.utils.verifyMessage(message, sig)
-    const domain = await blind.get(signingAddr as `0x${string}`)
-    if (domain) {
-      toast({
-        title: 'Message verified.',
-        description: "We've verified the sender's signature for you",
-        status: 'success',
-        duration: 9000,
-        isClosable: true
-      })
-    } else {
-      toast({
-        title: 'Message not verified.',
-        description: 'This signer is not a valid poster.',
-        status: 'error',
-        duration: 9000,
-        isClosable: true
-      })
-    }
-  }
+  const handleVerify = useVerify(post?.message, post?.signature)
 
   if (!post?.company) {
     console.log('no post')
@@ -124,7 +89,7 @@ const FullPost = () => {
             label="Verify message was signed by authenticated user"
           >
             <Button
-              onClick={verifySig}
+              onClick={handleVerify}
               className={font.className}
               variant="link"
             >
