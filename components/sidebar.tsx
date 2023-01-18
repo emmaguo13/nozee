@@ -1,4 +1,4 @@
-import { Button, Flex, Image, Text, useDisclosure } from '@chakra-ui/react'
+import { Button, Flex, Image, useDisclosure } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useRouter } from 'next/router'
@@ -46,6 +46,7 @@ export const Sidebar = () => {
         justifyContent="space-between"
         position="fixed"
         maxW="200px"
+        mt="56px"
       >
         <Flex
           flexDirection="column"

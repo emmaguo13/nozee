@@ -8,10 +8,9 @@ import '@rainbow-me/rainbowkit/styles.css'
 import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { configureChains, createClient, goerli, WagmiConfig } from 'wagmi'
+import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { Footer } from '../components/footer'
 import { Sidebar } from '../components/sidebar'
-
-import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { AppProvider } from '../contexts/AppProvider'
 import '../styles/globals.css'
 
@@ -21,7 +20,7 @@ const { chains, provider } = configureChains(
 )
 
 const { connectors } = getDefaultWallets({
-  appName: 'zk blind',
+  appName: 'nozee',
   chains
 })
 
@@ -49,25 +48,11 @@ export default function App({ Component, pageProps }: AppProps) {
           <AppProvider>
             <Footer />
             <Flex
-              position="absolute"
-              bottom="0"
-              // top="56px"
-              top="0"
-              left="0"
-              right="0"
-              // justifyContent="center"
-              // flexDirection="row"
-              // margin="0 auto"
-              // gap="4"
-              // padding="8"
-              // maxWidth="1200px"
-              // margin="0 auto"
-              // position="relative"
+              maxWidth={pathname !== '/login' ? '1200px' : '100%'}
+              margin="0 auto"
             >
-              {/* <Flex position="relative"> */}
               {pathname !== '/login' && <Sidebar />}
               <Component {...pageProps} />
-              {/* </Flex> */}
             </Flex>
           </AppProvider>
         </ChakraProvider>
