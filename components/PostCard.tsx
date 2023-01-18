@@ -1,21 +1,20 @@
 import { Box, Button, Flex, Text, Tooltip, useToast } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { ethers } from 'ethers'
+import { useRouter } from 'next/router'
 import { useContract, useSigner } from 'wagmi'
 import { abi } from '../constants/abi'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 const PostCard = ({
-  k,
+  id,
   msg,
   signature,
   company
 }: {
-  k: any
+  id: string
   msg: string
   signature: string
   company: string
@@ -53,22 +52,17 @@ const PostCard = ({
         isClosable: true
       })
     }
-    // verify that the signingaddr is the same as the addr we want
   }
   return (
     <>
       <Flex
-        direction="column"
         alignItems="flex-start"
         backgroundColor="#1E1E38"
-        padding="8"
-        // paddingTop="8"
-        // paddingBottom="8"
-        gap="4"
         borderRadius="10"
+        direction="column"
+        gap="4"
+        padding="8"
         minW="800px"
-        // maxW="800px"
-        // maxH="190px"
         _hover={{
           cursor: 'pointer',
           backgroundColor: '#262645',
@@ -86,12 +80,6 @@ const PostCard = ({
           >
             {company}
           </Box>
-          {/* <Text className={bodyFont.className}>
-            Signature:{' '}
-            {`${signature?.substring(0, 5)}...${signature?.substring(
-              signature.length - 5
-            )}`}
-          </Text> */}
           <Tooltip
             placement="top"
             openDelay={500}
@@ -110,12 +98,7 @@ const PostCard = ({
         </Flex>
         <Flex
           justifyContent="flex-start"
-          onClick={() =>
-            router.push({
-              pathname: `/post/${k}`
-              // query: { pid: k }
-            })
-          }
+          onClick={() => router.push(`/post/${id}`)}
         >
           <Text
             display="block"

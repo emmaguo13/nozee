@@ -24,6 +24,7 @@ import { useAccount, useContract, useSigner } from 'wagmi'
 import { abi } from '../constants/abi'
 import { useApp } from '../contexts/AppProvider'
 import { generate_inputs } from '../helpers/generate_input'
+import useDomain from '../hooks/useDomain'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -51,6 +52,11 @@ export default function Home() {
   const { data: signer } = useSigner()
   const [status, setStatus] = useState<Steps>(Steps.IDLE_DOWNLOADING)
   const { height, width } = useWindowSize()
+  const domain = useDomain()
+
+  useEffect(() => {
+    if (domain) setStatus(Steps.AUTHENTICATED)
+  }, [domain])
 
   const blind = useContract({
     address: '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF',
@@ -283,7 +289,7 @@ export default function Home() {
                 className={font.className}
                 onClick={() => router.push('/')}
               >
-                NOZEE
+                ENTER NOZEE @{domain}
               </Button>
             ) : (
               <Button

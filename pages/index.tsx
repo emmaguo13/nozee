@@ -1,10 +1,10 @@
-import { Button, Flex } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import PostCard from '../components/PostCard'
 import { Post } from '../types'
-import { getPosts, getPostsFilterDomain, updateScript } from '../utils/firebase'
+import { getPosts, getPostsFilterDomain } from '../utils/firebase'
 
 const Home = () => {
   const router = useRouter()
@@ -23,12 +23,6 @@ const Home = () => {
     fetchPosts()
   }, [router.query.domain])
 
-  const showPosts = useMemo(() => {
-    const p = [...posts]
-    // p.reverse()
-    return p
-  }, [posts])
-
   return (
     <>
       <Head>
@@ -38,10 +32,10 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex direction="column" pl="224px" gap="6" my="56px">
-        {showPosts.map(p => (
+        {posts.map(p => (
           <PostCard
             key={p.id}
-            k={p.id}
+            id={p.id}
             msg={p.message}
             signature={p.signature}
             company={p.company}

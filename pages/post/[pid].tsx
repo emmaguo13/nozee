@@ -15,7 +15,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useContract, useSigner } from 'wagmi'
 import { abi } from '../../constants/abi'
-import useDomain from '../../hooks/useDomain'
 import { Post } from '../../types'
 import { getPost, updateComment } from '../../utils/firebase'
 
