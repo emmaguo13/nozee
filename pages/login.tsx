@@ -65,7 +65,7 @@ export default function Home() {
     }
   })
   console.log('🚀 ~ Home ~ data', data)
-  const domain = useDomain(txSuccess)
+  const domain = useDomain()
   console.log('🚀 ~ Home ~ domain', domain)
 
   useEffect(() => {

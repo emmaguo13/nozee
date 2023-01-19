@@ -8,9 +8,13 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Textarea
+  Spacer,
+  Text,
+  Textarea,
+  Tooltip,
+  useToast
 } from '@chakra-ui/react'
-import { Silkscreen } from '@next/font/google'
+import { Karla, Silkscreen } from '@next/font/google'
 import { useEffect, useState } from 'react'
 import { useAccount, useConnect, useSigner } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
@@ -18,6 +22,7 @@ import useDomain from '../hooks/useDomain'
 import { createPost } from '../utils/firebase'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
+const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 const CreateModal = ({
   isOpen,
@@ -31,6 +36,7 @@ const CreateModal = ({
   const { address } = useAccount()
   const formattedAddr = address ? address : '0x'
   const [enabled, setEnabled] = useState(false)
+  const toast = useToast()
   const domain = useDomain()
 
   useEffect(() => {
@@ -43,22 +49,34 @@ const CreateModal = ({
 
   const { data: signer } = useSigner()
 
-  async function handleCreateModalModalPost() {
+  const handleCreatePost = async () => {
     if (!address || !domain || !signer) return
     const signedMessage = await signer.signMessage(message)
     const uniqueId = formattedAddr + Date.now().toString()
-    const post = await createPost({
+    await createPost({
       title,
       id: uniqueId,
       company: domain,
       message,
       address,
       signature: signedMessage
+    }).then(res => {
+      console.log(res)
+      toast({
+        title: 'Post created',
+        description: 'Your post has been created',
+        status: 'success',
+        duration: 5000,
+        position: 'bottom-right',
+        isClosable: true
+      })
+      onClose()
     })
   }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay backdropBlur="10px" />
+      <ModalOverlay backdropFilter="blur(8px)" />
       <ModalContent backgroundColor="#1E1E38" maxW="600px">
         <ModalHeader className={font.className}>Create Post</ModalHeader>
         <ModalCloseButton />
@@ -69,13 +87,40 @@ const CreateModal = ({
                 backgroundColor="#2C2C54"
                 onChange={e => setMessage(e.target.value)}
                 value={message}
+                className={bodyFont.className}
               />
             </>
           </Flex>
         </ModalBody>
 
         <ModalFooter>
-          <Button onClick={handleCreateModalModalPost}>Post</Button>
+          <div>
+            <Flex alignItems="flex-end" gap="1">
+              <Text className={bodyFont.className}>
+                You&apos;re posting from
+              </Text>
+              <Text className={font.className}>{domain}</Text>
+            </Flex>
+            <Tooltip
+              placement="top"
+              openDelay={500}
+              maxW={230}
+              textAlign="center"
+              label="You'll sign your message with your key, so that users can verify that it came from you. This does not cost you any gas."
+            >
+              <Text
+                className={bodyFont.className}
+                color="whiteAlpha.600"
+                fontSize="sm"
+              >
+                Why does my wallet pop up?
+              </Text>
+            </Tooltip>
+          </div>
+          <Spacer />
+          <Button backgroundColor="#4C82FB" onClick={handleCreatePost}>
+            Post
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

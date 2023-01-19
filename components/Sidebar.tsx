@@ -5,7 +5,8 @@ import {
   Icon,
   Image,
   Text,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
@@ -27,6 +28,7 @@ export const Sidebar = () => {
   const router = useRouter()
   const [domains, setDomains] = useState<string[]>()
   const [isPlaying, setIsPlaying] = useState(false)
+  const toast = useToast()
   console.log(router.query.domain)
 
   const audioRef = useRef<HTMLAudioElement>()
@@ -100,7 +102,19 @@ export const Sidebar = () => {
             width="100%"
             size="md"
             backgroundColor="#4C82FB"
-            onClick={() => onOpen()}
+            onClick={() => {
+              if (domain) {
+                onOpen()
+              } else {
+                toast({
+                  title: 'Please connect wallet',
+                  status: 'error',
+                  duration: 3000,
+                  position: 'bottom-right',
+                  isClosable: true
+                })
+              }
+            }}
           >
             New
           </Button>

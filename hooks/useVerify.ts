@@ -19,6 +19,7 @@ function useVerify(message?: string, signature?: string) {
     const signingAddr = utils.verifyMessage(message, fullSig)
     const domain = await blind.get(signingAddr as `0x${string}`)
 
+    // TODO: should check if domain matches post domain
     if (domain) {
       toast({
         title: 'Message verified.',
