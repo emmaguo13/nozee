@@ -20,7 +20,12 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Confetti from 'react-confetti'
 import { useWindowSize } from 'usehooks-ts'
-import { useAccount, useContract, useSigner } from 'wagmi'
+import {
+  useAccount,
+  useContract,
+  useSigner,
+  useWaitForTransaction
+} from 'wagmi'
 import { abi } from '../constants'
 import { useApp } from '../contexts/AppProvider'
 import { generate_inputs } from '../helpers/generate_input'
@@ -52,7 +57,16 @@ export default function Home() {
   const { data: signer } = useSigner()
   const [status, setStatus] = useState<Steps>(Steps.IDLE_DOWNLOADING)
   const { height, width } = useWindowSize()
-  const domain = useDomain()
+  const [hash, setHash] = useState<`0x${string}` | undefined>()
+  const { data, isSuccess: txSuccess } = useWaitForTransaction({
+    hash,
+    onSuccess: () => {
+      setStatus(Steps.AUTHENTICATED)
+    }
+  })
+  console.log('🚀 ~ Home ~ data', data)
+  const domain = useDomain(txSuccess)
+  console.log('🚀 ~ Home ~ domain', domain)
 
   useEffect(() => {
     if (domain) setStatus(Steps.AUTHENTICATED)
@@ -123,9 +137,8 @@ export default function Home() {
             gasLimit: 2000000 as any
           })
           .then(res => {
-            return res
+            setHash(res.hash as `0x${string}`)
           })
-        setStatus(Steps.AUTHENTICATED)
       }
     }
   }
@@ -215,9 +228,9 @@ export default function Home() {
                   >
                     here.
                   </Button>
-                  Unzip the file. Then, go to Manage Extensions & switch on
-                  Develop Mode in upper-right corner. Press load unpacked &
-                  select JWT Extension file from downloads.
+                  Unzip the file. Then, go to Manage Extensions in Chrome &
+                  switch on Develop Mode in upper-right corner. Press load
+                  unpacked & select JWT Extension file from downloads.
                 </AccordionPanel>
               </AccordionItem>
               <AccordionItem
@@ -276,7 +289,7 @@ export default function Home() {
                 </h2>
                 <AccordionPanel pb={4}>
                   You&apos;ll need to commit to your domain on chain by sending
-                  a transaction.
+                  a transaction. We recommend using a burner wallet.
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>

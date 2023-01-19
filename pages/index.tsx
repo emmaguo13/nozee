@@ -1,15 +1,15 @@
 import { Flex } from '@chakra-ui/react'
-import {
-  GetServerSideProps,
-  GetStaticProps,
-  InferGetStaticPropsType
-} from 'next'
+import { Karla, Silkscreen } from '@next/font/google'
+import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import PostCard from '../components/PostCard'
 import { Post } from '../types'
 import { getPosts, getPostsFilterDomain } from '../utils/firebase'
+
+const font = Silkscreen({ subsets: ['latin'], weight: '400' })
+const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 const Home = ({
   preloadedPosts
@@ -41,6 +41,26 @@ const Home = ({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex direction="column" pl="224px" gap="6" my="56px">
+        {router.query.domain && (
+          <Flex
+            alignItems="flex-start"
+            backgroundColor="#1E1E38"
+            borderRadius="10"
+            gap="4"
+            padding="8"
+            minW="800px"
+            className={bodyFont.className}
+            _hover={{
+              cursor: 'pointer',
+              backgroundColor: '#262645',
+              boxShadow:
+                '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
+            }}
+          >
+            Showing:
+            <span className={font.className}>{router.query.domain}</span>
+          </Flex>
+        )}
         {showPosts.map(p => (
           <PostCard
             key={p.id}
