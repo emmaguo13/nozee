@@ -44,7 +44,7 @@ enum Steps {
 
 const LoadingText = [
   'Downloading .zkey',
-  '',
+  'Ready to login!',
   'Generating Proofs',
   'Confirm in wallet to verify proof on chain',
   'Authenticated'
