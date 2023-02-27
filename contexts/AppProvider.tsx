@@ -2,7 +2,6 @@ import axios from 'axios'
 import localforage from 'localforage'
 import pako from 'pako'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { downloadFile } from '../utils/firebase'
 
 type Status = 'not downloaded' | 'downloading' | 'downloaded' | 'error'
 
@@ -15,6 +14,8 @@ const AppContext = createContext<AppContextValue | undefined>(undefined)
 
 const uncompressedZkey =
   'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey'
+const compressedZkey =
+  'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey.gz'
 const isCompressed = true
 const localKey = 'jwt_single-real.zkey'
 
@@ -26,18 +27,14 @@ function AppProvider({ children }: { children?: React.ReactNode }) {
     const fetchZkey = async () => {
       if (!first.current) return
       first.current = false
-      // change this to s3 bucket
-      // const compressedZkey = await downloadFile('jwt_single-real.zkey.gz')
       await localforage
         .getItem(localKey)
         .then(res => {
           if (res) {
-            console.log('🚀 ~ fetchZkey ~ res:', res)
             console.log('zkey already exists')
             setDownloadStatus('downloaded')
             return
           } else {
-            console.log('bad')
             setDownloadStatus('downloading')
             return axios.get(isCompressed ? compressedZkey : uncompressedZkey, {
               responseType: 'arraybuffer',

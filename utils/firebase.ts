@@ -32,15 +32,6 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.firestore()
-const storage = firebase.storage()
-
-// Download file from firebase storage
-export async function downloadFile(path: string) {
-  const storageRef = storage.ref()
-  const fileRef = storageRef.child(path)
-  const url = await fileRef.getDownloadURL()
-  return url
-}
 
 // Get all posts
 export async function getPosts() {
