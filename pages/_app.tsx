@@ -12,7 +12,6 @@ import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { Sidebar } from '../components/Sidebar'
 import { TopBar } from '../components/TopBar'
 import { AppProvider } from '../contexts/AppProvider'
-import '../styles/globals.css'
 
 const { chains, provider } = configureChains(
   [goerli],
@@ -32,7 +31,10 @@ const wagmiClient = createClient({
 
 export default function App({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter()
+
   const theme = extendTheme({
+    initialColorMode: 'dark',
+    useSystemColorMode: false,
     styles: {
       global: () => ({
         body: {
@@ -41,6 +43,7 @@ export default function App({ Component, pageProps }: AppProps) {
       })
     }
   })
+
   return (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains} theme={darkTheme()}>
