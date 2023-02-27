@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import 'firebase/firebase-storage'
 import { Comment } from '../pages/post/[pid]'
 import { Post } from '../types'
 // TODO: Add SDKs for Firebase products that you want to use
@@ -31,6 +32,15 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.firestore()
+const storage = firebase.storage()
+
+// Download file from firebase storage
+export async function downloadFile(path: string) {
+  const storageRef = storage.ref()
+  const fileRef = storageRef.child(path)
+  const url = await fileRef.getDownloadURL()
+  return url
+}
 
 // Get all posts
 export async function getPosts() {

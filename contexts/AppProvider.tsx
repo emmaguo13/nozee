@@ -1,6 +1,8 @@
 import axios from 'axios'
 import localforage from 'localforage'
+import pako from 'pako'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { downloadFile } from '../utils/firebase'
 
 type Status = 'not downloaded' | 'downloading' | 'downloaded' | 'error'
 
@@ -11,6 +13,11 @@ interface AppContextValue {
 
 const AppContext = createContext<AppContextValue | undefined>(undefined)
 
+const uncompressedZkey =
+  'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey'
+const isCompressed = true
+const localKey = 'jwt_single-real.zkey'
+
 function AppProvider({ children }: { children?: React.ReactNode }) {
   const [downloadStatus, setDownloadStatus] = useState<Status>('not downloaded')
   const [downloadProgress, setDownloadProgress] = useState<number>(0)
@@ -19,33 +26,41 @@ function AppProvider({ children }: { children?: React.ReactNode }) {
     const fetchZkey = async () => {
       if (!first.current) return
       first.current = false
+      // change this to s3 bucket
+      // const compressedZkey = await downloadFile('jwt_single-real.zkey.gz')
       await localforage
-        .getItem('jwt_single-real.zkey')
+        .getItem(localKey)
         .then(res => {
           if (res) {
+            console.log('🚀 ~ fetchZkey ~ res:', res)
             console.log('zkey already exists')
             setDownloadStatus('downloaded')
+            return
           } else {
+            console.log('bad')
             setDownloadStatus('downloading')
-            return axios.get(
-              'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey',
-              {
-                responseType: 'arraybuffer',
-                onDownloadProgress: progressEvent => {
-                  const percentage = Math.round(
-                    (progressEvent.loaded * 100) / progressEvent.total!
-                  )
-                  setDownloadProgress(percentage)
-                }
+            return axios.get(isCompressed ? compressedZkey : uncompressedZkey, {
+              responseType: 'arraybuffer',
+              onDownloadProgress: progressEvent => {
+                const percentage = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total!
+                )
+                setDownloadProgress(percentage)
               }
-            )
+            })
           }
         })
         .then(res => {
           if (!res) return
-          localforage.setItem('jwt_single-real.zkey', res.data).then(res => {
-            setDownloadStatus('downloaded')
-          })
+          if (isCompressed) {
+            const arrayBuffer = new Uint8Array(res.data)
+            const output = pako.ungzip(arrayBuffer)
+            const buff = output.buffer
+            localforage.setItem(localKey, buff)
+          } else {
+            localforage.setItem(localKey, res.data)
+          }
+          setDownloadStatus('downloaded')
         })
     }
     fetchZkey()
