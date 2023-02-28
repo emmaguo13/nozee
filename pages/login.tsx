@@ -44,7 +44,7 @@ enum Steps {
 
 const LoadingText = [
   'Downloading .zkey',
-  '',
+  'Ready to login!',
   'Generating Proofs',
   'Confirm in wallet to verify proof on chain',
   'Authenticated'
@@ -58,15 +58,14 @@ export default function Home() {
   const [status, setStatus] = useState<Steps>(Steps.IDLE_DOWNLOADING)
   const { height, width } = useWindowSize()
   const [hash, setHash] = useState<`0x${string}` | undefined>()
-  const { data, isSuccess: txSuccess } = useWaitForTransaction({
+
+  useWaitForTransaction({
     hash,
     onSuccess: () => {
       setStatus(Steps.AUTHENTICATED)
     }
   })
-  console.log('🚀 ~ Home ~ data', data)
   const domain = useDomain()
-  console.log('🚀 ~ Home ~ domain', domain)
 
   useEffect(() => {
     if (domain) setStatus(Steps.AUTHENTICATED)
@@ -85,12 +84,12 @@ export default function Home() {
   }, [router.query.msg, token])
 
   const handleLogin = async () => {
-    // Generate proofs and public inputs
     setStatus(Steps.GENERATING)
     if (!address) {
       console.log('need address')
       return
     }
+    // Fetch zkey from localstorage, download if not found
     const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
     if (!zkeyDb) {
       throw new Error('zkey was not found in the database')
@@ -98,6 +97,11 @@ export default function Home() {
     //@ts-ignore
     const zkeyRawData = new Uint8Array(zkeyDb)
     const zkeyFastFile = { type: 'mem', data: zkeyRawData }
+    const storedProof = await localforage.getItem('proof')
+    if (storedProof) {
+      console.log('proof found in localstorage, skipping proof generation')
+    }
+    // Generate Proof
     const worker = new Worker('./worker.js')
     const splitToken = token.split('.')
     const inputs = await generate_inputs(
@@ -109,6 +113,7 @@ export default function Home() {
     worker.onmessage = async function (e) {
       const { proof, publicSignals } = e.data
       console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
+      await localforage.setItem('proof', proof)
       setStatus(Steps.VERIFYING)
       console.log('before worker')
       const worker = new Worker('./worker-generate.js')

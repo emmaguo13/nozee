@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import 'firebase/firebase-storage'
 import { Comment } from '../pages/post/[pid]'
 import { Post } from '../types'
 // TODO: Add SDKs for Firebase products that you want to use
