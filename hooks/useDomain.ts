@@ -1,13 +1,12 @@
-import { useAccount, useContractRead } from 'wagmi'
-import { abi } from '../constants'
+import { useAccount } from 'wagmi'
+import { contractAddress } from '../constants'
+import { useBlindGet } from '../generated'
 
-function useDomain() {
+function useDomain(account?: `0x${string}`) {
   const { address } = useAccount()
-  const formattedAddress = address ? address : '0x'
-  const { data } = useContractRead({
-    address: '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF',
-    abi,
-    functionName: 'get',
+  const formattedAddress = account ? account : address ? address : '0x'
+  const { data } = useBlindGet({
+    address: contractAddress,
     args: [formattedAddress],
     staleTime: 2_000,
     watch: true,
