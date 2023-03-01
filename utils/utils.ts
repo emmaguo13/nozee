@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers'
 import localforage from 'localforage'
 
 export async function downloadFromFilename() {
@@ -19,4 +20,19 @@ export async function downloadFromFilename() {
       `Storage of jwt_single-real.zkey unsuccessful, make sure IndexedDB is enabled in your browser, or check CORS.`
     )
   }
+}
+
+export function formatSolidityCallData(data: any) {
+  const tokens = data
+    .replace(/["[\]\s]/g, '')
+    .split(',')
+    .map((x: any) => BigNumber.from(x).toHexString())
+  const [a1, a2, b1, b2, b3, b4, c1, c2, ...inputs] = tokens
+  const a = [a1, a2]
+  const b = [
+    [b1, b2],
+    [b3, b4]
+  ]
+  const c = [c1, c2]
+  return [a, b, c, inputs]
 }
