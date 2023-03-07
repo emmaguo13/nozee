@@ -3,6 +3,9 @@ import { initializeApp, applicationDefault, getApp, App, getApps, cert, Credenti
 import { getFirestore } from 'firebase-admin/firestore';
 import { Post } from '../../types'
 
+import { vkey } from './constants/vkey'
+const snarkjs = require('snarkjs')
+
 import secret from "../../firebaseSecret.json"
 
 let app: App;
@@ -48,6 +51,10 @@ async function createPost({
       })
   }
 
+export async function verifyProof(proof: any, publicSignals: any) {
+  const proofVerified = await snarkjs.groth16.verify(vkey, publicSignals, proof)
+  return proofVerified
+}
 
 // this allows you to write to a post
 export default async function handler(
@@ -67,11 +74,19 @@ export default async function handler(
     title
   */
 
-  let post; 
-  try {
-    post = await createPost(b)
-  } catch {
-    return response.status(500).send("Server error")
+  // verify proof here 
+  const isVerified = await verifyProof(b.proof, b.publicInputs)
+
+  if (isVerified) {
+    let post; 
+    try {
+      post = await createPost(b)
+      // post to web3.storage
+    } catch {
+      return response.status(500).send("Database write error")
+    }
+  } else {
+    return response.status(400).send("Proof not verified")
   }
 
   return response.status(200).send("Success")
