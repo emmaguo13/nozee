@@ -20,14 +20,10 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Confetti from 'react-confetti'
 import { useWindowSize } from 'usehooks-ts'
-import {
-  useAccount,
-  useContract,
-  useSigner,
-  useWaitForTransaction
-} from 'wagmi'
-import { abi } from '../constants'
+import { useAccount, useSigner, useWaitForTransaction } from 'wagmi'
+import { contractAddress } from '../constants'
 import { useApp } from '../contexts/AppProvider'
+import { useBlind } from '../generated'
 import { generate_inputs } from '../helpers/generate_input'
 import useDomain from '../hooks/useDomain'
 import { formatSolidityCallData } from '../utils/utils'
@@ -62,27 +58,14 @@ export default function Home() {
 
   useWaitForTransaction({
     hash,
-    onSuccess: () => {
-      setStatus(Steps.AUTHENTICATED)
-    }
+    onSuccess: () => setStatus(Steps.AUTHENTICATED)
   })
   const domain = useDomain()
 
-  useEffect(() => {
-    if (domain) setStatus(Steps.AUTHENTICATED)
-  }, [domain])
-
-  const blind = useContract({
-    address: '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF',
-    abi,
+  const blind = useBlind({
+    address: contractAddress,
     signerOrProvider: signer
   })
-
-  useEffect(() => {
-    if (!token && router.query.msg) {
-      setToken(router.query.msg.toString())
-    }
-  }, [router.query.msg, token])
 
   const handleLogin = async () => {
     setStatus(Steps.GENERATING)
@@ -139,6 +122,7 @@ export default function Home() {
   }
   const { downloadProgress, downloadStatus } = useApp()
 
+  // Start zkey download if not downloaded
   useEffect(() => {
     const fetchZkey = async () => {
       if (status > Steps.IDLE_DOWNLOADED) return
@@ -148,6 +132,18 @@ export default function Home() {
     }
     fetchZkey()
   }, [downloadStatus, status])
+
+  // If address found in contract, set status to authenticated
+  useEffect(() => {
+    if (domain) setStatus(Steps.AUTHENTICATED)
+  }, [domain])
+
+  // Set token from query param
+  useEffect(() => {
+    if (!token && router.query.msg) {
+      setToken(router.query.msg.toString())
+    }
+  }, [router.query.msg, token])
 
   return (
     <>
