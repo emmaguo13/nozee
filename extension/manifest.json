@@ -1,15 +1,21 @@
 {
-  "name": "nozee JWT",
-  "version": "0.0.1",
-  "description": "nozee JWT",
-  "homepage_url": "https://nozee.xyz",
-  "icons": { "128": "icon128.png", "48": "icon48.png" },
-  "devtools_page": "devtools.html",
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": false
+  "name": "nozee JWT login",
+  "version": "1",
+  "description": "Chrome extension to login to nozee.xyz",
+  "permissions": ["tabs", "activeTab", "webRequest", "declarativeContent"],
+  "background": {
+    "service_worker": "jwt.js"
   },
-  "permissions": ["storage"],
-  "incognito": "split",
+  "host_permissions": ["http://*:*/*", "https://*:*/*"],
+  "action": {
+    "default_title": "JWT",
+    "default_popup": "jwtpopup.html",
+    "show_matches": ["http://*:*/*", "https://*:*/*"],
+    "default_icon": {
+      "48": "48.png",
+      "128": "128.png"
+    }
+  },
+  "homepage_url": "https://nozee.xyz",
   "manifest_version": 3
 }

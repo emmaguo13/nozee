@@ -20,16 +20,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Confetti from 'react-confetti'
 import { useWindowSize } from 'usehooks-ts'
-import {
-  useAccount,
-  useContract,
-  useSigner,
-  useWaitForTransaction
-} from 'wagmi'
-import { abi } from '../constants'
+import { useAccount, useSigner, useWaitForTransaction } from 'wagmi'
+import { contractAddress } from '../constants'
 import { useApp } from '../contexts/AppProvider'
+import { useBlind } from '../generated'
 import { generate_inputs } from '../helpers/generate_input'
 import useDomain from '../hooks/useDomain'
+import { formatSolidityCallData } from '../utils/utils'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -61,27 +58,14 @@ export default function Home() {
 
   useWaitForTransaction({
     hash,
-    onSuccess: () => {
-      setStatus(Steps.AUTHENTICATED)
-    }
+    onSuccess: () => setStatus(Steps.AUTHENTICATED)
   })
   const domain = useDomain()
 
-  useEffect(() => {
-    if (domain) setStatus(Steps.AUTHENTICATED)
-  }, [domain])
-
-  const blind = useContract({
-    address: '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF',
-    abi,
+  const blind = useBlind({
+    address: contractAddress,
     signerOrProvider: signer
   })
-
-  useEffect(() => {
-    if (!token && router.query.msg) {
-      setToken(router.query.msg.toString())
-    }
-  }, [router.query.msg, token])
 
   const handleLogin = async () => {
     setStatus(Steps.GENERATING)
@@ -96,7 +80,7 @@ export default function Home() {
     }
     //@ts-ignore
     const zkeyRawData = new Uint8Array(zkeyDb)
-    const zkeyFastFile = { type: 'mem', data: zkeyRawData }
+    // const zkeyFastFile = { type: 'mem', data: zkeyRawData }
     const storedProof = await localforage.getItem('proof')
     if (storedProof) {
       console.log('proof found in localstorage, skipping proof generation')
@@ -109,36 +93,25 @@ export default function Home() {
       splitToken[0] + '.' + splitToken[1],
       address
     )
-    worker.postMessage([inputs, zkeyFastFile])
+    worker.postMessage(['fullProve', inputs, zkeyRawData])
     worker.onmessage = async function (e) {
       const { proof, publicSignals } = e.data
       console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
       await localforage.setItem('proof', proof)
       setStatus(Steps.VERIFYING)
       console.log('before worker')
-      const worker = new Worker('./worker-generate.js')
       const proofFastFile = { type: 'mem', data: proof }
       const publicSignalsFastFile = { type: 'mem', data: publicSignals }
-      worker.postMessage([proofFastFile, publicSignalsFastFile])
+      worker.postMessage([
+        'exportSolidityCallData',
+        proofFastFile,
+        publicSignalsFastFile
+      ])
       worker.onmessage = async function (e) {
-        const tokens = e.data
-          .replace(/["[\]\s]/g, '')
-          .split(',')
-          .map((x: any) => BigNumber.from(x).toHexString())
-        const [a1, a2, b1, b2, b3, b4, c1, c2, ...inputs] = tokens
-        const a = [a1, a2]
-        const b = [
-          [b1, b2],
-          [b3, b4]
-        ]
-        const c = [c1, c2]
+        const [a, b, c, publicInputs] = formatSolidityCallData(e.data)
 
-        console.log(a)
-        console.log(b)
-        console.log(c)
-        console.log(inputs)
         await blind
-          ?.add(a as any, b as any, c as any, inputs, {
+          ?.add(a as any, b as any, c as any, publicInputs, {
             gasLimit: 2000000 as any
           })
           .then(res => {
@@ -149,6 +122,7 @@ export default function Home() {
   }
   const { downloadProgress, downloadStatus } = useApp()
 
+  // Start zkey download if not downloaded
   useEffect(() => {
     const fetchZkey = async () => {
       if (status > Steps.IDLE_DOWNLOADED) return
@@ -158,6 +132,18 @@ export default function Home() {
     }
     fetchZkey()
   }, [downloadStatus, status])
+
+  // If address found in contract, set status to authenticated
+  useEffect(() => {
+    if (domain) setStatus(Steps.AUTHENTICATED)
+  }, [domain])
+
+  // Set token from query param
+  useEffect(() => {
+    if (!token && router.query.msg) {
+      setToken(router.query.msg.toString())
+    }
+  }, [router.query.msg, token])
 
   return (
     <>
