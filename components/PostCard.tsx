@@ -22,7 +22,7 @@ const PostCard = ({
 }) => {
   const router = useRouter()
   const cutMsg = message.substring(0, 575) + (message.length > 575 ? '...' : '')
-  const handleVerify = useVerify(message, signature)
+  // const handleVerify = useVerify(message, signature)
   const msg = truncate ? cutMsg : message
 
   return (
@@ -63,13 +63,13 @@ const PostCard = ({
             textAlign="center"
             label="Verify message was signed by authenticated user"
           >
-            <Button
-              onClick={handleVerify}
+            {/* <Button
+              // onClick={handleVerify}
               className={font.className}
               variant="link"
             >
               Verify
-            </Button>
+            </Button> */}
           </Tooltip>
         </Flex>
         <Flex
