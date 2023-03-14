@@ -13,7 +13,7 @@ let serviceAcc = {
 
 if (getApps().length == 0) {
     app = initializeApp({
-        credential: cert(serviceAcc),
+        credential: cert(serviceAcc as ServiceAccount),
         projectId: process.env.NEXT_PUBLIC_PROJECT_ID
     }, "nozee");
 } else {
@@ -22,14 +22,18 @@ if (getApps().length == 0) {
 
 const db = getFirestore(app)
 
-// read all posts
+// read a post
 export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse,
 ) {
 
-  const snapshot = await db
-    .collection('posts').orderBy('timestamp', 'desc').get()
+  const { body } = request
+  const b = JSON.parse(body)
 
-  return response.json(snapshot.docs.map(doc => doc.data() as Post))
+  const ref = db.collection('posts')
+  const query = ref.where('id', '==', b.id)
+  const snapshot = await query.get()
+
+  return response.json(snapshot.docs.map(doc => doc.data())[0] as Post)
 }

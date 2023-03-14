@@ -6,14 +6,17 @@ import { Post } from '../../types'
 import { vkey } from './constants/vkey'
 const snarkjs = require('snarkjs')
 
-import secret from "../../firebaseSecret.json"
-
 let app: App;
+
+let serviceAcc = {
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  privateKey: (process.env.FIREBASE_PRIVATE_KEY as string).replace(/\\n/g, '\n'),
+}
 
 if (getApps().length == 0) {
     app = initializeApp({
-        // credential: applicationDefault(),
-        credential: cert(secret as ServiceAccount),
+        credential: cert(serviceAcc as ServiceAccount),
         projectId: process.env.NEXT_PUBLIC_PROJECT_ID
     }, "nozee");
 } else {
