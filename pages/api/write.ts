@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { initializeApp, applicationDefault, getApp, App, getApps, cert, Credential, ServiceAccount } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { Post } from '../../types'
+import { Web3Storage, File } from 'web3.storage'
 
 import { vkey } from './constants/vkey'
 const snarkjs = require('snarkjs')
@@ -25,6 +26,21 @@ if (getApps().length == 0) {
 
 const db = getFirestore(app)
 
+function getAccessToken () {
+  return process.env.WEB3_STORAGE_TOKEN
+}
+
+function makeStorageClient () {
+  return new Web3Storage({ token: getAccessToken() as string })
+}
+
+async function web3storeFiles (files: File[]) {
+  const client = makeStorageClient()
+  const cid = await client.put(files)
+  console.log('stored files with cid:', cid)
+  return cid
+}
+
 async function createPost({
     id,
     company,
@@ -33,21 +49,32 @@ async function createPost({
     signature,
     title
   }: Post) {
+
+    const post = {
+      title,
+      company,
+      message,
+      address,
+      signature,
+      id,
+      timestamp: Date.now()
+    }
+
+    const buffer = Buffer.from(JSON.stringify(post))
+
+    const files = [
+      new File([buffer], 'hello.json')
+    ]
+
+    const cid = web3storeFiles(files)
+
     return db
       .collection('posts')
       .doc(id)
-      .set({
-        title,
-        company,
-        message,
-        address,
-        signature,
-        id,
-        timestamp: Date.now()
-      })
+      .set(post)
       .then(docRef => {
         console.log('Document written with ID: ', docRef)
-        return docRef
+        return cid
       })
       .catch(error => {
         throw new Error(error);
@@ -78,19 +105,19 @@ export default async function handler(
   */
 
   // verify proof here 
-  const isVerified = await verifyProof(b.proof, b.publicInputs)
-
+  const isVerified = await verifyProof(b.proof, b.publicSignals)
+  let post; 
   if (isVerified) {
-    let post; 
     try {
       post = await createPost(b)
       // post to web3.storage
-    } catch {
+    } catch (e) {
+      console.log(e)
       return response.status(500).send("Database write error")
     }
   } else {
     return response.status(400).send("Proof not verified")
   }
 
-  return response.status(200).send("Success")
+  return response.json({cid: post})
 }
