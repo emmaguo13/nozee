@@ -26,7 +26,15 @@ export default async function handler(
 
   // TODO: return the domain
   if (isVerified) {
-    return response.status(200).send("Success")
+    let domain = ""
+    for (var i = 18; i < 47; i++) {
+        //domain.push(byte(input[i]));
+        if (b.publicSignals[i] != "0") {
+            domain += String.fromCharCode(parseInt(b.publicSignals[i]));
+        }
+    }
+
+    return response.json({domain: domain})
   } else {
     return response.status(400).send("Proof not verified")
   }
