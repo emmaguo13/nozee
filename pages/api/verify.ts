@@ -26,13 +26,17 @@ export default async function handler(
 
   // TODO: return the domain
   if (isVerified) {
+    // Verify Openai address 
+
     let domain = ""
     for (var i = 18; i < 47; i++) {
-        //domain.push(byte(input[i]));
         if (b.publicSignals[i] != "0") {
             domain += String.fromCharCode(parseInt(b.publicSignals[i]));
         }
     }
+
+    console.log("showing domain")
+    console.log(domain)
 
     return response.json({domain: domain})
   } else {
