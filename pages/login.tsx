@@ -12,28 +12,21 @@ import {
   Text
 } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { BigNumber } from 'ethers'
 import localforage from 'localforage'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Confetti from 'react-confetti'
 import { useWindowSize } from 'usehooks-ts'
-import { useAccount, useSigner, useWaitForTransaction } from 'wagmi'
-import { contractAddress } from '../constants'
-import { useApp } from '../contexts/AppProvider'
-import { useBlind } from '../generated'
+import { Status, useApp } from '../contexts/AppProvider'
 import { generate_inputs } from '../helpers/generate_input'
-import useDomain from '../hooks/useDomain'
-import { formatSolidityCallData } from '../utils/utils'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 enum Steps {
-  IDLE_DOWNLOADING,
-  IDLE_DOWNLOADED,
+  DOWNLOADING,
+  DOWNLOADED,
   GENERATING,
   VERIFYING,
   AUTHENTICATED
@@ -48,102 +41,73 @@ const LoadingText = [
 ]
 
 export default function Home() {
-  const { address } = useAccount()
+  const { downloadProgress, downloadStatus, zkey } = useApp()
   const router = useRouter()
-  const [token, setToken] = useState('')
-  const { data: signer } = useSigner()
-  const [status, setStatus] = useState<Steps>(Steps.IDLE_DOWNLOADING)
+  const [status, setStatus] = useState<Steps>(
+    Status.DOWNLOADED ? Steps.DOWNLOADED : Steps.DOWNLOADING
+  )
   const { height, width } = useWindowSize()
-  const [hash, setHash] = useState<`0x${string}` | undefined>()
 
-  useWaitForTransaction({
-    hash,
-    onSuccess: () => setStatus(Steps.AUTHENTICATED)
-  })
-  const domain = useDomain()
-
-  const blind = useBlind({
-    address: contractAddress,
-    signerOrProvider: signer
-  })
+  const token = router.query.msg?.toString() ?? ''
 
   const handleLogin = async () => {
     setStatus(Steps.GENERATING)
-    if (!address) {
-      console.log('need address')
-      return
-    }
-    // Fetch zkey from localstorage, download if not found
-    const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
-    if (!zkeyDb) {
-      throw new Error('zkey was not found in the database')
-    }
-    //@ts-ignore
-    const zkeyRawData = new Uint8Array(zkeyDb)
-    // const zkeyFastFile = { type: 'mem', data: zkeyRawData }
-    const storedProof = await localforage.getItem('proof')
-    if (storedProof) {
+    const storedProof = JSON.parse((await localforage.getItem('proof')) || '{}')
+    const storedPublicSignals = await localforage.getItem('publicSignals')
+    // TODO: in what scenario do we want to store both proof and publicSignals?
+    if (storedProof && storedPublicSignals) {
       console.log('proof found in localstorage, skipping proof generation')
-    }
-    // Generate Proof
-    const worker = new Worker('./worker.js')
-    const splitToken = token.split('.')
-    const inputs = await generate_inputs(
-      splitToken[2],
-      splitToken[0] + '.' + splitToken[1],
-      address
-    )
-    worker.postMessage(['fullProve', inputs, zkeyRawData])
-    worker.onmessage = async function (e) {
-      const { proof, publicSignals } = e.data
-      console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
-      await localforage.setItem('proof', proof)
-      setStatus(Steps.VERIFYING)
-      console.log('before worker')
-      const proofFastFile = { type: 'mem', data: proof }
-      const publicSignalsFastFile = { type: 'mem', data: publicSignals }
-      worker.postMessage([
-        'exportSolidityCallData',
-        proofFastFile,
-        publicSignalsFastFile
-      ])
+      const res = await fetch('/api/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          proof: storedProof,
+          publicSignals: storedPublicSignals
+        })
+      })
+      const { isVerified } = await res.json()
+      if (isVerified) {
+        setStatus(Steps.AUTHENTICATED)
+        return
+      }
+    } else {
+      console.log('proof not found in localstorage, generating proof')
+      // Generate Proof
+      const worker = new Worker('./worker.js')
+      const splitToken = token.split('.')
+      const inputs = await generate_inputs(
+        splitToken[2],
+        splitToken[0] + '.' + splitToken[1],
+        '0x0000000000000000000000000000000000000000'
+      )
+      worker.postMessage(['fullProve', inputs, zkey])
       worker.onmessage = async function (e) {
-        const [a, b, c, publicInputs] = formatSolidityCallData(e.data)
-
-        await blind
-          ?.add(a as any, b as any, c as any, publicInputs, {
-            gasLimit: 2000000 as any
+        const { proof, publicSignals } = e.data
+        console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
+        const serializedProof = JSON.stringify(proof)
+        await localforage.setItem('proof', serializedProof)
+        await localforage.setItem('publicSignals', publicSignals)
+        setStatus(Steps.VERIFYING)
+        const res = await fetch('/api/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            proof,
+            publicSignals
           })
-          .then(res => {
-            setHash(res.hash as `0x${string}`)
-          })
+        })
+        const { isVerified } = await res.json()
+        if (isVerified) {
+          setStatus(Steps.AUTHENTICATED)
+          return
+        }
       }
     }
   }
-  const { downloadProgress, downloadStatus } = useApp()
-
-  // Start zkey download if not downloaded
-  useEffect(() => {
-    const fetchZkey = async () => {
-      if (status > Steps.IDLE_DOWNLOADED) return
-      if (downloadStatus === 'downloaded') {
-        setStatus(Steps.IDLE_DOWNLOADED)
-      }
-    }
-    fetchZkey()
-  }, [downloadStatus, status])
-
-  // If address found in contract, set status to authenticated
-  useEffect(() => {
-    if (domain) setStatus(Steps.AUTHENTICATED)
-  }, [domain])
-
-  // Set token from query param
-  useEffect(() => {
-    if (!token && router.query.msg) {
-      setToken(router.query.msg.toString())
-    }
-  }, [router.query.msg, token])
 
   return (
     <>
@@ -170,7 +134,6 @@ export default function Home() {
         as="main"
         direction="column"
         w="100%"
-        // margin="0 auto"
         position="relative"
         minH="100vh"
         className={bodyFont.className}
@@ -233,7 +196,7 @@ export default function Home() {
                 <h2>
                   <AccordionButton>
                     <Flex alignItems="center" gap="4" flex="1">
-                      {downloadStatus === 'downloaded' ? (
+                      {downloadStatus === Status.DOWNLOADED ? (
                         <>
                           <CheckCircleIcon color="green.200" />
                           .zkey Downloaded
@@ -254,53 +217,23 @@ export default function Home() {
                   store any data.
                 </AccordionPanel>
               </AccordionItem>
-              <AccordionItem
-                _hover={{
-                  cursor: 'pointer',
-                  backgroundColor: '#0A0A12'
-                }}
-              >
-                <h2>
-                  <AccordionButton>
-                    <Flex alignItems="center" gap="4" flex="1">
-                      {address ? (
-                        <>
-                          <CheckCircleIcon color="green.200" />
-                          Wallet Connected
-                        </>
-                      ) : (
-                        <>
-                          <WarningIcon />
-                          Connect Wallet
-                        </>
-                      )}
-                    </Flex>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  You&apos;ll need to commit to your domain on chain by sending
-                  a transaction. We recommend using a burner wallet.
-                </AccordionPanel>
-              </AccordionItem>
             </Accordion>
-            <Flex placeContent="center">
-              <ConnectButton accountStatus="full" chainStatus="full" />
-            </Flex>
             {status === Steps.AUTHENTICATED ? (
               <Button
                 backgroundColor="#992870"
                 className={font.className}
                 onClick={() => router.push('/')}
               >
-                ENTER NOZEE @{domain}
+                {/* Fetch domain from circuit regex */}
+                ENTER NOZEE @DOMAIN
               </Button>
             ) : (
               <Button
                 backgroundColor="#4C82FB"
-                isLoading={status > Steps.IDLE_DOWNLOADED}
+                isLoading={status > Steps.DOWNLOADED}
                 onClick={handleLogin}
                 loadingText={LoadingText[status]}
+                isDisabled={!token}
               >
                 Login
               </Button>
@@ -317,9 +250,9 @@ export default function Home() {
               status === Steps.AUTHENTICATED ? '#992870' : '#4C82FB'
             }
             isIndeterminate={
-              status > Steps.IDLE_DOWNLOADED &&
+              status > Steps.DOWNLOADED &&
               status !== Steps.AUTHENTICATED &&
-              downloadStatus !== 'downloading'
+              downloadStatus !== Status.DOWNLOADING
             }
           />
         </Box>

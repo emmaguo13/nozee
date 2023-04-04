@@ -63,13 +63,13 @@ const PostCard = ({
             textAlign="center"
             label="Verify message was signed by authenticated user"
           >
-            {/* <Button
+            <Button
               // onClick={handleVerify}
               className={font.className}
               variant="link"
             >
               Verify
-            </Button> */}
+            </Button>
           </Tooltip>
         </Flex>
         <Flex
