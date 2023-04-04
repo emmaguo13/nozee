@@ -1,3 +1,10 @@
+export const uncompressedZkey =
+  'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey'
+export const compressedZkey =
+  'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey.gz'
+export const isCompressed = true
+export const localZkeyKey = 'jwt.zkey'
+
 export const contractAddress = '0xAD6aab5161C5DC3f20210b2e4B4d01196737F1EF'
 export const abi = [
   {

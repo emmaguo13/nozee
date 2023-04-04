@@ -15,18 +15,18 @@ import { Karla, Silkscreen } from '@next/font/google'
 import localforage from 'localforage'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Confetti from 'react-confetti'
 import { useWindowSize } from 'usehooks-ts'
-import { useApp } from '../contexts/AppProvider'
+import { Status, useApp } from '../contexts/AppProvider'
 import { generate_inputs } from '../helpers/generate_input'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 enum Steps {
-  IDLE_DOWNLOADING,
-  IDLE_DOWNLOADED,
+  DOWNLOADING,
+  DOWNLOADED,
   GENERATING,
   VERIFYING,
   AUTHENTICATED
@@ -41,19 +41,17 @@ const LoadingText = [
 ]
 
 export default function Home() {
+  const { downloadProgress, downloadStatus, zkey } = useApp()
   const router = useRouter()
-  const [token, setToken] = useState('')
-  const [status, setStatus] = useState<Steps>(Steps.IDLE_DOWNLOADING)
+  const [status, setStatus] = useState<Steps>(
+    Status.DOWNLOADED ? Steps.DOWNLOADED : Steps.DOWNLOADING
+  )
   const { height, width } = useWindowSize()
+
+  const token = router.query.msg?.toString() ?? ''
 
   const handleLogin = async () => {
     setStatus(Steps.GENERATING)
-    const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
-    if (!zkeyDb) {
-      throw new Error('zkey was not found in the database')
-    }
-    //@ts-ignore
-    const zkeyRawData = new Uint8Array(zkeyDb)
     const storedProof = JSON.parse((await localforage.getItem('proof')) || '{}')
     const storedPublicSignals = await localforage.getItem('publicSignals')
     // TODO: in what scenario do we want to store both proof and publicSignals?
@@ -61,6 +59,9 @@ export default function Home() {
       console.log('proof found in localstorage, skipping proof generation')
       const res = await fetch('/api/verify', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           proof: storedProof,
           publicSignals: storedPublicSignals
@@ -81,7 +82,7 @@ export default function Home() {
         splitToken[0] + '.' + splitToken[1],
         '0x0000000000000000000000000000000000000000'
       )
-      worker.postMessage(['fullProve', inputs, zkeyRawData])
+      worker.postMessage(['fullProve', inputs, zkey])
       worker.onmessage = async function (e) {
         const { proof, publicSignals } = e.data
         console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
@@ -91,6 +92,9 @@ export default function Home() {
         setStatus(Steps.VERIFYING)
         const res = await fetch('/api/verify', {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
             proof,
             publicSignals
@@ -104,25 +108,6 @@ export default function Home() {
       }
     }
   }
-  const { downloadProgress, downloadStatus } = useApp()
-
-  // Start zkey download if not downloaded
-  useEffect(() => {
-    const fetchZkey = async () => {
-      if (status > Steps.IDLE_DOWNLOADED) return
-      if (downloadStatus === 'downloaded') {
-        setStatus(Steps.IDLE_DOWNLOADED)
-      }
-    }
-    fetchZkey()
-  }, [downloadStatus, status])
-
-  // Set token from query param
-  useEffect(() => {
-    if (!token && router.query.msg) {
-      setToken(router.query.msg.toString())
-    }
-  }, [router.query.msg, token])
 
   return (
     <>
@@ -149,7 +134,6 @@ export default function Home() {
         as="main"
         direction="column"
         w="100%"
-        // margin="0 auto"
         position="relative"
         minH="100vh"
         className={bodyFont.className}
@@ -212,7 +196,7 @@ export default function Home() {
                 <h2>
                   <AccordionButton>
                     <Flex alignItems="center" gap="4" flex="1">
-                      {downloadStatus === 'downloaded' ? (
+                      {downloadStatus === Status.DOWNLOADED ? (
                         <>
                           <CheckCircleIcon color="green.200" />
                           .zkey Downloaded
@@ -246,9 +230,10 @@ export default function Home() {
             ) : (
               <Button
                 backgroundColor="#4C82FB"
-                isLoading={status > Steps.IDLE_DOWNLOADED}
+                isLoading={status > Steps.DOWNLOADED}
                 onClick={handleLogin}
                 loadingText={LoadingText[status]}
+                isDisabled={!token}
               >
                 Login
               </Button>
@@ -265,9 +250,9 @@ export default function Home() {
               status === Steps.AUTHENTICATED ? '#992870' : '#4C82FB'
             }
             isIndeterminate={
-              status > Steps.IDLE_DOWNLOADED &&
+              status > Steps.DOWNLOADED &&
               status !== Steps.AUTHENTICATED &&
-              downloadStatus !== 'downloading'
+              downloadStatus !== Status.DOWNLOADING
             }
           />
         </Box>
