@@ -12,21 +12,14 @@ import {
   Text
 } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { BigNumber } from 'ethers'
 import localforage from 'localforage'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Confetti from 'react-confetti'
 import { useWindowSize } from 'usehooks-ts'
-import { useAccount, useSigner, useWaitForTransaction } from 'wagmi'
-import { contractAddress } from '../constants'
 import { useApp } from '../contexts/AppProvider'
-import { useBlind } from '../generated'
 import { generate_inputs } from '../helpers/generate_input'
-import useDomain from '../hooks/useDomain'
-import { formatSolidityCallData } from '../utils/utils'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -48,39 +41,19 @@ const LoadingText = [
 ]
 
 export default function Home() {
-  const { address } = useAccount()
   const router = useRouter()
   const [token, setToken] = useState('')
-  const { data: signer } = useSigner()
   const [status, setStatus] = useState<Steps>(Steps.IDLE_DOWNLOADING)
   const { height, width } = useWindowSize()
-  const [hash, setHash] = useState<`0x${string}` | undefined>()
-
-  useWaitForTransaction({
-    hash,
-    onSuccess: () => setStatus(Steps.AUTHENTICATED)
-  })
-  const domain = useDomain()
-
-  const blind = useBlind({
-    address: contractAddress,
-    signerOrProvider: signer
-  })
 
   const handleLogin = async () => {
     setStatus(Steps.GENERATING)
-    // if (!address) {
-    //   console.log('need address')
-    //   return
-    // }
-    // Fetch zkey from localstorage, download if not found
     const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
     if (!zkeyDb) {
       throw new Error('zkey was not found in the database')
     }
     //@ts-ignore
     const zkeyRawData = new Uint8Array(zkeyDb)
-    // const zkeyFastFile = { type: 'mem', data: zkeyRawData }
     const storedProof = await localforage.getItem('proof')
     if (storedProof) {
       console.log('proof found in localstorage, skipping proof generation')
@@ -99,10 +72,6 @@ export default function Home() {
       console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
       await localforage.setItem('proof', proof)
       setStatus(Steps.VERIFYING)
-      console.log('before worker')
-      const proofFastFile = { type: 'mem', data: proof }
-      const publicSignalsFastFile = { type: 'mem', data: publicSignals }
-      // use /api/verify to verify proof
       const res = await fetch('/api/verify', {
         method: 'POST',
         body: JSON.stringify({
@@ -268,46 +237,15 @@ export default function Home() {
                   store any data.
                 </AccordionPanel>
               </AccordionItem>
-              <AccordionItem
-                _hover={{
-                  cursor: 'pointer',
-                  backgroundColor: '#0A0A12'
-                }}
-              >
-                <h2>
-                  <AccordionButton>
-                    <Flex alignItems="center" gap="4" flex="1">
-                      {address ? (
-                        <>
-                          <CheckCircleIcon color="green.200" />
-                          Wallet Connected
-                        </>
-                      ) : (
-                        <>
-                          <WarningIcon />
-                          Connect Wallet
-                        </>
-                      )}
-                    </Flex>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  You&apos;ll need to commit to your domain on chain by sending
-                  a transaction. We recommend using a burner wallet.
-                </AccordionPanel>
-              </AccordionItem>
             </Accordion>
-            <Flex placeContent="center">
-              <ConnectButton accountStatus="full" chainStatus="full" />
-            </Flex>
             {status === Steps.AUTHENTICATED ? (
               <Button
                 backgroundColor="#992870"
                 className={font.className}
                 onClick={() => router.push('/')}
               >
-                ENTER NOZEE @{domain}
+                {/* Fetch domain from circuit regex */}
+                ENTER NOZEE @DOMAIN
               </Button>
             ) : (
               <Button
