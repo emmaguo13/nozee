@@ -17,15 +17,11 @@ export default async function handler(
   const { body } = request
   const b = JSON.parse(body)
 
-  console.log(b)
-
+  console.log('🚀 ~ b.proof:', b.proof)
+  console.log('🚀 ~ b.publicSignals:', b.publicSignals)
   // verify proof here
   const isVerified = await verifyProof(b.proof, b.publicSignals)
 
   // TODO: return the domain
-  if (isVerified) {
-    return response.status(200).send('Success')
-  } else {
-    return response.status(400).send('Proof not verified')
-  }
+  return response.status(200).json({ isVerified })
 }

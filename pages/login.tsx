@@ -69,10 +69,10 @@ export default function Home() {
 
   const handleLogin = async () => {
     setStatus(Steps.GENERATING)
-    if (!address) {
-      console.log('need address')
-      return
-    }
+    // if (!address) {
+    //   console.log('need address')
+    //   return
+    // }
     // Fetch zkey from localstorage, download if not found
     const zkeyDb = await localforage.getItem('jwt_single-real.zkey')
     if (!zkeyDb) {
@@ -91,7 +91,7 @@ export default function Home() {
     const inputs = await generate_inputs(
       splitToken[2],
       splitToken[0] + '.' + splitToken[1],
-      address
+      '0x0000000000000000000000000000000000000000'
     )
     worker.postMessage(['fullProve', inputs, zkeyRawData])
     worker.onmessage = async function (e) {
@@ -102,22 +102,36 @@ export default function Home() {
       console.log('before worker')
       const proofFastFile = { type: 'mem', data: proof }
       const publicSignalsFastFile = { type: 'mem', data: publicSignals }
-      worker.postMessage([
-        'exportSolidityCallData',
-        proofFastFile,
-        publicSignalsFastFile
-      ])
-      worker.onmessage = async function (e) {
-        const [a, b, c, publicInputs] = formatSolidityCallData(e.data)
-
-        await blind
-          ?.add(a as any, b as any, c as any, publicInputs, {
-            gasLimit: 2000000 as any
-          })
-          .then(res => {
-            setHash(res.hash as `0x${string}`)
-          })
+      // use /api/verify to verify proof
+      const res = await fetch('/api/verify', {
+        method: 'POST',
+        body: JSON.stringify({
+          proof,
+          publicSignals
+        })
+      })
+      const data = await res.json()
+      console.log('data', data)
+      if (data.isVerified) {
+        setStatus(Steps.AUTHENTICATED)
       }
+
+      // worker.postMessage([
+      //   'exportSolidityCallData',
+      //   proofFastFile,
+      //   publicSignalsFastFile
+      // ])
+      // worker.onmessage = async function (e) {
+      //   const [a, b, c, publicInputs] = formatSolidityCallData(e.data)
+
+      //   await blind
+      //     ?.add(a as any, b as any, c as any, publicInputs, {
+      //       gasLimit: 2000000 as any
+      //     })
+      //     .then(res => {
+      //       setHash(res.hash as `0x${string}`)
+      //     })
+      // }
     }
   }
   const { downloadProgress, downloadStatus } = useApp()
@@ -134,9 +148,9 @@ export default function Home() {
   }, [downloadStatus, status])
 
   // If address found in contract, set status to authenticated
-  useEffect(() => {
-    if (domain) setStatus(Steps.AUTHENTICATED)
-  }, [domain])
+  // useEffect(() => {
+  //   if (domain) setStatus(Steps.AUTHENTICATED)
+  // }, [domain])
 
   // Set token from query param
   useEffect(() => {
