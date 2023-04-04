@@ -54,53 +54,54 @@ export default function Home() {
     }
     //@ts-ignore
     const zkeyRawData = new Uint8Array(zkeyDb)
-    const storedProof = await localforage.getItem('proof')
-    if (storedProof) {
+    const storedProof = JSON.parse((await localforage.getItem('proof')) || '{}')
+    const storedPublicSignals = await localforage.getItem('publicSignals')
+    // TODO: in what scenario do we want to store both proof and publicSignals?
+    if (storedProof && storedPublicSignals) {
       console.log('proof found in localstorage, skipping proof generation')
-    }
-    // Generate Proof
-    const worker = new Worker('./worker.js')
-    const splitToken = token.split('.')
-    const inputs = await generate_inputs(
-      splitToken[2],
-      splitToken[0] + '.' + splitToken[1],
-      '0x0000000000000000000000000000000000000000'
-    )
-    worker.postMessage(['fullProve', inputs, zkeyRawData])
-    worker.onmessage = async function (e) {
-      const { proof, publicSignals } = e.data
-      console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
-      await localforage.setItem('proof', proof)
-      setStatus(Steps.VERIFYING)
       const res = await fetch('/api/verify', {
         method: 'POST',
         body: JSON.stringify({
-          proof,
-          publicSignals
+          proof: storedProof,
+          publicSignals: storedPublicSignals
         })
       })
-      const data = await res.json()
-      console.log('data', data)
-      if (data.isVerified) {
+      const { isVerified } = await res.json()
+      if (isVerified) {
         setStatus(Steps.AUTHENTICATED)
+        return
       }
-
-      // worker.postMessage([
-      //   'exportSolidityCallData',
-      //   proofFastFile,
-      //   publicSignalsFastFile
-      // ])
-      // worker.onmessage = async function (e) {
-      //   const [a, b, c, publicInputs] = formatSolidityCallData(e.data)
-
-      //   await blind
-      //     ?.add(a as any, b as any, c as any, publicInputs, {
-      //       gasLimit: 2000000 as any
-      //     })
-      //     .then(res => {
-      //       setHash(res.hash as `0x${string}`)
-      //     })
-      // }
+    } else {
+      console.log('proof not found in localstorage, generating proof')
+      // Generate Proof
+      const worker = new Worker('./worker.js')
+      const splitToken = token.split('.')
+      const inputs = await generate_inputs(
+        splitToken[2],
+        splitToken[0] + '.' + splitToken[1],
+        '0x0000000000000000000000000000000000000000'
+      )
+      worker.postMessage(['fullProve', inputs, zkeyRawData])
+      worker.onmessage = async function (e) {
+        const { proof, publicSignals } = e.data
+        console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
+        const serializedProof = JSON.stringify(proof)
+        await localforage.setItem('proof', serializedProof)
+        await localforage.setItem('publicSignals', publicSignals)
+        setStatus(Steps.VERIFYING)
+        const res = await fetch('/api/verify', {
+          method: 'POST',
+          body: JSON.stringify({
+            proof,
+            publicSignals
+          })
+        })
+        const { isVerified } = await res.json()
+        if (isVerified) {
+          setStatus(Steps.AUTHENTICATED)
+          return
+        }
+      }
     }
   }
   const { downloadProgress, downloadStatus } = useApp()
@@ -115,11 +116,6 @@ export default function Home() {
     }
     fetchZkey()
   }, [downloadStatus, status])
-
-  // If address found in contract, set status to authenticated
-  // useEffect(() => {
-  //   if (domain) setStatus(Steps.AUTHENTICATED)
-  // }, [domain])
 
   // Set token from query param
   useEffect(() => {
