@@ -103,17 +103,18 @@ export const Sidebar = () => {
             size="md"
             backgroundColor="#4C82FB"
             onClick={() => {
-              if (domain) {
-                onOpen()
-              } else {
-                toast({
-                  title: 'Please connect wallet',
-                  status: 'error',
-                  duration: 3000,
-                  position: 'bottom-right',
-                  isClosable: true
-                })
-              }
+              onOpen()
+              // if (domain) {
+              //   onOpen()
+              // } else {
+              //   toast({
+              //     title: 'Please connect wallet',
+              //     status: 'error',
+              //     duration: 3000,
+              //     position: 'bottom-right',
+              //     isClosable: true
+              //   })
+              // }
             }}
           >
             New
