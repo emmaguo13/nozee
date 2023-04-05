@@ -12,12 +12,13 @@ export default async function handler(
   response: NextApiResponse
 ) {
   console.log('🚀 ~ request:', typeof request.body)
+  console.log(request.body)
   const isVerified = await verifyProof(
     request.body.proof,
     request.body.publicSignals
   )
+  const b = request.body
   // TODO: return the domain
-<<<<<<< HEAD
   if (isVerified) {
     // Verify Openai address 
 
@@ -36,7 +37,3 @@ export default async function handler(
     return response.status(400).send("Proof not verified")
   }
 }
-=======
-  return response.status(200).json({ isVerified })
-}
->>>>>>> main
