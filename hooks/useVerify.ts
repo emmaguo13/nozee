@@ -3,9 +3,7 @@ import { utils } from 'ethers'
 import useDomain from './useDomain'
 
 function useVerify(message: string, signature: string) {
-  const fullSig = utils.splitSignature(signature)
-  const signingAddr = utils.verifyMessage(message, fullSig)
-  const domain = useDomain(signingAddr as `0x${string}`)
+  const domain = useDomain()
 
   const toast = useToast()
 

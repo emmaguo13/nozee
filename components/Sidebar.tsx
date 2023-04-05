@@ -22,13 +22,11 @@ const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
 
 export const Sidebar = () => {
-  const { address } = useAccount()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const domain = useDomain()
   const router = useRouter()
   const [domains, setDomains] = useState<string[]>()
   const [isPlaying, setIsPlaying] = useState(false)
-  const toast = useToast()
   console.log(router.query.domain)
 
   const audioRef = useRef<HTMLAudioElement>()
@@ -62,10 +60,6 @@ export const Sidebar = () => {
       setIsPlaying(true)
     }
   }
-
-  const formattedAccount = address
-    ? `${address.slice(0, 6)}...${address.slice(-4)}`
-    : 'Connect Wallet'
 
   return (
     <>
