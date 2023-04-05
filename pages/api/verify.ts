@@ -14,7 +14,7 @@ export default async function handler(
   )
   const b = request.body
   if (isVerified) {
-    if (!verifyPublicKey(request.body.publicSignals)) {
+    if (!verifyPublicKey(request.body.publicSignals, 'openai')) {
       return response.status(500).json({ error: 'Public key not verified' })
     }
 

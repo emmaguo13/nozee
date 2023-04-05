@@ -86,7 +86,7 @@ export default async function handler(
     return response.status(500).json({ error: 'Proof not verified' })
   }
 
-  if (!verifyPublicKey(request.body.publicSignals)) {
+  if (!verifyPublicKey(request.body.publicSignals, 'openai')) {
     return response.status(500).json({ error: 'Public key not verified' })
   }
 
