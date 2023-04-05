@@ -1,19 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import {
-  initializeApp,
-  applicationDefault,
-  getApp,
   App,
-  getApps,
+  ServiceAccount,
   cert,
-  Credential,
-  ServiceAccount
+  getApp,
+  getApps,
+  initializeApp
 } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
+import { NextApiRequest, NextApiResponse } from 'next'
 import { Post } from '../../types'
-
-import { vkey } from './constants/vkey'
-const snarkjs = require('snarkjs')
 
 let app: App
 
@@ -58,7 +53,7 @@ async function createPost({
       timestamp: Date.now()
     })
     .then(docRef => {
-      console.log('Document written with ID: ', docRef)
+      console.log('Document written', docRef)
       return docRef
     })
     .catch(error => {
@@ -66,42 +61,34 @@ async function createPost({
     })
 }
 
-export async function verifyProof(proof: any, publicSignals: any) {
-  const proofVerified = await snarkjs.groth16.verify(vkey, publicSignals, proof)
-  return proofVerified
-}
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://www.nozee.xyz/'
+    : 'http://localhost:3000/'
 
-// this allows you to write to a post
 export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
-  const { body } = request
-  const b = JSON.parse(body)
+  const { isVerified } = await fetch(BASE_URL + '/api/verify', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      proof: request.body.proof,
+      publicSignals: request.body.publicSignals
+    })
+  }).then(res => res.json())
 
-  /*
-    id,
-    company,
-    message,
-    address,
-    signature,
-    title
-  */
-
-  // verify proof here
-  const isVerified = await verifyProof(b.proof, b.publicInputs)
-
-  if (isVerified) {
-    let post
-    try {
-      post = await createPost(b)
-      // post to web3.storage
-    } catch {
-      return response.status(500).send('Database write error')
-    }
-  } else {
-    return response.status(400).send('Proof not verified')
+  if (!isVerified) {
+    return response.status(500).json({ error: 'Proof not verified' })
   }
 
-  return response.status(200).send('Success')
+  try {
+    const post = await createPost(request.body)
+    return response.status(200).json(post)
+  } catch (error) {
+    return response.status(500).json({ error })
+  }
 }
