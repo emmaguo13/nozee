@@ -16,7 +16,6 @@ import {
 } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi'
 import useDomain from '../hooks/useDomain'
 import localforage from 'localforage'
 
@@ -32,8 +31,6 @@ const CreateModal = ({
 }) => {
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
-  const { address } = useAccount()
-  const formattedAddr = address ? address : '0x'
   const [enabled, setEnabled] = useState(false)
   const toast = useToast()
   const domain = useDomain()
@@ -54,7 +51,7 @@ const CreateModal = ({
       body: JSON.stringify({
         title,
         message,
-        address: formattedAddr,
+        address: '',
         domain,
         company: 'Apple',
         signature: '',
