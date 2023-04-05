@@ -8,8 +8,8 @@ import {
 } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { verifyPublicKey } from '../../helpers/verifyPublicKey'
 import { Post } from '../../types'
-import { openAiPubKey } from '../../constants'
 
 let app: App
 
@@ -32,15 +32,6 @@ if (getApps().length == 0) {
 }
 
 const db = getFirestore(app)
-
-const verifyPublicKey = (publicSignals: string[]) => {
-  for (var i = 0; i < 17; i++) {
-    if (publicSignals[i] != openAiPubKey[i]) {
-      return false
-    }
-  }
-  return true
-}
 
 async function createPost({
   id,

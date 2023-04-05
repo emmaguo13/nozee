@@ -1,33 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { vkey } from './constants/vkey'
-import { openAiPubKey } from '../../constants'
+import { vkey } from '../../constants'
+import { verifyPublicKey } from '../../helpers/verifyPublicKey'
 const snarkjs = require('snarkjs')
-
-export async function verifyProof(proof: any, publicSignals: any) {
-  const proofVerified = await snarkjs.groth16.verify(vkey, publicSignals, proof)
-  return proofVerified
-}
-
-const verifyPublicKey = (publicSignals: string[]) => {
-  for (var i = 0; i < 17; i++) {
-    if (publicSignals[i] != openAiPubKey[i]) {
-      return false
-    }
-  }
-  return true
-}
 
 export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
-  const isVerified = await verifyProof(
-    request.body.proof,
-    request.body.publicSignals
+  const isVerified = await snarkjs.groth16.verify(
+    vkey,
+    request.body.publicSignals,
+    request.body.proof
   )
   const b = request.body
   if (isVerified) {
-    // Verify Openai address
     if (!verifyPublicKey(request.body.publicSignals)) {
       return response.status(500).json({ error: 'Public key not verified' })
     }
