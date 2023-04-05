@@ -16,10 +16,9 @@ import {
 } from '@chakra-ui/react'
 import { Karla, Silkscreen } from '@next/font/google'
 import { useEffect, useState } from 'react'
-import { useAccount, useConnect, useSigner } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
+import { useAccount } from 'wagmi'
 import useDomain from '../hooks/useDomain'
-import { createPost } from '../utils/firebase'
+import localforage from 'localforage'
 
 const font = Silkscreen({ subsets: ['latin'], weight: '400' })
 const bodyFont = Karla({ subsets: ['latin'], weight: '400' })
@@ -43,35 +42,60 @@ const CreateModal = ({
     if (!enabled) setEnabled(true)
   }, [enabled])
 
-  const { connect } = useConnect({
-    connector: new InjectedConnector()
-  })
-
-  const { data: signer } = useSigner()
-
   const handleCreatePost = async () => {
-    if (!address || !domain || !signer) return
-    const signedMessage = await signer.signMessage(message)
-    const uniqueId = formattedAddr + Date.now().toString()
-    await createPost({
-      title,
-      id: uniqueId,
-      company: domain,
-      message,
-      address,
-      signature: signedMessage
-    }).then(res => {
-      console.log(res)
-      toast({
-        title: 'Post created',
-        description: 'Your post has been created',
-        status: 'success',
-        duration: 5000,
-        position: 'bottom-right',
-        isClosable: true
+    // call /api/write to write to the database
+    const storedProof = JSON.parse((await localforage.getItem('proof')) || '{}')
+    const storedPublicSignals = await localforage.getItem('publicSignals')
+    await fetch('/api/write', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title,
+        message,
+        address: formattedAddr,
+        domain,
+        company: 'Apple',
+        signature: '',
+        id: Date.now().toString(),
+        proof: storedProof,
+        publicSignals: storedPublicSignals
       })
-      onClose()
     })
+
+    toast({
+      title: 'Post created',
+      description: 'Your post has been created',
+      status: 'success',
+      duration: 5000,
+      position: 'bottom-right',
+      isClosable: true
+    })
+    onClose()
+
+    // if (!address || !domain || !signer) return
+    // const signedMessage = await signer.signMessage(message)
+    // const uniqueId = formattedAddr + Date.now().toString()
+    // await createPost({
+    //   title,
+    //   id: uniqueId,
+    //   company: domain,
+    //   message,
+    //   address,
+    //   signature: signedMessage
+    // }).then(res => {
+    //   console.log(res)
+    //   toast({
+    //     title: 'Post created',
+    //     description: 'Your post has been created',
+    //     status: 'success',
+    //     duration: 5000,
+    //     position: 'bottom-right',
+    //     isClosable: true
+    //   })
+    //   onClose()
+    // })
   }
 
   return (
