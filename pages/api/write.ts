@@ -10,6 +10,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { verifyPublicKey } from '../../helpers/verifyPublicKey'
 import { Post } from '../../types'
+import { Web3Storage, File } from 'web3.storage'
 
 let app: App
 
@@ -33,6 +34,21 @@ if (getApps().length == 0) {
 
 const db = getFirestore(app)
 
+function getAccessToken() {
+  return process.env.WEB3_STORAGE_TOKEN
+}
+
+function makeStorageClient() {
+  return new Web3Storage({ token: getAccessToken() as string })
+}
+
+async function web3storeFiles(files: File[]) {
+  const client = makeStorageClient()
+  const cid = await client.put(files)
+  console.log('stored files with cid:', cid)
+  return cid
+}
+
 async function createPost({
   id,
   company,
@@ -41,21 +57,30 @@ async function createPost({
   signature,
   title
 }: Post) {
+
+  const post = {
+    title,
+    company,
+    message,
+    address,
+    signature,
+    id,
+    timestamp: Date.now()
+  }
+
+  const buffer = Buffer.from(JSON.stringify(post))
+
+  const files = [new File([buffer], 'hello.json')]
+
+  const cid = await web3storeFiles(files)
+
   return db
     .collection('posts')
     .doc(id)
-    .set({
-      title,
-      company,
-      message,
-      address,
-      signature,
-      id,
-      timestamp: Date.now()
-    })
+    .set(post)
     .then(docRef => {
       console.log('Document written', docRef)
-      return docRef
+      return {docRef, cid}
     })
     .catch(error => {
       throw new Error(error)
@@ -71,7 +96,7 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
-  const { isVerified } = await fetch(BASE_URL + '/api/verify', {
+  const { isVerified, domain } = await fetch(BASE_URL + '/api/verify', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -91,8 +116,8 @@ export default async function handler(
   }
 
   try {
-    const post = await createPost(request.body)
-    return response.status(200).json(post)
+    const res = await createPost(request.body)
+    return response.status(200).json({...res, domain})
   } catch (error) {
     return response.status(500).json({ error })
   }
