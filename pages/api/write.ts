@@ -57,7 +57,6 @@ async function createPost({
   signature,
   title
 }: Post) {
-
   const post = {
     title,
     company,
@@ -80,7 +79,7 @@ async function createPost({
     .set(post)
     .then(docRef => {
       console.log('Document written', docRef)
-      return {docRef, cid}
+      return { docRef, cid }
     })
     .catch(error => {
       throw new Error(error)
@@ -96,6 +95,8 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
+  const { key } = request.query
+  console.log('🚀 ~ key:', key)
   const { isVerified, domain } = await fetch(BASE_URL + '/api/verify', {
     method: 'POST',
     headers: {
@@ -111,13 +112,15 @@ export default async function handler(
     return response.status(500).json({ error: 'Proof not verified' })
   }
 
-  if (!verifyPublicKey(request.body.publicSignals, 'openai')) {
+  if (
+    !verifyPublicKey(request.body.publicSignals, key?.toString() || 'openai')
+  ) {
     return response.status(500).json({ error: 'Public key not verified' })
   }
 
   try {
     const res = await createPost(request.body)
-    return response.status(200).json({...res, domain})
+    return response.status(200).json({ ...res, domain })
   } catch (error) {
     return response.status(500).json({ error })
   }
