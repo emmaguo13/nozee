@@ -1,12 +1,13 @@
-import { openAiPubKey } from '../constants'
+import { headspacePubKey, openAiPubKey } from '../constants'
 
-type publicKey = 'openai'
-export const verifyPublicKey = (publicSignals: string[], key: publicKey) => {
+export const verifyPublicKey = (publicSignals: string[], key: string) => {
   let currentKey: string[]
   switch (key) {
     case 'openai':
       currentKey = openAiPubKey
       break
+    case 'headspace':
+      currentKey = headspacePubKey
     default:
       currentKey = []
       break

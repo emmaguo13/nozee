@@ -7,6 +7,8 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
+  const { key } = request.query
+  console.log('🚀 ~ key:', key)
   const isVerified = await snarkjs.groth16.verify(
     vkey,
     request.body.publicSignals,
@@ -14,7 +16,9 @@ export default async function handler(
   )
   const b = request.body
   if (isVerified) {
-    if (!verifyPublicKey(request.body.publicSignals, 'openai')) {
+    if (
+      !verifyPublicKey(request.body.publicSignals, key?.toString() || 'openai')
+    ) {
       return response.status(500).json({ error: 'Public key not verified' })
     }
 
