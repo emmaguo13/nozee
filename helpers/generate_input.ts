@@ -1,6 +1,10 @@
 import { shaHash } from './shaHash'
 import { bytesToBigInt, fromHex, toCircomBigIntBytes } from './binaryFormat'
-import { MAX_HEADER_PADDED_BYTES } from './constants'
+import {
+  HEADSPACE_PUBKEY,
+  MAX_HEADER_PADDED_BYTES,
+  OPENAI_PUBKEY
+} from './constants'
 import { Hash } from './fast-sha256'
 const pki = require('node-forge').pki
 
@@ -10,7 +14,8 @@ export async function generate_inputs(
   // ethAddress: string = '0x0000000000000000000000000000000000000000'
   signature: string,
   msg: string,
-  ethAddress: string
+  ethAddress: string,
+  key: string
 ): Promise<any> {
   console.log('🚀 ~ signature', signature)
   const sig = BigInt('0x' + Buffer.from(signature, 'base64').toString('hex'))
@@ -22,15 +27,18 @@ export async function generate_inputs(
   const domain_idx_num = BigInt(domain_index ?? 0)
 
   const circuitType = CircuitType.JWT
-  const pubKeyData = pki.publicKeyFromPem(`-----BEGIN PUBLIC KEY-----
-  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27rOErDOPvPc3mOADYtQ
-  BeenQm5NS5VHVaoO/Zmgsf1M0Wa/2WgLm9jX65Ru/K8Az2f4MOdpBxxLL686ZS+K
-  7eJC/oOnrxCRzFYBqQbYo+JMeqNkrCn34yed4XkX4ttoHi7MwCEpVfb05Qf/ZAmN
-  I1XjecFYTyZQFrd9LjkX6lr05zY6aM/+MCBNeBWp35pLLKhiq9AieB1wbDPcGnqx
-  lXuU/bLgIyqUltqLkr9JHsf/2T4VrXXNyNeQyBq5wjYlRkpBQDDDNOcdGpx1buRr
-  Z2hFyYuXDRrMcR6BQGC0ur9hI5obRYlchDFhlb0ElsJ2bshDDGRk5k3doHqbhj2I
-  gQIDAQAB
-  -----END PUBLIC KEY-----`)
+  let currentKey: string
+  switch (key) {
+    case 'openai':
+      currentKey = OPENAI_PUBKEY
+      break
+    case 'headspace':
+      currentKey = HEADSPACE_PUBKEY
+    default:
+      currentKey = ''
+      break
+  }
+  const pubKeyData = pki.publicKeyFromPem(currentKey)
 
   const modulus = BigInt(pubKeyData.n.toString())
   const fin_result = await getCircuitInputs(

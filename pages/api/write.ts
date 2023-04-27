@@ -71,6 +71,8 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
+  const { key } = request.query
+  console.log('🚀 ~ key:', key)
   const { isVerified } = await fetch(BASE_URL + '/api/verify', {
     method: 'POST',
     headers: {
@@ -86,7 +88,9 @@ export default async function handler(
     return response.status(500).json({ error: 'Proof not verified' })
   }
 
-  if (!verifyPublicKey(request.body.publicSignals, 'openai')) {
+  if (
+    !verifyPublicKey(request.body.publicSignals, key?.toString() || 'openai')
+  ) {
     return response.status(500).json({ error: 'Public key not verified' })
   }
 

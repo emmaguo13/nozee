@@ -43,6 +43,7 @@ const LoadingText = [
 export default function Home() {
   const { downloadProgress, downloadStatus, zkey } = useApp()
   const router = useRouter()
+  const [domain, setDomain] = useState()
   const [status, setStatus] = useState<Steps>(
     Status.DOWNLOADED ? Steps.DOWNLOADED : Steps.DOWNLOADING
   )
@@ -67,8 +68,9 @@ export default function Home() {
           publicSignals: storedPublicSignals
         })
       })
-      const { isVerified } = await res.json()
+      const { domain, isVerified } = await res.json()
       if (isVerified) {
+        setDomain(domain)
         setStatus(Steps.AUTHENTICATED)
         return
       }
@@ -80,7 +82,9 @@ export default function Home() {
       const inputs = await generate_inputs(
         splitToken[2],
         splitToken[0] + '.' + splitToken[1],
-        '0x0000000000000000000000000000000000000000'
+        '0x0000000000000000000000000000000000000000',
+        // TODO: change this
+        'headspace'
       )
       worker.postMessage(['fullProve', inputs, zkey])
       worker.onmessage = async function (e) {
@@ -102,6 +106,7 @@ export default function Home() {
         })
         const { isVerified } = await res.json()
         if (isVerified) {
+          setDomain(domain)
           setStatus(Steps.AUTHENTICATED)
           return
         }
@@ -225,7 +230,7 @@ export default function Home() {
                 onClick={() => router.push('/')}
               >
                 {/* Fetch domain from circuit regex */}
-                ENTER NOZEE @DOMAIN
+                ENTER NOZEE @{domain}
               </Button>
             ) : (
               <Button
