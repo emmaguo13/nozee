@@ -27,6 +27,25 @@ export async function generate_inputs(
   const domain_idx_num = BigInt(domain_index ?? 0)
 
   const circuitType = CircuitType.JWT
+  const OPENAI_PUBKEY = `-----BEGIN PUBLIC KEY-----
+  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27rOErDOPvPc3mOADYtQ
+  BeenQm5NS5VHVaoO/Zmgsf1M0Wa/2WgLm9jX65Ru/K8Az2f4MOdpBxxLL686ZS+K
+  7eJC/oOnrxCRzFYBqQbYo+JMeqNkrCn34yed4XkX4ttoHi7MwCEpVfb05Qf/ZAmN
+  I1XjecFYTyZQFrd9LjkX6lr05zY6aM/+MCBNeBWp35pLLKhiq9AieB1wbDPcGnqx
+  lXuU/bLgIyqUltqLkr9JHsf/2T4VrXXNyNeQyBq5wjYlRkpBQDDDNOcdGpx1buRr
+  Z2hFyYuXDRrMcR6BQGC0ur9hI5obRYlchDFhlb0ElsJ2bshDDGRk5k3doHqbhj2I
+  gQIDAQAB
+  -----END PUBLIC KEY-----`
+  const HEADSPACE_PUBKEY = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA14yuGbqZ7adQ05MSgDxG
+Z1xcl+qHhJ16corRoIVxesIdomcPhNd/Wwkn46UciBQTopZGiXQ27jaEd+vXl0rw
+p6NCMByzUR5nH1P5f5IDaHaZKMH94cGHDPRWpUQdH6JrbOSyp2RcPwLIgiL0GwDv
+ZI5se2gJdCR6Zt4Eq5fPdQM7yNeNWamPDLPo9TCroAu16HxQUq7zojVFjZ2wJjcr
+35Ml+gLOJIm9rg1xVI9X13dmu5MwvWJQYSp4qoOvQumXr2LyYLYdi81p9lwtKAVb
+IljzX6VziAph/2ekfERHLAJK2f58DfZlnyTAQ7VgrL48jYKrPwTauhzgc8+1zyw5
+pwIDAQAB
+-----END PUBLIC KEY-----
+`
   let currentKey: string
   switch (key) {
     case 'openai':
@@ -38,7 +57,9 @@ export async function generate_inputs(
       currentKey = ''
       break
   }
-  const pubKeyData = pki.publicKeyFromPem(currentKey)
+  const pubKeyData = pki.publicKeyFromPem(
+    key === 'headspace' ? HEADSPACE_PUBKEY : OPENAI_PUBKEY
+  )
 
   const modulus = BigInt(pubKeyData.n.toString())
   const fin_result = await getCircuitInputs(

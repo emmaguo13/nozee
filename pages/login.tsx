@@ -84,7 +84,7 @@ export default function Home() {
         splitToken[0] + '.' + splitToken[1],
         '0x0000000000000000000000000000000000000000',
         // TODO: change this
-        'headspace'
+        'openai'
       )
       worker.postMessage(['fullProve', inputs, zkey])
       worker.onmessage = async function (e) {
@@ -104,7 +104,7 @@ export default function Home() {
             publicSignals
           })
         })
-        const { isVerified } = await res.json()
+        const { domain, isVerified } = await res.json()
         if (isVerified) {
           setDomain(domain)
           setStatus(Steps.AUTHENTICATED)
