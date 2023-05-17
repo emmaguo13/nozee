@@ -65,7 +65,12 @@
     document.querySelector('#token').innerText = token
     document.querySelector('#request').innerText = request || ''
     document.querySelector('#login').onclick = function () {
-      chrome.tabs.create({ url: 'https://nozee.xyz/login?msg=' + token })
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+        let url = tabs[0].url.split('.')[1]
+        chrome.tabs.create({
+          url: `https://nozee.xyz/login?msg=${token}&key=${url}`
+        })
+      })
     }
   }
 
