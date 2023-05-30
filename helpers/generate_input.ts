@@ -27,7 +27,12 @@ export async function generate_inputs(
   const domain_idx_num = BigInt(domain_index ?? 0)
 
   const { timestamp:timeStr, time_index:timestamp_idx} = findTimestampInJSON(msg);
-  const timestamp = BigInt(timeStr)
+  // generate timestamp instead of finding it in the json
+  // const timestamp = BigInt(timeStr)
+
+  const now = new Date()  
+  const utcMilllisecondsSinceEpoch = now.getTime()  
+  const timestamp = Math.round(utcMilllisecondsSinceEpoch / 1000)
   const timestamp_idx_num = BigInt(timestamp_idx ?? 0)
 
   const circuitType = CircuitType.JWT
