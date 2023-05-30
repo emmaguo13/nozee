@@ -26,6 +26,10 @@ export async function generate_inputs(
   const domain = Buffer.from(domainStr ?? '')
   const domain_idx_num = BigInt(domain_index ?? 0)
 
+  const { timestamp:timeStr, time_index:timestamp_idx} = findTimestampInJSON(msg);
+  const timestamp = BigInt(timeStr)
+  const timestamp_idx_num = BigInt(timestamp_idx ?? 0)
+
   const circuitType = CircuitType.JWT
   const OPENAI_PUBKEY = `-----BEGIN PUBLIC KEY-----
   MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27rOErDOPvPc3mOADYtQ
@@ -70,7 +74,9 @@ pwIDAQAB
     circuitType,
     period_idx_num,
     domain_idx_num,
-    domain
+    domain,
+    timestamp, 
+    timestamp_idx_num
   )
 
   return fin_result.circuitInputs
@@ -86,6 +92,8 @@ export interface ICircuitInputs {
   period_idx?: string
   domain_idx?: string
   domain?: string[]
+  timestamp?: string
+  timestamp_idx?: string
 }
 enum CircuitType {
   RSA = 'rsa',
@@ -140,6 +148,18 @@ function findDomain(msg: string) {
     if (email_index) domain_idx = match[0].indexOf(domain) + email_index
   }
   return { domain, domain_idx }
+}
+
+function findTimestampInJSON(msg: string) {
+  var s = Buffer.from(msg, 'base64')
+  var json = AsciiArrayToString(s)
+  let time_index = json.indexOf(`"exp":`) + 6
+  let timestamp = json.substring(time_index, time_index + 10)
+
+  time_index += 1
+
+  return {timestamp, time_index}
+  
 }
 
 function mergeUInt8Arrays(a1: Uint8Array, a2: Uint8Array): Uint8Array {
@@ -207,7 +227,9 @@ export async function getCircuitInputs(
   circuit: CircuitType,
   period_idx_num: BigInt,
   domain_idx_num: BigInt,
-  domain_raw: Buffer
+  domain_raw: Buffer,
+  timestamp: BigInt,
+  timestamp_idx_num: BigInt
 ): Promise<{
   valid: {
     validSignatureFormat?: boolean
@@ -262,6 +284,9 @@ export async function getCircuitInputs(
   const period_idx = period_idx_num.toString()
   const domain_idx = domain_idx_num.toString()
 
+  const time = timestamp.toString()
+  const time_idx = timestamp_idx_num.toString()
+
   const address = bytesToBigInt(fromHex(eth_address)).toString()
   const address_plus_one = (bytesToBigInt(fromHex(eth_address)) + 1n).toString()
 
@@ -274,7 +299,9 @@ export async function getCircuitInputs(
     address_plus_one,
     period_idx,
     domain_idx,
-    domain
+    domain,
+    time, 
+    time_idx
   }
   return {
     circuitInputs,
