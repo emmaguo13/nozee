@@ -86,6 +86,9 @@ export default function Home() {
         // TODO: change this
         'openai'
       )
+
+      console.log("INPUTS TEST!!!", inputs);
+      
       worker.postMessage(['fullProve', inputs, zkey])
       worker.onmessage = async function (e) {
         const { proof, publicSignals } = e.data

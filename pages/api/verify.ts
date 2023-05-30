@@ -28,6 +28,7 @@ export default async function handler(
         domain += String.fromCharCode(parseInt(b.publicSignals[i]))
       }
     }
+
     return response.status(200).json({ domain, isVerified })
   } else {
     return response.status(500).json({ error: 'Proof not verified' })
