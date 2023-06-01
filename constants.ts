@@ -1,7 +1,7 @@
 export const uncompressedZkey =
   'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey'
 export const compressedZkey =
-  'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_timestamp.zkey.gz'
+  'https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_timestamp1.zkey.gz'
 export const isCompressed = true
 export const localZkeyKey = 'jwt.zkey'
 
