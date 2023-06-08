@@ -1,21 +1,19 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: "nozee",
-  description: "zkp-based authentication using jwt",
+  name: 'nozee',
+  description: 'zkp-based authentication using jwt',
   mainNav: [
     {
-      title: "Home",
-      href: "/",
+      title: 'Home',
+      href: '/'
     },
     {
-      title: "Login",
-      href: "/login",
-    },
+      title: 'Login',
+      href: '/login'
+    }
   ],
   links: {
-    // twitter: "https://twitter.com/shadcn",
-    github: "https://github.com/sehyunc/nozee",
-    // docs: "https://ui.shadcn.com",
-  },
+    github: 'https://github.com/sehyunc/nozee'
+  }
 }
