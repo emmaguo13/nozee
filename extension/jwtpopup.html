@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+
+    <title>JWT</title>
+    <style>
+      html {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+        overflow: hidden;
+      }
+      body {
+        top: 0;
+        left: 0;
+        margin: 0px;
+        padding: 0px;
+        width: 100%;
+        background-color: #efefef;
+        overflow: hidden;
+      }
+      .popup {
+        margin: 10px;
+        width: 97.5%;
+        max-width: 97.5%;
+      }
+      h3 {
+        border-radius: 2px;
+        padding: 10px;
+        background-color: #333;
+        color: #efefef;
+      }
+      pre {
+        border: 1px dotted #333;
+        padding: 5px;
+        background-color: white;
+      }
+      .wrapping {
+        border: 1px dotted #333;
+        padding: 5px;
+        background-color: white;
+        font-family: monospace;
+        overflow-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="popup">
+      <div id="token_absent" style="width: 500px">
+        <h3>nozee</h3>
+        <ol>
+          <h4>
+            Go to
+            <a href="https://chat.openai.com/chat" target="_blank">Chat GPT</a>
+          </h4>
+          <h4>Login using your work email</h4>
+          <h4>Open this extension</h4>
+        </ol>
+      </div>
+      <div id="token_present" style="display: none">
+        <h3>nozee</h3>
+        <button type="button" class="btn btn-primary" id="login">
+          Login to Nozee
+        </button>
+
+        <h4>Decoded Token</h4>
+        <h5>Header</h5>
+        <pre id="decoded_header"></pre>
+        <h5>
+          Payload
+          <span
+            id="copy_decoded_token"
+            class="btn btn-primary"
+            title="Copy Payload to Clipboard"
+            >&#x1f4cb;</span
+          >
+        </h5>
+        <pre id="decoded_token"></pre>
+        <h4>
+          JWT<span
+            id="copy_token"
+            class="btn btn-primary"
+            title="Copy Token to Clipboard"
+            >&#x1f4cb;</span
+          >
+        </h4>
+        <p id="token" class="wrapping"></p>
+        <h4>Request</h4>
+        <p id="request" class="wrapping"></p>
+      </div>
+    </div>
+    <script src="jwtpopup.js"></script>
+  </body>
+</html>
