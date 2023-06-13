@@ -27,7 +27,7 @@ export default async function handler(
   }
 
   // verify timestamp
-  let timestamp = parseInt(request.body.publicSignals[47]);
+  let timestamp = parseInt(request.body.publicSignals[48]);
   console.log('timestamp from frontend', timestamp)
 
   const now = new Date()  
