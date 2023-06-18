@@ -84,7 +84,7 @@ export default function Home() {
         splitToken[0] + '.' + splitToken[1],
         '0x0000000000000000000000000000000000000000',
         // TODO: change this
-        'openai'
+        'headspace'
       )
 
       console.log("INPUTS TEST!!!", inputs);
@@ -92,7 +92,7 @@ export default function Home() {
       worker.postMessage(['fullProve', inputs, zkey])
       worker.onmessage = async function (e) {
         const { proof, publicSignals } = e.data
-        console.log('PROOF SUCCESSFULLY GENERATED: ', proof)
+        console.log('PROOF SUCCESSFULLY GENERATED: ', proof, publicSignals)
         const serializedProof = JSON.stringify(proof)
         await localforage.setItem('proof', serializedProof)
         await localforage.setItem('publicSignals', publicSignals)
