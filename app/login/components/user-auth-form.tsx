@@ -3,7 +3,6 @@
 import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { BASE_URL } from "@/constants"
 import { Status, useApp } from "@/contexts/AppProvider"
 import localforage from "localforage"
 
@@ -33,16 +32,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     )
     if (storedProof && storedPublicSignals?.length) {
       console.log("Proof found in local storage. Skipping proof generation.")
-      const res = await fetch(BASE_URL + "/api/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          proof: JSON.parse(storedProof),
-          publicSignals: storedPublicSignals,
-        }),
-      })
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            proof: JSON.parse(storedProof),
+            publicSignals: storedPublicSignals,
+          }),
+        }
+      )
       const { domain, isVerified } = await res.json()
       if (isVerified) {
         console.log(
@@ -70,17 +72,20 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         console.log("Proof successfully generated", proof)
         await localforage.setItem("proof", JSON.stringify(proof))
         await localforage.setItem("publicSignals", publicSignals)
-        const res = await fetch(BASE_URL + "/api/verify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            key: "openai",
-            proof,
-            publicSignals,
-          }),
-        })
+        const res = await fetch(
+          process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              key: "openai",
+              proof,
+              publicSignals,
+            }),
+          }
+        )
         const { domain, isVerified } = await res.json()
         if (isVerified) {
           setDomain(domain)

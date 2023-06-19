@@ -1,4 +1,3 @@
-import { BASE_URL } from "@/constants"
 import { Post } from "@/types"
 
 import { SiteHeader } from "@/components/site-header"
@@ -11,13 +10,16 @@ interface MarketingLayoutProps {
 export default async function MarketingLayout({
   children,
 }: MarketingLayoutProps) {
-  const response = await fetch(BASE_URL + "/api/posts", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-  })
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/posts",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    }
+  )
   const data = await response.json()
   const domains: string[] = Array.from(
     new Set(data.map((post: Post) => post.domain))

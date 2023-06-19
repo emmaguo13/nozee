@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { BASE_URL } from "@/constants"
 import localforage from "localforage"
 
 import { Button } from "@/components/ui/button"
@@ -37,7 +36,7 @@ export function NewPostButton() {
       alert("Please generate a proof first")
       return
     }
-    const res = await fetch(BASE_URL + "/api/write", {
+    const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/write", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

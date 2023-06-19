@@ -1,10 +1,9 @@
-import { BASE_URL } from "@/constants"
 import { Post } from "@/types"
 
 import { PostCard } from "@/components/post-card"
 
 export default async function IndexPage() {
-  const posts = await fetch(BASE_URL + "/api/posts", {
+  const posts = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/posts", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -1,6 +1,5 @@
 import { randomUUID } from "crypto"
 import { NextResponse } from "next/server"
-import { BASE_URL } from "@/constants"
 import { Post } from "@/types"
 import {
   App,
@@ -78,16 +77,19 @@ async function createPost({ domain, body, title }: Post) {
 
 export async function POST(request: Request) {
   const req = await request.json()
-  const { isVerified, domain } = await fetch(BASE_URL + "/api/verify", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      proof: req.proof,
-      publicSignals: req.publicSignals,
-    }),
-  }).then((res) => res.json())
+  const { isVerified, domain } = await fetch(
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        proof: req.proof,
+        publicSignals: req.publicSignals,
+      }),
+    }
+  ).then((res) => res.json())
 
   if (!isVerified) {
     return NextResponse.json({ error: "Proof not verified" }, { status: 500 })
