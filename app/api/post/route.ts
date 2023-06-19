@@ -15,7 +15,7 @@ let app: App
 let serviceAcc = {
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  privateKey: (process.env.FIREBASE_PRIVATE_KEY as string).replace(
+  privateKey: ((process.env.FIREBASE_PRIVATE_KEY as string) || "").replace(
     /\\n/g,
     "\n"
   ),
