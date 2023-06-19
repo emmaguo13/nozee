@@ -1,4 +1,5 @@
 import { Post } from "@/types"
+import * as admin from "firebase-admin"
 
 import { SiteHeader } from "@/components/site-header"
 import { SidebarNav } from "@/app/(feed)/components/sidebar-nav"
@@ -6,19 +7,28 @@ import { SidebarNav } from "@/app/(feed)/components/sidebar-nav"
 interface MarketingLayoutProps {
   children: React.ReactNode
 }
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
+    }),
+  })
+}
+
+const db = admin.firestore()
 
 export default async function MarketingLayout({
   children,
 }: MarketingLayoutProps) {
-  const response = await fetch(
-    process.env.NEXT_PUBLIC_BASE_URL + "/api/posts",
-    {
-      method: "GET",
-    }
-  )
-  const data = await response.json()
+  const snapshot = await db
+    .collection("posts")
+    .orderBy("timestamp", "desc")
+    .get()
+  const posts = snapshot.docs.map((doc) => doc.data() as Post)
   const domains: string[] = Array.from(
-    new Set(data.map((post: Post) => post.domain))
+    new Set(posts.map((post: Post) => post.domain))
   )
   const sidebarNavItems = domains.sort().map((domain: string) => ({
     title: domain,
