@@ -17,7 +17,7 @@ export default async function MarketingLayout({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ domain: "" }),
     }
   )
   const data = await response.json()

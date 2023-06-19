@@ -8,7 +8,7 @@ export default async function IndexPage() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify({ domain: "" }),
   }).then((res) => res.json())
   return (
     <>
