@@ -8,21 +8,29 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "esModuleInterop": true,
-    "jsx": "preserve",
     "incremental": true,
-    "isolatedModules": true,
-    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
-    "declaration": true,
-    "declarationDir": "types/circomlibjs",
-    "typeRoots": ["node_modules/@types", "./types"]
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "utils/wasm/getPrecomputesHelpers.js"
+    ".next/types/**/*.ts",
+    "app/(feed)/[domain]"
   ],
   "exclude": ["node_modules"]
 }

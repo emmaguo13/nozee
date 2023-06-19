@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/react,nextjs
-# Edit at https://www.toptal.com/developers/gitignore?templates=react,nextjs
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,react,nextjs
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,react,nextjs
 
 ### NextJS ###
 # dependencies
@@ -29,13 +29,9 @@ yarn-error.log*
 
 # local env files
 .env*.local
-.env
 
 # vercel
 .vercel
-
-# firebase
-firebaseSecret.json
 
 # typescript
 *.tsbuildinfo
@@ -57,4 +53,23 @@ psd
 thumb
 sketch
 
-# End of https://www.toptal.com/developers/gitignore/api/react,nextjs
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
+
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,react,nextjs
