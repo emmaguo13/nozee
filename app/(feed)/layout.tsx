@@ -1,6 +1,5 @@
 import { BASE_URL } from "@/constants"
 import { Post } from "@/types"
-import axios from "axios"
 
 import { SiteHeader } from "@/components/site-header"
 import { SidebarNav } from "@/app/(feed)/components/sidebar-nav"
@@ -12,17 +11,16 @@ interface MarketingLayoutProps {
 export default async function MarketingLayout({
   children,
 }: MarketingLayoutProps) {
-  const response = await axios.post(
-    BASE_URL + "/api/posts",
-    {},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
+  const response = await fetch(BASE_URL + "/api/posts", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  })
+  const data = await response.json()
   const domains: string[] = Array.from(
-    new Set(response.data.map((post: Post) => post.domain))
+    new Set(data.map((post: Post) => post.domain))
   )
   const sidebarNavItems = domains.sort().map((domain: string) => ({
     title: domain,

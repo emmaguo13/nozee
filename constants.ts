@@ -1,7 +1,7 @@
-export const BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://www.nozee.xyz"
-    : "http://localhost:3000"
+export const BASE_URL = "http://localhost:3000"
+// process.env.NODE_ENV === "production"
+//   ? "https://www.nozee.xyz"
+//   : "http://localhost:3000"
 export const uncompressedZkey =
   "https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey"
 export const compressedZkey =
