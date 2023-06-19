@@ -63,7 +63,7 @@ export function NewPostButton() {
 
   // TODO: change to form
   return (
-    <Dialog open={open}>
+    <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
         <Button onClick={() => setOpen(true)} variant="ghost" size="sm">
           <Icons.add />
