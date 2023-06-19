@@ -13,11 +13,7 @@ export default async function MarketingLayout({
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/posts",
     {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ domain: "" }),
+      method: "GET",
     }
   )
   const data = await response.json()

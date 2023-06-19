@@ -28,9 +28,11 @@ if (getApps().length == 0) {
 
 const db = getFirestore(app)
 
-export async function GET() {
+export async function POST(request: Request) {
+  const body = await request.json()
   const snapshot = await db
     .collection("posts")
+    .where("domain", "==", body.domain)
     .orderBy("timestamp", "desc")
     .get()
   return NextResponse.json(snapshot.docs.map((doc) => doc.data() as Post))

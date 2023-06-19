@@ -7,13 +7,16 @@ export default async function Page({
 }: {
   params: { domain: string }
 }) {
-  const posts = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/posts", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ domain }),
-  }).then((res) => res.json())
+  const posts = await fetch(
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/filtered-posts",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ domain }),
+    }
+  ).then((res) => res.json())
   return (
     <>
       {posts.map((post: Post) => (

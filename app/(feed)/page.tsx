@@ -4,11 +4,7 @@ import { PostCard } from "@/components/post-card"
 
 export default async function IndexPage() {
   const posts = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/posts", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ domain: "" }),
+    method: "GET",
   }).then((res) => res.json())
   return (
     <>
