@@ -6,6 +6,7 @@ import { verifyPublicKey } from "@/lib/verifyPublicKey"
 const snarkjs = require("snarkjs")
 
 export async function POST(request: Request) {
+  console.time("Verification time")
   const req = await request.json()
   const isVerified = await snarkjs.groth16.verify(
     vkey,
@@ -16,9 +17,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Proof not verified" })
   }
 
-  if (!verifyPublicKey(req.publicSignals, req.key || "openai")) {
-    return NextResponse.json({ error: "Public key not verified" })
-  }
+  // if (!verifyPublicKey(req.publicSignals, req.key || "openai")) {
+  //   return NextResponse.json({ error: "Public key not verified" })
+  // }
 
   // const timestamp = parseInt(req.publicSignals[47])
   // console.log(
@@ -45,5 +46,6 @@ export async function POST(request: Request) {
     }
   }
 
+  console.timeEnd("Verification time")
   return NextResponse.json({ domain, isVerified })
 }
