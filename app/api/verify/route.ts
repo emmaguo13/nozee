@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server"
-
 import { vkey } from "@/constants"
 
 import { verifyPublicKey } from "@/lib/verifyPublicKey"
 
 const snarkjs = require("snarkjs")
+
+export const config = {
+  runtime: "edge",
+}
 
 export async function POST(request: Request) {
   console.time("Verification time")
@@ -14,9 +17,9 @@ export async function POST(request: Request) {
     req.publicSignals,
     req.proof
   )
-  // if (!isVerified) {
-  //   return NextResponse.json({ error: "Proof not verified" })
-  // }
+  if (!isVerified) {
+    return NextResponse.json({ error: "Proof not verified" })
+  }
 
   if (!verifyPublicKey(req.publicSignals, req.key || "openai")) {
     return NextResponse.json({ error: "Public key not verified" })
