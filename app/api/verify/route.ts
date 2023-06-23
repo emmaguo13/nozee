@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server"
 
-// import { vkey } from "@/constants"
+import { vkey } from "@/constants"
 
 import { verifyPublicKey } from "@/lib/verifyPublicKey"
 
-// const snarkjs = require("snarkjs")
+const snarkjs = require("snarkjs")
 
 export async function POST(request: Request) {
   console.time("Verification time")
   const req = await request.json()
-  // const isVerified = await snarkjs.groth16.verify(
-  //   vkey,
-  //   req.publicSignals,
-  //   req.proof
-  // )
+  const isVerified = await snarkjs.groth16.verify(
+    vkey,
+    req.publicSignals,
+    req.proof
+  )
   // if (!isVerified) {
   //   return NextResponse.json({ error: "Proof not verified" })
   // }
