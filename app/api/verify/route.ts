@@ -5,9 +5,7 @@ import { verifyPublicKey } from "@/lib/verifyPublicKey"
 
 const snarkjs = require("snarkjs")
 
-export const config = {
-  runtime: "edge",
-}
+export const runtime = "edge"
 
 export async function POST(request: Request) {
   console.time("Verification time")
