@@ -16,19 +16,38 @@ export default async function handler(
     request.body.proof
   )
   const b = request.body
-  if (isVerified) {
-    if (!verifyPublicKey(request.body.publicSignals, "openai")) {
-      return response.status(500).json({ error: "Public key not verified" })
-    }
-
-    let domain = ""
-    for (var i = 18; i < 47; i++) {
-      if (b.publicSignals[i] != "0") {
-        domain += String.fromCharCode(parseInt(b.publicSignals[i]))
-      }
-    }
-    return response.status(200).json({ domain, isVerified })
-  } else {
-    return response.status(500).json({ error: "Proof not verified" })
+  if (!isVerified) {
+    return response.status(500).json({ error: "Invalid proof" })
   }
+  if (
+    !verifyPublicKey(request.body.publicSignals, request.body.key || "openai")
+  ) {
+    return response.status(500).json({ error: "Invalid public key" })
+  }
+
+  // const timestamp = parseInt(req.publicSignals[47])
+  // console.log(
+  //   "🚀 ~ file: route.ts:23 ~ POST ~ timestamp:",
+  //   new Date(timestamp * 1000).toLocaleString()
+  // )
+  // const current_timestamp = Math.round(new Date().getTime() / 1000)
+  // console.log(
+  //   "🚀 ~ file: route.ts:25 ~ POST ~ current_timestamp:",
+  //   new Date(current_timestamp * 1000).toLocaleString()
+  // )
+
+  // const timeDifference = current_timestamp - timestamp
+  // const twentyMinutesInMilliseconds = 20 * 60 * 1000
+
+  // if (timeDifference > twentyMinutesInMilliseconds) {
+  //   return NextResponse.json({ error: "timestamp generated too early" })
+  // }
+
+  let domain = ""
+  for (var i = 18; i < 47; i++) {
+    if (b.publicSignals[i] != "0") {
+      domain += String.fromCharCode(parseInt(b.publicSignals[i]))
+    }
+  }
+  return response.status(200).json({ domain, isVerified })
 }
