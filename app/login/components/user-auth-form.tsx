@@ -19,7 +19,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [domain, setDomain] = React.useState<string>("")
 
-  const token = searchParams.get("msg")
+  const token = searchParams?.get("msg")
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault()
