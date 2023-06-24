@@ -25,23 +25,23 @@ export default async function handler(
     return response.status(500).json({ error: "Invalid public key" })
   }
 
-  // const timestamp = parseInt(req.publicSignals[47])
-  // console.log(
-  //   "🚀 ~ file: route.ts:23 ~ POST ~ timestamp:",
-  //   new Date(timestamp * 1000).toLocaleString()
-  // )
-  // const current_timestamp = Math.round(new Date().getTime() / 1000)
-  // console.log(
-  //   "🚀 ~ file: route.ts:25 ~ POST ~ current_timestamp:",
-  //   new Date(current_timestamp * 1000).toLocaleString()
-  // )
+  const timestamp = parseInt(request.body.publicSignals[48])
+  console.log(
+    "🚀 ~ file: route.ts:23 ~ POST ~ timestamp:",
+    new Date(timestamp * 1000).toLocaleString()
+  )
+  const current_timestamp = Math.round(new Date().getTime() / 1000)
+  console.log(
+    "🚀 ~ file: route.ts:25 ~ POST ~ current_timestamp:",
+    new Date(current_timestamp * 1000).toLocaleString()
+  )
 
-  // const timeDifference = current_timestamp - timestamp
-  // const twentyMinutesInMilliseconds = 20 * 60 * 1000
+  const timeDifference = current_timestamp - timestamp
+  const twentyMinutesInMilliseconds = 20 * 60 * 1000
 
-  // if (timeDifference > twentyMinutesInMilliseconds) {
-  //   return NextResponse.json({ error: "timestamp generated too early" })
-  // }
+  if (timeDifference > twentyMinutesInMilliseconds) {
+    return response.status(500).json({ error: "Invalid timestamp: generated too early" })
+  }
 
   let domain = ""
   for (var i = 18; i < 47; i++) {
