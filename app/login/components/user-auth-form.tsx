@@ -58,7 +58,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       const inputs = await generate_inputs(
         splitToken[2],
         splitToken[0] + "." + splitToken[1],
-        "0x0000000000000000000000000000000000000000",
         // TODO: change this
         "openai"
       )

@@ -1,8 +1,7 @@
 import { bytesToBigInt, fromHex, toCircomBigIntBytes } from "./binaryFormat"
 import {
-  HEADSPACE_PUBKEY,
-  MAX_HEADER_PADDED_BYTES,
-  OPENAI_PUBKEY,
+  MAX_MSG_PADDED_BYTES,
+  OPENAI_PUBKEY
 } from "./constants"
 import { Hash } from "./fast-sha256"
 import { shaHash } from "./shaHash"
@@ -12,7 +11,6 @@ const pki = require("node-forge").pki
 export async function generate_inputs(
   signature: string,
   msg: string,
-  ethAddress: string,
   key: string
 ): Promise<any> {
   const sig = BigInt("0x" + Buffer.from(signature, "base64").toString("hex"))
@@ -23,49 +21,16 @@ export async function generate_inputs(
   const domain = Buffer.from(domainStr ?? "")
   const domain_idx_num = BigInt(domain_index ?? 0)
 
-  const { timestamp: timeStr, time_index: timestamp_idx } =
+  const timestamp_idx =
     findTimestampInJSON(msg)
-  // generate timestamp instead of finding it in the json
-  // const timestamp = BigInt(timeStr)
 
   const now = new Date()
   const utcMilllisecondsSinceEpoch = now.getTime()
   const timestamp = Math.round(utcMilllisecondsSinceEpoch / 1000)
   const timestamp_idx_num = BigInt(timestamp_idx ?? 0)
 
-  const circuitType = CircuitType.JWT
-  const OPENAI_PUBKEY = `-----BEGIN PUBLIC KEY-----
-  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27rOErDOPvPc3mOADYtQ
-  BeenQm5NS5VHVaoO/Zmgsf1M0Wa/2WgLm9jX65Ru/K8Az2f4MOdpBxxLL686ZS+K
-  7eJC/oOnrxCRzFYBqQbYo+JMeqNkrCn34yed4XkX4ttoHi7MwCEpVfb05Qf/ZAmN
-  I1XjecFYTyZQFrd9LjkX6lr05zY6aM/+MCBNeBWp35pLLKhiq9AieB1wbDPcGnqx
-  lXuU/bLgIyqUltqLkr9JHsf/2T4VrXXNyNeQyBq5wjYlRkpBQDDDNOcdGpx1buRr
-  Z2hFyYuXDRrMcR6BQGC0ur9hI5obRYlchDFhlb0ElsJ2bshDDGRk5k3doHqbhj2I
-  gQIDAQAB
-  -----END PUBLIC KEY-----`
-  const HEADSPACE_PUBKEY = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA14yuGbqZ7adQ05MSgDxG
-Z1xcl+qHhJ16corRoIVxesIdomcPhNd/Wwkn46UciBQTopZGiXQ27jaEd+vXl0rw
-p6NCMByzUR5nH1P5f5IDaHaZKMH94cGHDPRWpUQdH6JrbOSyp2RcPwLIgiL0GwDv
-ZI5se2gJdCR6Zt4Eq5fPdQM7yNeNWamPDLPo9TCroAu16HxQUq7zojVFjZ2wJjcr
-35Ml+gLOJIm9rg1xVI9X13dmu5MwvWJQYSp4qoOvQumXr2LyYLYdi81p9lwtKAVb
-IljzX6VziAph/2ekfERHLAJK2f58DfZlnyTAQ7VgrL48jYKrPwTauhzgc8+1zyw5
-pwIDAQAB
------END PUBLIC KEY-----
-`
-  let currentKey: string
-  switch (key) {
-    case "openai":
-      currentKey = OPENAI_PUBKEY
-      break
-    case "headspace":
-      currentKey = HEADSPACE_PUBKEY
-    default:
-      currentKey = ""
-      break
-  }
   const pubKeyData = pki.publicKeyFromPem(
-    key === "headspace" ? HEADSPACE_PUBKEY : OPENAI_PUBKEY
+    OPENAI_PUBKEY
   )
 
   const modulus = BigInt(pubKeyData.n.toString())
@@ -73,8 +38,6 @@ pwIDAQAB
     sig,
     modulus,
     message,
-    ethAddress,
-    circuitType,
     period_idx_num,
     domain_idx_num,
     domain,
@@ -89,20 +52,12 @@ export interface ICircuitInputs {
   message?: string[]
   modulus?: string[]
   signature?: string[]
-  address?: string
-  address_plus_one?: string
   message_padded_bytes?: string
   period_idx?: string
   domain_idx?: string
   domain?: string[]
   timestamp?: string
   timestamp_idx?: string
-}
-enum CircuitType {
-  RSA = "rsa",
-  SHA = "sha",
-  TEST = "test",
-  JWT = "jwt",
 }
 
 function assert(cond: boolean, errorMessage: string) {
@@ -156,11 +111,10 @@ function findTimestampInJSON(msg: string) {
   var s = Buffer.from(msg, "base64")
   var json = AsciiArrayToString(s)
   let time_index = json.indexOf(`"exp":`) + 6
-  let timestamp = json.substring(time_index, time_index + 10)
 
   time_index += 1
 
-  return { timestamp, time_index }
+  return time_index
 }
 
 function mergeUInt8Arrays(a1: Uint8Array, a2: Uint8Array): Uint8Array {
@@ -224,12 +178,9 @@ export async function getCircuitInputs(
   rsa_signature: BigInt,
   rsa_modulus: BigInt,
   msg: Buffer,
-  eth_address: string,
-  circuit: CircuitType,
   period_idx_num: BigInt,
   domain_idx_num: BigInt,
   domain_raw: Buffer,
-  // timestamp: BigInt,
   timestamp: number,
   timestamp_idx_num: BigInt
 ): Promise<{
@@ -254,7 +205,7 @@ export async function getCircuitInputs(
   // Sha add padding
   const [messagePadded, messagePaddedLen] = await sha256Pad(
     prehashBytesUnpadded,
-    MAX_HEADER_PADDED_BYTES
+    MAX_MSG_PADDED_BYTES
   )
 
   // domain padding
@@ -289,16 +240,11 @@ export async function getCircuitInputs(
   const time = timestamp.toString()
   const time_idx = timestamp_idx_num.toString()
 
-  const address = bytesToBigInt(fromHex(eth_address)).toString()
-  const address_plus_one = (bytesToBigInt(fromHex(eth_address)) + 1n).toString()
-
   const circuitInputs = {
     message,
     modulus,
     signature,
     message_padded_bytes,
-    address,
-    address_plus_one,
     period_idx,
     domain_idx,
     domain,
