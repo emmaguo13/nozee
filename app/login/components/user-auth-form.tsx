@@ -59,7 +59,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         splitToken[2],
         splitToken[0] + "." + splitToken[1],
         // TODO: change this
-        "openai"
+        "jwt_client"
       )
       console.log("Generated inputs", inputs)
 

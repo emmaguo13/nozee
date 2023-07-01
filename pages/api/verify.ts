@@ -19,10 +19,12 @@ export default async function handler(
   if (!isVerified) {
     return response.status(500).json({ error: "Invalid proof" })
   }
+
+  console.log(request.body.key)
   if (
-    !verifyPublicKey(request.body.publicSignals, request.body.key || "openai")
+    !verifyPublicKey(request.body.publicSignals, request.body.key || "jwt_client")
   ) {
-    return response.status(500).json({ error: "Invalid public key" })
+    return response.status(501).json({ error: "Invalid public key" })
   }
 
   const timestamp = parseInt(request.body.publicSignals[48])
@@ -40,11 +42,11 @@ export default async function handler(
   const twentyMinutesInMilliseconds = 20 * 60 * 1000
 
   if (timeDifference > twentyMinutesInMilliseconds) {
-    return response.status(500).json({ error: "Invalid timestamp: generated too early" })
+    return response.status(502).json({ error: "Invalid timestamp: generated too early" })
   }
 
   let domain = ""
-  for (var i = 18; i < 47; i++) {
+  for (var i = 17; i < 47; i++) {
     if (b.publicSignals[i] != "0") {
       domain += String.fromCharCode(parseInt(b.publicSignals[i]))
     }
