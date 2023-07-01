@@ -20,6 +20,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [domain, setDomain] = React.useState<string>("")
 
   const token = searchParams?.get("msg")
+  const key = searchParams?.get("key")
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault()
@@ -42,6 +43,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           body: JSON.stringify({
             proof: JSON.parse(storedProof),
             publicSignals: storedPublicSignals,
+            key: key
           }),
         }
       )
@@ -59,7 +61,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         splitToken[2],
         splitToken[0] + "." + splitToken[1],
         // TODO: change this
-        "jwt_client"
+        key as string
       )
       console.log("Generated inputs", inputs)
 
@@ -79,7 +81,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              key: "openai",
+              key: key as string,
               proof,
               publicSignals,
             }),

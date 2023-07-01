@@ -32,7 +32,7 @@ export async function generate_inputs(
 
   let currentKey;
 
-  if (signer == "jwt_client") {
+  if (signer == "get-jwt") {
     currentKey = JWT_CLIENT_PUBKEY;
   } else if (signer == "openai") {
     currentKey = OPENAI_PUBKEY

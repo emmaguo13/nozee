@@ -22,7 +22,7 @@ export default async function handler(
 
   console.log(request.body.key)
   if (
-    !verifyPublicKey(request.body.publicSignals, request.body.key || "jwt_client")
+    !verifyPublicKey(request.body.publicSignals, request.body.key || "openai")
   ) {
     return response.status(501).json({ error: "Invalid public key" })
   }

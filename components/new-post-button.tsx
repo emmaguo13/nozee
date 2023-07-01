@@ -2,6 +2,7 @@
 
 import React from "react"
 import localforage from "localforage"
+import { useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -26,6 +27,9 @@ export function NewPostButton() {
   const [title, setTitle] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
 
+  const searchParams = useSearchParams()
+  const key = searchParams?.get("key")
+
   const handleSubmit = async () => {
     setIsLoading(true)
     const storedProof = await localforage.getItem<string>("proof")
@@ -44,7 +48,7 @@ export function NewPostButton() {
       body: JSON.stringify({
         title,
         body: body,
-        key: "openai",
+        key: key as string,
         proof: JSON.parse(storedProof),
         publicSignals: storedPublicSignals,
       }),
