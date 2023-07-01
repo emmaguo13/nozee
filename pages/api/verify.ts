@@ -20,7 +20,6 @@ export default async function handler(
     return response.status(500).json({ error: "Invalid proof" })
   }
 
-  console.log(request.body.key)
   if (
     !verifyPublicKey(request.body.publicSignals, request.body.key || "openai")
   ) {

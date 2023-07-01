@@ -6,7 +6,7 @@ export const verifyPublicKey = (publicSignals: string[], key: string) => {
     case 'openai':
       currentKey = openAiPubKey
       break
-    case 'get-jwt':
+    case 'vercel':
       currentKey = jwtClientPubKey
       break
     default:
