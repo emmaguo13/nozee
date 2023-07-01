@@ -6,7 +6,7 @@ export const verifyPublicKey = (publicSignals: string[], key: string) => {
     case 'openai':
       currentKey = openAiPubKey
       break
-    case 'headspace':
+    case 'jwt_client':
       currentKey = headspacePubKey
     default:
       currentKey = []

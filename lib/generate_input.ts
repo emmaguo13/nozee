@@ -1,7 +1,8 @@
 import { toCircomBigIntBytes } from "./binaryFormat"
 import {
   MAX_MSG_PADDED_BYTES,
-  OPENAI_PUBKEY
+  OPENAI_PUBKEY,
+  JWT_CLIENT_PUBKEY
 } from "./constants"
 import { Hash } from "./fast-sha256"
 import { shaHash } from "./shaHash"
@@ -11,7 +12,7 @@ const pki = require("node-forge").pki
 export async function generate_inputs(
   signature: string,
   msg: string,
-  key: string
+  signer: string
 ): Promise<any> {
   const sig = BigInt("0x" + Buffer.from(signature, "base64").toString("hex"))
   const message = Buffer.from(msg)
@@ -29,8 +30,16 @@ export async function generate_inputs(
   const timestamp = Math.round(utcMilllisecondsSinceEpoch / 1000)
   const timestamp_idx_num = BigInt(timestamp_idx ?? 0)
 
+  let currentKey;
+
+  if (signer == "JWT_CLIENT") {
+    currentKey = JWT_CLIENT_PUBKEY;
+  } else if (signer == "OPENAI") {
+    currentKey = OPENAI_PUBKEY
+  }
+
   const pubKeyData = pki.publicKeyFromPem(
-    OPENAI_PUBKEY
+    currentKey
   )
 
   const modulus = BigInt(pubKeyData.n.toString())
