@@ -1,4 +1,4 @@
-import { bytesToBigInt, fromHex, toCircomBigIntBytes } from "./binaryFormat"
+import { toCircomBigIntBytes } from "./binaryFormat"
 import {
   MAX_MSG_PADDED_BYTES,
   OPENAI_PUBKEY
