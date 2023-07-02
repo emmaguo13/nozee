@@ -35,7 +35,7 @@ export default function AuthenticationPage() {
         </Link>
         <div className="relative flex h-full flex-col p-10 text-white lg:dark:border-r">
           <div className="absolute inset-0 bg-cover" />
-          <div className="relative z-20 flex items-center text-lg font-medium">
+          <div className="relative z-20 hidden items-center text-lg font-medium lg:flex">
             <Command className="mr-2 h-6 w-6" /> nozee
           </div>
           <div className="relative z-20 m-auto">
