@@ -1,12 +1,12 @@
-import { jwtClientPubKey, openAiPubKey } from '../constants'
+import { jwtClientPubKey, openAiPubKey } from "../constants"
 
 export const verifyPublicKey = (publicSignals: string[], key: string) => {
   let currentKey: string[]
   switch (key) {
-    case 'openai':
+    case "openai":
       currentKey = openAiPubKey
       break
-    case 'vercel':
+    case "vercel":
       currentKey = jwtClientPubKey
       break
     default:
