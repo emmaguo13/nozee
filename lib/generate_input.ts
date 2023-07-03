@@ -1,8 +1,8 @@
 import { toCircomBigIntBytes } from "./binaryFormat"
 import {
+  JWT_CLIENT_PUBKEY,
   MAX_MSG_PADDED_BYTES,
   OPENAI_PUBKEY,
-  JWT_CLIENT_PUBKEY
 } from "./constants"
 import { Hash } from "./fast-sha256"
 import { shaHash } from "./shaHash"
@@ -22,25 +22,24 @@ export async function generate_inputs(
   const domain = Buffer.from(domainStr ?? "")
   const domain_idx_num = BigInt(domain_index ?? 0)
 
-  const timestamp_idx =
-    findTimestampInJSON(msg)
+  const timestamp_idx = findTimestampInJSON(msg)
 
   const now = new Date()
   const utcMilllisecondsSinceEpoch = now.getTime()
   const timestamp = Math.round(utcMilllisecondsSinceEpoch / 1000)
   const timestamp_idx_num = BigInt(timestamp_idx ?? 0)
 
-  let currentKey;
+  let currentKey
 
-  if (signer == "get-jwt") {
-    currentKey = JWT_CLIENT_PUBKEY;
+  if (signer == "vercel") {
+    currentKey = JWT_CLIENT_PUBKEY
   } else if (signer == "openai") {
     currentKey = OPENAI_PUBKEY
   }
 
-  const pubKeyData = pki.publicKeyFromPem(
-    currentKey
-  )
+  console.log(signer)
+
+  const pubKeyData = pki.publicKeyFromPem(currentKey)
 
   const modulus = BigInt(pubKeyData.n.toString())
   const fin_result = await getCircuitInputs(

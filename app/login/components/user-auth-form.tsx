@@ -31,7 +31,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     const storedPublicSignals = await localforage.getItem<string[]>(
       "publicSignals"
     )
-    if (storedProof && storedPublicSignals?.length) {
+    const storedKey = await localforage.getItem<string>("key")
+
+    if (storedProof && storedPublicSignals?.length && storedKey) {
       console.log("Proof found in local storage. Skipping proof generation.")
       const res = await fetch(
         process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
@@ -43,7 +45,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           body: JSON.stringify({
             proof: JSON.parse(storedProof),
             publicSignals: storedPublicSignals,
-            key: key
+            key: storedKey,
           }),
         }
       )
@@ -73,6 +75,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         console.log("Proof successfully generated", proof)
         await localforage.setItem("proof", JSON.stringify(proof))
         await localforage.setItem("publicSignals", publicSignals)
+        await localforage.setItem("key", key)
         const res = await fetch(
           process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
           {

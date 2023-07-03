@@ -66,6 +66,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         proof: req.proof,
         publicSignals: req.publicSignals,
+        key: req.key,
       }),
     }
   ).then((res) => res.json())

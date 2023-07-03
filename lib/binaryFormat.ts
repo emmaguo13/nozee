@@ -1,4 +1,4 @@
-import { CIRCOM_BIGINT_N, CIRCOM_BIGINT_K } from './constants'
+import { CIRCOM_BIGINT_K, CIRCOM_BIGINT_N } from "./constants"
 
 export function bytesToString(bytes: Uint8Array): string {
   return new TextDecoder().decode(bytes)
@@ -6,8 +6,8 @@ export function bytesToString(bytes: Uint8Array): string {
 
 export function stringToBytes(str: string) {
   const encodedText = new TextEncoder().encode(str)
-  const toReturn = Uint8Array.from(str, x => x.charCodeAt(0))
-  const buf = Buffer.from(str, 'utf8')
+  const toReturn = Uint8Array.from(str, (x) => x.charCodeAt(0))
+  const buf = Buffer.from(str, "utf8")
   return toReturn
   // TODO: Check encoding mismatch if the proof doesnt work
   // Note that our custom encoding function maps (239, 191, 189) -> (253)
@@ -51,7 +51,7 @@ export function bytesToBigInt(bytes: Uint8Array) {
 
 export function toCircomBigIntBytes(num: BigInt | bigint) {
   const res = []
-  const bigintNum: bigint = typeof num == 'bigint' ? num : num.valueOf()
+  const bigintNum: bigint = typeof num == "bigint" ? num : num.valueOf()
   const msk = (1n << BigInt(CIRCOM_BIGINT_N)) - 1n
   for (let i = 0; i < CIRCOM_BIGINT_K; ++i) {
     res.push(((bigintNum >> BigInt(i * CIRCOM_BIGINT_N)) & msk).toString())
@@ -60,7 +60,7 @@ export function toCircomBigIntBytes(num: BigInt | bigint) {
 }
 
 // https://stackoverflow.com/a/69585881
-const HEX_STRINGS = '0123456789abcdef'
+const HEX_STRINGS = "0123456789abcdef"
 const MAP_HEX = {
   0: 0,
   1: 1,
@@ -83,14 +83,14 @@ const MAP_HEX = {
   C: 12,
   D: 13,
   E: 14,
-  F: 15
+  F: 15,
 } as const
 
 // Fast Uint8Array to hex
 export function toHex(bytes: Uint8Array): string {
   return Array.from(bytes || [])
-    .map(b => HEX_STRINGS[b >> 4] + HEX_STRINGS[b & 15])
-    .join('')
+    .map((b) => HEX_STRINGS[b >> 4] + HEX_STRINGS[b & 15])
+    .join("")
 }
 
 // Mimics Buffer.from(x, 'hex') logic
@@ -98,10 +98,10 @@ export function toHex(bytes: Uint8Array): string {
 // https://github.com/nodejs/node/blob/v14.18.1/src/string_bytes.cc#L246-L261
 export function fromHex(hexString: string): Uint8Array {
   let hexStringTrimmed: string = hexString
-  if (hexString[0] === '0' && hexString[1] === 'x') {
+  if (hexString[0] === "0" && hexString[1] === "x") {
     hexStringTrimmed = hexString.slice(2)
   }
-  const bytes = new Uint8Array(Math.floor((hexStringTrimmed || '').length / 2))
+  const bytes = new Uint8Array(Math.floor((hexStringTrimmed || "").length / 2))
   let i
   for (i = 0; i < bytes.length; i++) {
     const a = MAP_HEX[hexStringTrimmed[i * 2] as keyof typeof MAP_HEX]
@@ -132,7 +132,7 @@ export function packBytesIntoNBytes(
   n = 7
 ): Array<bigint> {
   const messagePadded: Uint8Array =
-    typeof messagePaddedRaw === 'string'
+    typeof messagePaddedRaw === "string"
       ? stringToBytes(messagePaddedRaw)
       : messagePaddedRaw
   let output: Array<bigint> = []
@@ -143,11 +143,10 @@ export function packBytesIntoNBytes(
     const j = (i / n) | 0
     console.assert(
       j === output.length - 1,
-      'Not editing the index of the last element -- packing loop invariants bug!'
+      "Not editing the index of the last element -- packing loop invariants bug!"
     )
     output[j] += BigInt(messagePadded[i]) << BigInt((i % n) * 8)
   }
   return output
 }
 // Usage: let in_padded_n_bytes = packBytesIntoNBytes(messagePadded, 7).map((x) => x.toString()); // Packed into 7 byte signals
-

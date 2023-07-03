@@ -41,7 +41,9 @@ export default async function handler(
   const twentyMinutesInMilliseconds = 20 * 60 * 1000
 
   if (timeDifference > twentyMinutesInMilliseconds) {
-    return response.status(502).json({ error: "Invalid timestamp: generated too early" })
+    return response
+      .status(502)
+      .json({ error: "Invalid timestamp: generated too early" })
   }
 
   let domain = ""
