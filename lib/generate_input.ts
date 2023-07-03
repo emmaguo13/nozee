@@ -32,11 +32,13 @@ export async function generate_inputs(
 
   let currentKey;
 
-  if (signer == "get-jwt") {
+  if (signer == "vercel") {
     currentKey = JWT_CLIENT_PUBKEY;
   } else if (signer == "openai") {
     currentKey = OPENAI_PUBKEY
   }
+
+  console.log(signer)
 
   const pubKeyData = pki.publicKeyFromPem(
     currentKey
