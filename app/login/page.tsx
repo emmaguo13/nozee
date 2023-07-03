@@ -79,8 +79,11 @@ export default function AuthenticationPage() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  Follow the steps here to download the extension to get your
-                  JWT.
+                  Follow the steps{" "}
+                  <Link href="/help" className="underline">
+                    here
+                  </Link>{" "}
+                  to download the extension to get your JWT.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
