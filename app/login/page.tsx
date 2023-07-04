@@ -33,7 +33,12 @@ export default function AuthenticationPage() {
         >
           Home
         </Link>
-        <div className="relative flex h-full flex-col p-10 text-white lg:dark:border-r">
+        <div className="sm:hidden">
+          <p className="text-sm">
+            Please use a desktop browser to login to nozee.
+          </p>
+        </div>
+        <div className="relative hidden h-full flex-col p-10 text-white sm:flex lg:dark:border-r">
           <div className="absolute inset-0 bg-cover" />
           <div className="relative z-20 hidden items-center text-lg font-medium lg:flex">
             <Command className="mr-2 h-6 w-6" /> nozee
@@ -89,7 +94,7 @@ export default function AuthenticationPage() {
             </Accordion>
           </div>
         </div>
-        <div className="lg:p-8">
+        <div className="hidden sm:flex lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight">

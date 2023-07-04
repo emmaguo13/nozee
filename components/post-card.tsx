@@ -20,9 +20,9 @@ export function PostCard({ post }: { post: Post }) {
   const fillClassName = `fill-${color}-400`
   const textClassName = `text-${color}-400`
   return (
-    <Card>
+    <Card className="min-w-full">
       <CardHeader className="grid grid-cols-[1fr] items-start gap-4 space-y-0">
-        <div className="w-[500px] space-y-1 break-all">
+        <div className=" space-y-1 break-all">
           <CardTitle>{post.title}</CardTitle>
           <CardDescription>
             <div className="text-white">{truncatedMessage}</div>

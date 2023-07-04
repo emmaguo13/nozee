@@ -9,7 +9,7 @@ export default async function IndexPage() {
         <h1 className="text-2xl font-extrabold leading-tight tracking-tighter md:text-3xl">
           Installing the extension
         </h1>
-        <p className="max-w-[700px] text-lg">
+        <p className="max-w-prose text-lg">
           Nozee leverages the power of JWTs, a widely used standard for securely
           transmitting information. When you log in to Nozee, you use a JWT
           obtained from another site, such as ChatGPT, as your authentication
@@ -24,7 +24,7 @@ export default async function IndexPage() {
           from the JWT forms the basis for determining your company affiliation.
         </p>
 
-        <ol className="max-w-[700px] list-decimal text-lg">
+        <ol className="max-w-prose list-decimal text-lg">
           <li>
             <a
               className="underline"
@@ -53,7 +53,7 @@ export default async function IndexPage() {
           Logging in
         </h1>
 
-        <ol className="max-w-[700px] list-decimal text-lg">
+        <ol className="max-w-prose list-decimal text-lg">
           <li>
             Once you have the Nozee extension installed, navigate to a
             compatible site, such as ChatGPT.
