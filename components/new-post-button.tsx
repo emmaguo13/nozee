@@ -1,6 +1,7 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
+import { revalidatePath } from "next/cache"
 import localforage from "localforage"
 
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,29 @@ export function NewPostButton() {
   const [open, setOpen] = React.useState(false)
   const [title, setTitle] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
+  const [domain, setDomain] = React.useState("")
+
+  useEffect(() => {
+    const get = async () => {
+      const storedPublicSignals = await localforage.getItem<string[]>(
+        "publicSignals"
+      )
+      console.log(
+        "🚀 ~ file: new-post-button.tsx:40 ~ get ~ storedPublicSignals:",
+        storedPublicSignals
+      )
+      if (storedPublicSignals && storedPublicSignals.length > 0) {
+        let domain = ""
+        for (var i = 17; i < 47; i++) {
+          if (storedPublicSignals[i] != "0") {
+            domain += String.fromCharCode(parseInt(storedPublicSignals[i]))
+          }
+        }
+        setDomain(domain)
+      }
+    }
+    get()
+  }, [])
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -60,6 +84,7 @@ export function NewPostButton() {
         description: "Your post has been created",
       })
       setIsLoading(false)
+      revalidatePath("/")
     }
   }
 
@@ -76,7 +101,8 @@ export function NewPostButton() {
         <DialogHeader>
           <DialogTitle>Create a Post</DialogTitle>
           <DialogDescription>
-            Anonymously post while attesting that you&apos;re from [domain here]
+            Anonymously post while attesting that you&apos;re from{" "}
+            <p className="capitalize">{domain}</p>
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
