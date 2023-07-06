@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect } from "react"
-import { revalidatePath } from "next/cache"
+import { useRouter } from "next/navigation"
 import localforage from "localforage"
 
 import { Button } from "@/components/ui/button"
@@ -27,15 +27,12 @@ export function NewPostButton() {
   const [title, setTitle] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
   const [domain, setDomain] = React.useState("")
+  const router = useRouter()
 
   useEffect(() => {
     const get = async () => {
       const storedPublicSignals = await localforage.getItem<string[]>(
         "publicSignals"
-      )
-      console.log(
-        "🚀 ~ file: new-post-button.tsx:40 ~ get ~ storedPublicSignals:",
-        storedPublicSignals
       )
       if (storedPublicSignals && storedPublicSignals.length > 0) {
         let domain = ""
@@ -84,7 +81,7 @@ export function NewPostButton() {
         description: "Your post has been created",
       })
       setIsLoading(false)
-      revalidatePath("/")
+      router.refresh()
     }
   }
 
