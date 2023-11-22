@@ -29,3 +29,5 @@ export default async function IndexPage() {
     </>
   )
 }
+
+export const revalidate = 0
