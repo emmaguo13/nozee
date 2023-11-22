@@ -10,6 +10,7 @@ import { generate_inputs } from "@/lib/generate_input"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
+import { ec as EC } from 'elliptic';
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -18,6 +19,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [domain, setDomain] = React.useState<string>("")
+
+  // todo: this does not actually fix my error right now
+  const [previousProof, setPreviousProof] = React.useState<boolean>(false)
 
   const token = searchParams?.get("msg")
   const key = searchParams?.get("key")
@@ -33,10 +37,27 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     )
     const storedKey = await localforage.getItem<string>("key")
 
+    // check if priv and pub keys are also stored 
+    var storedPrivKey = await localforage.getItem<string>("privkey")
+    var storedPubKey = await localforage.getItem<string>("pubkey")
+
+    if (!(storedPrivKey && storedPubKey)) {
+      // add an ECDSA public key as public input to the proof
+      const ec = new EC('secp256k1');
+      var ecKey = ec.genKeyPair();
+      storedPubKey = ecKey.getPublic('hex');
+      storedPrivKey = ecKey.getPrivate('hex');
+
+      await localforage.setItem("privkey", storedPrivKey)
+      await localforage.setItem("pubkey", storedPubKey)
+      console.log("stored keys in local storage")
+    }
+
     if (storedProof && storedPublicSignals?.length && storedKey) {
+      setPreviousProof(true)
       console.log("Proof found in local storage. Skipping proof generation.")
       const res = await fetch(
-        process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
+        process.env.NEXT_PUBLIC_BASE_URL + "/api/addKey",
         {
           method: "POST",
           headers: {
@@ -46,6 +67,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             proof: JSON.parse(storedProof),
             publicSignals: storedPublicSignals,
             key: storedKey,
+            pubkey: storedPubKey
           }),
         }
       )
@@ -55,10 +77,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           `Verification successful. Domain: ${domain}. Is verified: ${isVerified}.`
         )
         setDomain(domain)
+
         return
       }
     } else {
+
       const splitToken = token.split(".")
+
+      // todo: add pubkey as a public input!
       const inputs = await generate_inputs(
         splitToken[2],
         splitToken[0] + "." + splitToken[1],
@@ -77,7 +103,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         await localforage.setItem("publicSignals", publicSignals)
         await localforage.setItem("key", key)
         const res = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
+          process.env.NEXT_PUBLIC_BASE_URL + "/api/addKey",
           {
             method: "POST",
             headers: {
@@ -87,6 +113,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               key: key as string,
               proof,
               publicSignals,
+              pubkey: storedPubKey
             }),
           }
         )
@@ -118,7 +145,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             ))}
           {downloadStatus === Status.DOWNLOADING
             ? "Getting proving key"
-            : !token
+            : !token && !previousProof
             ? "No JWT loaded"
             : !zkey
             ? "No proving key loaded"

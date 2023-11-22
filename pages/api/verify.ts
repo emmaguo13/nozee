@@ -52,5 +52,8 @@ export default async function handler(
       domain += String.fromCharCode(parseInt(b.publicSignals[i]))
     }
   }
+
+  // add the public key to firebase -- this public key is now a verified user
+
   return response.status(200).json({ domain, isVerified })
 }
