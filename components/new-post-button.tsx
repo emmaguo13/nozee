@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { ec as EC } from "elliptic"
 import localforage from "localforage"
 
 import { Button } from "@/components/ui/button"
@@ -54,11 +55,19 @@ export function NewPostButton() {
       "publicSignals"
     )
     const storedKey = await localforage.getItem<string>("key")
-
+    const storedPubKey = await localforage.getItem<string>("pubkey")
+    const storedPrivKey = await localforage.getItem<string>("privkey")
+    // although we do not need to verify a proof upon posting, we want the user to have prev verified a proof
     if (!storedProof || storedPublicSignals?.length === 0 || !storedKey) {
       alert("Please generate a proof first")
       return
     }
+    // todo: change msgHash to just msgHex, since we're not hashing the message, there's no need
+    const ec = new EC("secp256k1")
+    const hexMsg = Buffer.from(body, "utf8").toString("hex")
+    const key = ec.keyFromPrivate(storedPrivKey as string, "hex")
+    const signature = key.sign(hexMsg, "hex", { canonical: true }).toDER("hex")
+
     const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/write", {
       method: "POST",
       headers: {
@@ -66,10 +75,10 @@ export function NewPostButton() {
       },
       body: JSON.stringify({
         title,
-        body: body,
-        key: storedKey,
-        proof: JSON.parse(storedProof),
-        publicSignals: storedPublicSignals,
+        body,
+        pubkey: storedPubKey,
+        msgHash: hexMsg,
+        signature,
       }),
     })
     if (res.status === 200) {

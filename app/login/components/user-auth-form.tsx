@@ -4,13 +4,13 @@ import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Status, useApp } from "@/contexts/AppProvider"
+import { ec as EC } from "elliptic"
 import localforage from "localforage"
 
 import { generate_inputs } from "@/lib/generate_input"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
-import { ec as EC } from 'elliptic';
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -37,20 +37,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     )
     const storedKey = await localforage.getItem<string>("key")
 
-    // check if priv and pub keys are also stored 
+    // check if priv and pub keys are also stored
     var storedPrivKey = await localforage.getItem<string>("privkey")
     var storedPubKey = await localforage.getItem<string>("pubkey")
 
     if (!(storedPrivKey && storedPubKey)) {
       // add an ECDSA public key as public input to the proof
-      const ec = new EC('secp256k1');
-      var ecKey = ec.genKeyPair();
-      storedPubKey = ecKey.getPublic('hex');
-      storedPrivKey = ecKey.getPrivate('hex');
+      const ec = new EC("secp256k1")
+      var ecKey = ec.genKeyPair()
+      storedPubKey = ecKey.getPublic("hex")
+      storedPrivKey = ecKey.getPrivate("hex")
 
       await localforage.setItem("privkey", storedPrivKey)
       await localforage.setItem("pubkey", storedPubKey)
-      console.log("stored keys in local storage")
     }
 
     if (storedProof && storedPublicSignals?.length && storedKey) {
@@ -67,7 +66,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             proof: JSON.parse(storedProof),
             publicSignals: storedPublicSignals,
             key: storedKey,
-            pubkey: storedPubKey
+            pubkey: storedPubKey,
           }),
         }
       )
@@ -81,7 +80,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         return
       }
     } else {
-
       const splitToken = token.split(".")
 
       // todo: add pubkey as a public input!
@@ -113,7 +111,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               key: key as string,
               proof,
               publicSignals,
-              pubkey: storedPubKey
+              pubkey: storedPubKey,
             }),
           }
         )

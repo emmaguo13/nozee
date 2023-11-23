@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import * as admin from "firebase-admin"
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+
+import "firebase/firestore"
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -15,23 +15,33 @@ if (!admin.apps.length) {
 
 const db = admin.firestore()
 
-async function addPubKey(pubkey: string, domain:string, time: Date) {
-  const exp = firebase.firestore.Timestamp.fromDate(time);
+async function addPubKey(pubkey: string, domain: string, time: Date) {
+  // Their firebase proof expiration is 2 weeks from when they last generated the proof.
+  const new_time = new Date(time)
+  new_time.setDate(new_time.getDate() + 14)
+
   const user = {
-    pubkey, 
-    domain, 
-    exp
+    pubkey,
+    domain,
+    exp: new_time.toISOString(),
   }
-  return db
-    .collection("pubkeys")
-    .add(user)
-    .then((docRef) => {
-      console.log("Document written with ID: ", docRef.id)
-      return docRef.id
-    })
-    .catch((error) => {
-      throw new Error(error)
-    })
+
+  const ref = db.collection("pubkeys")
+  const query = ref.where("pubkey", "==", pubkey)
+  const snapshot = await query.get()
+
+  if (snapshot.empty) {
+    db.collection("pubkeys")
+      .add(user)
+      .then((docRef) => {
+        console.log("Document written with ID: ", docRef.id)
+      })
+      .catch((error) => {
+        throw new Error(error)
+      })
+  } else {
+    console.log("Pubkey already exists")
+  }
 }
 
 export async function POST(request: Request) {
@@ -56,12 +66,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const res = await addPubKey(
-      req.pubkey, 
-      domain, 
-      time
-    )
-    // res = docRef.id
+    await addPubKey(req.pubkey, domain, time)
     return NextResponse.json({ isVerified, domain }, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 })

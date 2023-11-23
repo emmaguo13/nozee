@@ -31,7 +31,7 @@ async function web3storeFiles(files: File[]) {
   return cid
 }
 
-async function createPost({ domain, body, title }: Post) {
+async function createPost(title: string, domain: string, body: string) {
   const post = {
     body,
     domain,
@@ -55,34 +55,33 @@ async function createPost({ domain, body, title }: Post) {
 }
 
 export async function POST(request: Request) {
+  // request: { pubkey: string, signature: string, msgHash: string, title: string, body: string }
   const req = await request.json()
-  const { isVerified, domain } = await fetch(
-    process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
+
+  const { isValid, domain } = await fetch(
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/verifySig",
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        proof: req.proof,
-        publicSignals: req.publicSignals,
-        key: req.key,
+        pubkey: req.pubkey,
+        signature: req.signature,
+        msgHash: req.msgHash,
       }),
     }
   ).then((res) => res.json())
 
-  if (!isVerified) {
-    return NextResponse.json({ error: "Proof not verified" }, { status: 500 })
+  if (!isValid) {
+    return NextResponse.json(
+      { error: "Signature not verified" },
+      { status: 500 }
+    )
   }
 
   try {
-    const res = await createPost({
-      title: req.title,
-      domain,
-      body: req.body,
-      id: "",
-      timestamp: "",
-    })
+    const res = await createPost(req.title, domain, req.body)
     return NextResponse.json({ ...res, domain }, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 })

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
+import { ec as EC } from "elliptic"
 import * as admin from "firebase-admin"
-import { ec as EC } from 'elliptic';
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -15,43 +15,51 @@ if (!admin.apps.length) {
 const db = admin.firestore()
 
 export async function POST(request: Request) {
+  // request: { pubkey: string, signature: string, msgHash: string }
   const req = await request.json()
 
   try {
+    var ec = new EC("secp256k1")
     const ref = db.collection("pubkeys")
     const query = ref.where("pubkey", "==", req.pubkey)
     const snapshot = await query.get()
-    
+
     if (snapshot.empty) {
-        throw new Error("No matching documents.")
+      throw new Error("No matching documents.")
     }
     const res = snapshot.docs.map((doc) => doc.data())[0]
-    const exp = res.exp.toDate().getTime()
-    const publicKey = res.pubkey
+    const exp = new Date(res.exp)
+    const publicKey = ec.keyFromPublic(res.pubkey, "hex")
 
-    const current_time = new Date().getTime()
-
-    if (current_time > exp) {
-        
-    }
+    const current_time = new Date()
 
     // check expiration
-    console.log(publicKey)
+    if (current_time.getTime() <= exp.getTime()) {
+      // verify signature
+      // todo: i feel like i won't need this hex conversion of signature
+      var signatureDER = new Buffer(req.signature, "hex")
 
-    // todo: make error handling better
+      var isValidSignature = ec.verify(
+        req.msgHash,
+        signatureDER,
+        publicKey,
+        "hex"
+      )
 
-    // verify signature
-    var ec = new EC('secp256k1');
-
-    var signatureDER = new Buffer(req.signature, 'hex');
-    var isValidSignature = ec.verify(req.msgHash, signatureDER, publicKey, 'hex');
-
-    if (isValidSignature) {
-        return NextResponse.json(true, { status: 200 })
-    } else {
+      if (isValidSignature) {
+        return NextResponse.json(
+          { isValid: true, domain: res.domain },
+          { status: 200 }
+        )
+      } else {
         throw new Error("Invalid ECDSA signature")
+      }
+    } else {
+      // todo: make it more clear when a jwt is expired!
+      throw new Error("Expired")
     }
 
+    // todo: make error handling better
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 })
   }
