@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import * as admin from "firebase-admin"
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -13,10 +15,12 @@ if (!admin.apps.length) {
 
 const db = admin.firestore()
 
-async function addPubKey(pubkey: string, domain:string) {
+async function addPubKey(pubkey: string, domain:string, time: Date) {
+  const exp = firebase.firestore.Timestamp.fromDate(time);
   const user = {
     pubkey, 
-    domain
+    domain, 
+    exp
   }
   return db
     .collection("pubkeys")
@@ -32,7 +36,7 @@ async function addPubKey(pubkey: string, domain:string) {
 
 export async function POST(request: Request) {
   const req = await request.json()
-  const { isVerified, domain } = await fetch(
+  const { isVerified, domain, time } = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
     {
       method: "POST",
@@ -54,7 +58,8 @@ export async function POST(request: Request) {
   try {
     const res = await addPubKey(
       req.pubkey, 
-      domain
+      domain, 
+      time
     )
     // res = docRef.id
     return NextResponse.json({ isVerified, domain }, { status: 200 })

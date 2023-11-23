@@ -27,9 +27,10 @@ export default async function handler(
   }
 
   const timestamp = parseInt(request.body.publicSignals[48])
+  const formatted_timestamp = new Date(timestamp * 1000).toLocaleString()
   console.log(
     "🚀 ~ file: route.ts:23 ~ POST ~ timestamp:",
-    new Date(timestamp * 1000).toLocaleString()
+    formatted_timestamp
   )
   const current_timestamp = Math.round(new Date().getTime() / 1000)
   console.log(
@@ -55,5 +56,5 @@ export default async function handler(
 
   // add the public key to firebase -- this public key is now a verified user
 
-  return response.status(200).json({ domain, isVerified })
+  return response.status(200).json({ domain, isVerified, time: formatted_timestamp })
 }
