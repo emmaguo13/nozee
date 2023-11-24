@@ -31,13 +31,19 @@ async function web3storeFiles(files: File[]) {
   return cid
 }
 
-async function createPost(title: string, domain: string, body: string) {
+async function createPost(
+  title: string,
+  domain: string,
+  body: string,
+  pubkey: string
+) {
   const post = {
     body,
     domain,
     title,
     id: randomUUID(),
     timestamp: Date.now(),
+    pubkey,
   }
   const buffer = Buffer.from(JSON.stringify(post))
   const files = [new File([buffer], "hello.json")]
@@ -81,7 +87,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const res = await createPost(req.title, domain, req.body)
+    const res = await createPost(req.title, domain, req.body, req.pubkey)
     return NextResponse.json({ ...res, domain }, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 })

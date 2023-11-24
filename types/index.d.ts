@@ -6,9 +6,13 @@ export interface NavItem {
 }
 
 export type Comment = {
-  epoch: string
+  // epoch: string
   comment: string
-  company: string
+  domain: string
+  pubkey: string
+  timestamp: string
+  upvotes: string[]
+  id: string
 }
 
 export type Post = {
@@ -17,4 +21,7 @@ export type Post = {
   body: string
   id: string
   timestamp: string
+  comments: Comment[]
+  upvotes: string[] // string of public keys
+  pubkey: string
 }

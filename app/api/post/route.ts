@@ -23,5 +23,6 @@ export async function POST(request: Request) {
   const query = ref.where("id", "==", req.id)
   const snapshot = await query.get()
 
+  // todo: handle when some post fields are missing
   return NextResponse.json(snapshot.docs.map((doc) => doc.data())[0] as Post)
 }
