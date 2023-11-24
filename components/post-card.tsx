@@ -11,8 +11,13 @@ import {
 } from "@/components/ui/card"
 import { ReactButton } from "@/components/react-button"
 
-export function PostCard({ post }: { post: Post }) {
-  const MAX_LENGTH = 200
+export function PostCard({ post, preview }: { post: Post; preview: boolean }) {
+  var MAX_LENGTH = 150
+
+  if (!preview) {
+    MAX_LENGTH = 500
+  }
+
   const truncatedMessage =
     post.body?.length > MAX_LENGTH
       ? post.body.slice(0, MAX_LENGTH) + "..."

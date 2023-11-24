@@ -83,14 +83,14 @@ export function PostWrapper({ post }: { post: Post }) {
       <Dialog onOpenChange={setOpen} open={open}>
         <DialogTrigger asChild>
           <div onClick={() => setOpen(true)}>
-            <PostCard post={post} key={post.id} />
+            <PostCard post={post} key={post.id} preview={true} />
           </div>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <div className="grid gap-4 py-4">
             <div>
               <div className="flex flex-col items-start gap-2">
-                <PostCard post={post} key={post.id} />
+                <PostCard post={post} key={post.id} preview={false} />
                 {post.comments ? (
                   post.comments.map((comment: Comment) => (
                     <CommentCard comment={comment} postId={post.id} />

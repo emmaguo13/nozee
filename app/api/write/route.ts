@@ -1,20 +1,9 @@
 import { randomUUID } from "crypto"
 import { NextResponse } from "next/server"
 import { Post } from "@/types"
-import * as admin from "firebase-admin"
 import { File, Web3Storage } from "web3.storage"
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
-    }),
-  })
-}
-
-const db = admin.firestore()
+import db from "@/app/lib/firebase"
 
 function getAccessToken() {
   return process.env.WEB3_STORAGE_TOKEN
