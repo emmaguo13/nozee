@@ -11,9 +11,11 @@ import { cn } from "@/lib/utils"
 export function ReactButton({
   color,
   postId,
+  commentId,
 }: {
   color: string
   postId: string
+  commentId: string
 }) {
   const [isLoading, setIsLoading] = React.useState(false)
   const router = useRouter()
@@ -51,6 +53,7 @@ export function ReactButton({
         pubkey: storedPubKey,
         signature,
         postId: postId,
+        commentId: commentId,
       }),
     })
     if (res.status === 200) {

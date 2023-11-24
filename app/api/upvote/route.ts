@@ -14,11 +14,41 @@ if (!admin.apps.length) {
 
 const db = admin.firestore()
 
-export async function upvotePost(postId: string, pubkey: string) {
+export async function upvotePost(
+  postId: string,
+  pubkey: string,
+  commentId: string
+) {
   const postRef = db.collection("posts").doc(postId)
   const post = (await postRef.get()).data() as Post
 
-  console.log(post)
+  if (!post) {
+    throw Error("Post not found")
+  }
+
+  if (commentId != "") {
+    var comments = post.comments
+    var comment = comments.find((c) => c.id == commentId)
+
+    if (!comment) {
+      throw Error("Comment not found")
+    }
+    var upvotes = comment.upvotes
+
+    if (!upvotes) {
+      upvotes = []
+    }
+
+    if (upvotes.includes(pubkey)) {
+      return
+    }
+    const newUpvotes = [...upvotes, pubkey]
+    comment = { ...comment, upvotes: newUpvotes }
+    const newComments = comments.map((c) => (c.id == commentId ? comment : c))
+    await postRef.update({ comments: newComments })
+    return
+  }
+
   var upvotes = post.upvotes
 
   if (!upvotes) {
@@ -63,7 +93,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await upvotePost(req.postId, req.pubkey)
+    await upvotePost(req.postId, req.pubkey, req.commentId)
     return NextResponse.json({ status: 200 })
   } catch (error) {
     return NextResponse.json({ error }, { status: 501 })

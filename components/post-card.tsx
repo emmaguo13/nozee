@@ -46,7 +46,7 @@ export function PostCard({ post }: { post: Post }) {
             })}
           </div>
           <div className="flex items-center capitalize">
-            <ReactButton color={color} postId={post.id} />
+            <ReactButton color={color} postId={post.id} commentId={""} />
             {post.upvotes ? post.upvotes.length : 0}
           </div>
         </div>

@@ -10,7 +10,13 @@ import {
 } from "@/components/ui/card"
 import { ReactButton } from "@/components/react-button"
 
-export function CommentCard({ comment }: { comment: Comment }) {
+export function CommentCard({
+  comment,
+  postId,
+}: {
+  comment: Comment
+  postId: string
+}) {
   const MAX_LENGTH = 200
   const truncatedMessage =
     comment.comment?.length > MAX_LENGTH
@@ -44,7 +50,7 @@ export function CommentCard({ comment }: { comment: Comment }) {
             })}
           </div>
           <div className="flex items-center capitalize">
-            <ReactButton color={color} postId={comment.id} />
+            <ReactButton color={color} postId={postId} commentId={comment.id} />
             {comment.upvotes ? comment.upvotes.length : 0}
           </div>
         </div>

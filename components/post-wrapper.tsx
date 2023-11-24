@@ -93,7 +93,7 @@ export function PostWrapper({ post }: { post: Post }) {
                 <PostCard post={post} key={post.id} />
                 {post.comments ? (
                   post.comments.map((comment: Comment) => (
-                    <CommentCard comment={comment} />
+                    <CommentCard comment={comment} postId={post.id} />
                   ))
                 ) : (
                   <div></div>
