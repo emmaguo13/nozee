@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { Proof } from "@/types"
 
-import db from "@/app/lib/firebase"
+import db from "@/lib/firebase"
 
 // note: the proof is a json string
 // todo: ^ clean this

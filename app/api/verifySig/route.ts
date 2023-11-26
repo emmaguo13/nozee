@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 
-import db from "@/app/lib/firebase"
-import { ecdsaVerify } from "@/app/lib/verifySig"
+import db from "@/lib/firebase"
+import { ecdsaVerify } from "@/lib/verifySig"
 
 export async function POST(request: Request) {
   // request: { pubkey: string, signature: string, msgHash: string }

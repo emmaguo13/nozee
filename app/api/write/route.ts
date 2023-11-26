@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 import { Post } from "@/types"
 import { File, Web3Storage } from "web3.storage"
 
-import db from "@/app/lib/firebase"
+import db from "@/lib/firebase"
 
 function getAccessToken() {
   return process.env.WEB3_STORAGE_TOKEN

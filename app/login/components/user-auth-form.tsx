@@ -45,7 +45,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
     if (storedProof && storedPublicSignals?.length && storedKey) {
       console.log("Proof found in local storage. Skipping proof generation.")
-
+      
       const res = await fetch(
         process.env.NEXT_PUBLIC_BASE_URL + "/api/addKey",
         {

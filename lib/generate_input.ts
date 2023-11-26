@@ -6,6 +6,7 @@ import {
 } from "./constants"
 import { Hash } from "./fast-sha256"
 import { shaHash } from "./shaHash"
+import { domainBlacklist } from "./filterEmail"
 
 const pki = require("node-forge").pki
 
@@ -19,6 +20,10 @@ export async function generate_inputs(
   const period_idx_num = BigInt(msg.indexOf("."))
 
   const { domain: domainStr, domain_idx: domain_index } = findDomain(msg)
+
+  if (domainBlacklist.includes(domainStr as string)) {
+    alert("Please login to ChatGPT with your work email")
+  }
   const domain = Buffer.from(domainStr ?? "")
   const domain_idx_num = BigInt(domain_index ?? 0)
 
@@ -31,9 +36,11 @@ export async function generate_inputs(
 
   let currentKey
 
-  if (signer == "vercel") {
-    currentKey = JWT_CLIENT_PUBKEY
-  } else if (signer == "openai") {
+  // if (signer == "vercel") {
+  //   currentKey = JWT_CLIENT_PUBKEY
+  // } else 
+  
+  if (signer == "openai") {
     currentKey = OPENAI_PUBKEY
   }
 

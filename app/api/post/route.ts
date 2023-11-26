@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { Post } from "@/types"
 
-import db from "@/app/lib/firebase"
+import db from "@/lib/firebase"
 
 export async function POST(request: Request) {
   const req = await request.json()
