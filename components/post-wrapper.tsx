@@ -89,7 +89,7 @@ export function PostWrapper({ post }: { post: Post }) {
         <DialogContent className="sm:max-w-[425px]">
           <div className="grid gap-4 py-4">
             <div>
-              <div className="flex flex-col items-start gap-2">
+              <div className="flex max-h-60 flex-col items-start gap-2 overflow-auto">
                 <PostCard post={post} key={post.id} preview={false} />
                 {post.comments ? (
                   post.comments.map((comment: Comment) => (

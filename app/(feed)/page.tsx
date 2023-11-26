@@ -1,6 +1,7 @@
 import { Post } from "@/types"
 import * as admin from "firebase-admin"
 
+import { Intro } from "@/components/intro"
 import { PostWrapper } from "@/components/post-wrapper"
 
 if (!admin.apps.length) {
@@ -23,6 +24,7 @@ export default async function IndexPage() {
   const posts = snapshot.docs.map((doc) => doc.data() as Post)
   return (
     <>
+      <Intro />
       {posts.map((post: Post) => (
         <PostWrapper post={post} key={post.id} />
       ))}

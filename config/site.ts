@@ -12,6 +12,18 @@ export const siteConfig = {
       title: "Login",
       href: "/login",
     },
+    {
+      title: "About",
+      href: "/about",
+    },
+    {
+      title: "Privacy",
+      href: "/privacy",
+    },
+    {
+      title: "Guidelines",
+      href: "/guidelines",
+    },
   ],
   links: {
     github: "https://github.com/sehyunc/nozee",

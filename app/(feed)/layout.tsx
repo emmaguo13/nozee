@@ -1,8 +1,8 @@
 import { Post } from "@/types"
 import * as admin from "firebase-admin"
 
+import { SidebarNav } from "@/components/sidebar-nav"
 import { SiteHeader } from "@/components/site-header"
-import { SidebarNav } from "@/app/(feed)/components/sidebar-nav"
 
 interface MarketingLayoutProps {
   children: React.ReactNode
