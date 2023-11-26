@@ -11,6 +11,8 @@ export async function upvotePost(
   const postRef = db.collection("posts").doc(postId)
   const post = (await postRef.get()).data() as Post
 
+  var newUpvotes = [] as string[]
+
   if (!post) {
     throw Error("Post not found")
   }
@@ -28,10 +30,12 @@ export async function upvotePost(
       upvotes = []
     }
 
+    // remove upvote
     if (upvotes.includes(pubkey)) {
-      return
+      newUpvotes = upvotes.filter((u) => u != pubkey)
+    } else {
+      newUpvotes = [...upvotes, pubkey]
     }
-    const newUpvotes = [...upvotes, pubkey]
     comment = { ...comment, upvotes: newUpvotes }
     const newComments = comments.map((c) => (c.id == commentId ? comment : c))
     await postRef.update({ comments: newComments })
@@ -45,9 +49,10 @@ export async function upvotePost(
   }
 
   if (upvotes.includes(pubkey)) {
-    return
+    newUpvotes = upvotes.filter((u) => u != pubkey)
+  } else {
+    newUpvotes = [...upvotes, pubkey]
   }
-  const newUpvotes = [...upvotes, pubkey]
 
   await postRef.update({ upvotes: newUpvotes })
 }
@@ -66,7 +71,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         pubkey: req.pubkey,
         signature: req.signature,
-        msgHash: req.postId,
+        msgHash: (req.commentId != "" ? req.commentId :req.postId),
       }),
     }
   ).then((res) => res.json())
