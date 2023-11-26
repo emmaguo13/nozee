@@ -4,31 +4,28 @@ import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Status, useApp } from "@/contexts/AppProvider"
-import { ec as EC } from "elliptic"
 import localforage from "localforage"
 
 import { generate_inputs } from "@/lib/generate_input"
 import { cn } from "@/lib/utils"
+import { generateAndStoreKey, retrievePublicKey } from "@/lib/webcrypto"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const { downloadStatus, zkey } = useApp()
+  const { downloadStatus, zkey, proofExists } = useApp()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [domain, setDomain] = React.useState<string>("")
-
-  // todo: this does not actually fix my error right now
-  const [previousProof, setPreviousProof] = React.useState<boolean>(false)
 
   const token = searchParams?.get("msg")
   const key = searchParams?.get("key")
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault()
-    if (!token) return
+    if (!token && !proofExists) return
     setIsLoading(true)
 
     const storedProof = await localforage.getItem<string>("proof")
@@ -38,23 +35,17 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     const storedKey = await localforage.getItem<string>("key")
 
     // check if priv and pub keys are also stored
-    var storedPrivKey = await localforage.getItem<string>("privkey")
-    var storedPubKey = await localforage.getItem<string>("pubkey")
+    var pubKey = await retrievePublicKey()
 
-    if (!(storedPrivKey && storedPubKey)) {
+    if (pubKey == "") {
       // add an ECDSA public key as public input to the proof
-      const ec = new EC("secp256k1")
-      var ecKey = ec.genKeyPair()
-      storedPubKey = ecKey.getPublic("hex")
-      storedPrivKey = ecKey.getPrivate("hex")
-
-      await localforage.setItem("privkey", storedPrivKey)
-      await localforage.setItem("pubkey", storedPubKey)
+      await generateAndStoreKey()
+      pubKey = await retrievePublicKey()
     }
 
     if (storedProof && storedPublicSignals?.length && storedKey) {
-      setPreviousProof(true)
       console.log("Proof found in local storage. Skipping proof generation.")
+
       const res = await fetch(
         process.env.NEXT_PUBLIC_BASE_URL + "/api/addKey",
         {
@@ -66,7 +57,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             proof: JSON.parse(storedProof),
             publicSignals: storedPublicSignals,
             key: storedKey,
-            pubkey: storedPubKey,
+            pubkey: pubKey,
           }),
         }
       )
@@ -80,7 +71,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         return
       }
     } else {
-      const splitToken = token.split(".")
+      const splitToken = (token as string).split(".")
 
       // todo: add pubkey as a public input!
       const inputs = await generate_inputs(
@@ -111,7 +102,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               key: key as string,
               proof,
               publicSignals,
-              pubkey: storedPubKey,
+              pubkey: pubKey,
             }),
           }
         )
@@ -134,7 +125,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         </Button>
       ) : (
         <Button
-          disabled={!token || isLoading || downloadStatus !== Status.DOWNLOADED}
+          disabled={
+            (!token || isLoading || downloadStatus !== Status.DOWNLOADED) &&
+            !proofExists
+          }
           onClick={onSubmit}
         >
           {isLoading ||
@@ -143,11 +137,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             ))}
           {downloadStatus === Status.DOWNLOADING
             ? "Getting proving key"
-            : !token && !previousProof
+            : !token && !proofExists
             ? "No JWT loaded"
             : !zkey
             ? "No proving key loaded"
-            : "Generate proof"}
+            : "Authenticate"}
         </Button>
       )}
     </div>

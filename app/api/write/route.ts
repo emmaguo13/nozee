@@ -24,9 +24,10 @@ async function createPost(
   title: string,
   domain: string,
   body: string,
-  pubkey: string
+  pubkey: string,
+  id: string
 ) {
-  const post = {
+  var post = {
     body,
     domain,
     title,
@@ -34,13 +35,42 @@ async function createPost(
     timestamp: Date.now(),
     pubkey,
   }
+
+  // check if we're editing or posting
+  if (id != "") {
+    // verify that their pubkey is the same as the pubkey from the post
+    const postRef = db.collection("posts").doc(post.id)
+    const doc = await postRef.get()
+    if (doc.exists) {
+      const postPubkey = (doc.data() as Post).pubkey
+      if (postPubkey != pubkey) {
+        throw new Error("pubkeys dont match")
+      }
+    } else {
+      // todo: better error handling here
+      throw new Error("no such post")
+    }
+
+    post = {
+      body,
+      domain,
+      title,
+      id: id,
+      timestamp: Date.now(),
+      pubkey,
+    }
+  }
+
   const buffer = Buffer.from(JSON.stringify(post))
   const files = [new File([buffer], "hello.json")]
   const cid = await web3storeFiles(files)
+
+  const submit = { ...post, web3Id: cid }
+
   return db
     .collection("posts")
     .doc(post.id)
-    .set(post)
+    .set(submit)
     .then((docRef) => {
       return { docRef, cid }
     })
@@ -50,7 +80,7 @@ async function createPost(
 }
 
 export async function POST(request: Request) {
-  // request: { pubkey: string, signature: string, msgHash: string, title: string, body: string }
+  // request: { pubkey: string, signature: string, msgHash: string, title: string, body: string, id: string }
   const req = await request.json()
 
   const { isValid, domain } = await fetch(
@@ -63,7 +93,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         pubkey: req.pubkey,
         signature: req.signature,
-        msgHash: req.msgHash,
+        msgHash: req.body,
       }),
     }
   ).then((res) => res.json())
@@ -76,9 +106,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const res = await createPost(req.title, domain, req.body, req.pubkey)
+    const res = await createPost(
+      req.title,
+      domain,
+      req.body,
+      req.pubkey,
+      req.postId
+    )
     return NextResponse.json({ ...res, domain }, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 })
+    return NextResponse.json({ error }, { status: 501 })
   }
 }

@@ -24,4 +24,11 @@ export type Post = {
   comments: Comment[]
   upvotes: string[] // string of public keys
   pubkey: string
+  web3Id: string
+}
+
+export type Proof = {
+  pi_a: number[]
+  pi_b: number[][]
+  pi_c: number[]
 }

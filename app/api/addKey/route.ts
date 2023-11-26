@@ -1,9 +1,17 @@
 import { NextResponse } from "next/server"
-import * as admin from "firebase-admin"
+import { Proof } from "@/types"
 
 import db from "@/app/lib/firebase"
 
-async function addPubKey(pubkey: string, domain: string, time: Date) {
+// note: the proof is a json string
+// todo: ^ clean this
+async function addPubKey(
+  pubkey: string,
+  domain: string,
+  time: Date,
+  proof: Proof,
+  publicSignals: number[]
+) {
   // Their firebase proof expiration is 2 weeks from when they last generated the proof.
   const new_time = new Date(time)
   new_time.setDate(new_time.getDate() + 14)
@@ -12,6 +20,8 @@ async function addPubKey(pubkey: string, domain: string, time: Date) {
     pubkey,
     domain,
     exp: new_time.toISOString(),
+    proof: JSON.stringify(proof),
+    publicSignals,
   }
 
   const ref = db.collection("pubkeys")
@@ -23,9 +33,6 @@ async function addPubKey(pubkey: string, domain: string, time: Date) {
       .add(user)
       .then((docRef) => {
         console.log("Document written with ID: ", docRef.id)
-      })
-      .catch((error) => {
-        throw new Error(error)
       })
   } else {
     console.log("Pubkey already exists")
@@ -54,9 +61,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    await addPubKey(req.pubkey, domain, time)
+    await addPubKey(req.pubkey, domain, time, req.proof, req.publicSignals)
     return NextResponse.json({ isVerified, domain }, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 })
+    return NextResponse.json({ error }, { status: 501 })
   }
 }

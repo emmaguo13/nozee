@@ -1,5 +1,5 @@
 import { Post } from "@/types"
-import { Circle, ThumbsUp } from "lucide-react"
+import { Circle, MessageCircle } from "lucide-react"
 
 import { cn, getHashColor } from "@/lib/utils"
 import {
@@ -53,6 +53,14 @@ export function PostCard({ post, preview }: { post: Post; preview: boolean }) {
           <div className="flex items-center capitalize">
             <ReactButton color={color} postId={post.id} commentId={""} />
             {post.upvotes ? post.upvotes.length : 0}
+          </div>
+
+          <div className="flex items-center capitalize">
+            {/* <EditButton color={color} postId={post.id} commentId={""} body={} /> */}
+            <MessageCircle
+              className={cn("mr-1 h-3 w-3", fillClassName, textClassName)}
+            />
+            {post.comments ? post.comments.length : 0}
           </div>
         </div>
       </CardContent>

@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto"
 import { NextResponse } from "next/server"
 import { Post } from "@/types"
-import { ec as EC } from "elliptic"
 
 import db from "@/app/lib/firebase"
 
@@ -9,25 +8,49 @@ export async function comment(
   postId: string,
   pubkey: string,
   domain: string,
-  comment: string
+  comment: string,
+  id: string
 ) {
   const postRef = db.collection("posts").doc(postId)
   const post = (await postRef.get()).data() as Post
   var comments = post.comments
 
-  const newComment = {
+  if (!comments) {
+    comments = []
+  }
+
+  var newComment = {
     comment,
     domain,
     pubkey,
     timestamp: Date.now(),
-    upvotes: [],
+    upvotes: [] as string[],
     id: randomUUID(),
   }
-  if (!comments) {
-    comments = []
+
+  // todo: clean, make edits work eventually
+  if (id != "" && comments.length != 0) {
+    const matchingComment = comments.find((comment) => comment.id === id)
+    if (!matchingComment) {
+      throw Error("Comment not found")
+    }
+
+    if (matchingComment.pubkey != pubkey) {
+      throw Error("Pubkey doesn't match")
+    }
+
+    newComment = {
+      comment,
+      domain,
+      pubkey,
+      timestamp: Date.now(),
+      id: matchingComment.id,
+      upvotes: matchingComment.upvotes,
+    }
   }
+
   const newComments = [...comments, newComment]
-  await postRef.update({ comments: newComments })
+  await postRef.set({ comments: newComments }, { merge: true })
 }
 
 export async function POST(request: Request) {
@@ -35,9 +58,6 @@ export async function POST(request: Request) {
   const req = await request.json()
 
   // signature is of the post id
-  const ec = new EC("secp256k1")
-  const hexMsg = Buffer.from(req.postId, "utf8").toString("hex")
-
   const { isValid, domain } = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/verifySig",
     {
@@ -48,7 +68,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         pubkey: req.pubkey,
         signature: req.signature,
-        msgHash: hexMsg,
+        msgHash: req.postId,
       }),
     }
   ).then((res) => res.json())
@@ -61,7 +81,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await comment(req.postId, req.pubkey, domain, req.comment)
+    await comment(req.postId, req.pubkey, domain, req.comment, req.id)
     return NextResponse.json({ status: 200 })
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 })

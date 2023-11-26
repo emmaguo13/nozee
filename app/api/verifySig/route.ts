@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server"
-import { ec as EC } from "elliptic"
 
 import db from "@/app/lib/firebase"
+import { ecdsaVerify } from "@/app/lib/verifySig"
 
 export async function POST(request: Request) {
   // request: { pubkey: string, signature: string, msgHash: string }
   const req = await request.json()
 
   try {
-    var ec = new EC("secp256k1")
     const ref = db.collection("pubkeys")
     const query = ref.where("pubkey", "==", req.pubkey)
     const snapshot = await query.get()
@@ -18,21 +17,16 @@ export async function POST(request: Request) {
     }
     const res = snapshot.docs.map((doc) => doc.data())[0]
     const exp = new Date(res.exp)
-    const publicKey = ec.keyFromPublic(res.pubkey, "hex")
 
     const current_time = new Date()
 
     // check expiration
     if (current_time.getTime() <= exp.getTime()) {
       // verify signature
-      // todo: i feel like i won't need this hex conversion of signature
-      var signatureDER = new Buffer(req.signature, "hex")
-
-      var isValidSignature = ec.verify(
+      var isValidSignature = await ecdsaVerify(
         req.msgHash,
-        signatureDER,
-        publicKey,
-        "hex"
+        req.signature,
+        res.pubkey
       )
 
       if (isValidSignature) {

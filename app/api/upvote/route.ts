@@ -48,16 +48,13 @@ export async function upvotePost(
     return
   }
   const newUpvotes = [...upvotes, pubkey]
-  console.log(newUpvotes)
+
   await postRef.update({ upvotes: newUpvotes })
 }
 
 export async function POST(request: Request) {
-  // request: { pubkey: string, signature: string, postId: string }
+  // request: { pubkey: string, signature: string, postId: string, commentId: string }
   const req = await request.json()
-
-  // signature is of the post id
-  const hexMsg = Buffer.from(req.postId, "utf8").toString("hex")
 
   const { isValid, domain } = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/verifySig",
@@ -69,7 +66,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         pubkey: req.pubkey,
         signature: req.signature,
-        msgHash: hexMsg,
+        msgHash: req.postId,
       }),
     }
   ).then((res) => res.json())

@@ -1,29 +1,23 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React from "react"
 import { useRouter } from "next/navigation"
 import { Comment, Post } from "@/types"
-import { ec as EC } from "elliptic"
 import localforage from "localforage"
 
+import { ecdsaSign, retrievePublicKey } from "@/lib/webcrypto"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Icons } from "@/components/icons"
-import { PostCard } from "@/components/post-card"
-import MarketingLayout from "@/app/(feed)/layout"
 
 import { CommentCard } from "./comment-card"
+import { PostCard } from "./post-card"
 import { Card } from "./ui/card"
 import { toast } from "./ui/use-toast"
 
@@ -40,18 +34,23 @@ export function PostWrapper({ post }: { post: Post }) {
       "publicSignals"
     )
     const storedKey = await localforage.getItem<string>("key")
-    const storedPubKey = await localforage.getItem<string>("pubkey")
-    const storedPrivKey = await localforage.getItem<string>("privkey")
+
     // although we do not need to verify a proof upon posting, we want the user to have prev verified a proof
     if (!storedProof || storedPublicSignals?.length === 0 || !storedKey) {
-      alert("Please generate a proof first")
+      alert("Please go to the login page and generate a proof")
       return
     }
-    // todo: change msgHash to just msgHex, since we're not hashing the message, there's no need
-    const ec = new EC("secp256k1")
-    const hexMsg = Buffer.from(post.id, "utf8").toString("hex")
-    const key = ec.keyFromPrivate(storedPrivKey as string, "hex")
-    const signature = key.sign(hexMsg, "hex", { canonical: true }).toDER("hex")
+
+    const storedPubKey = await retrievePublicKey()
+    const signatureBuff = await ecdsaSign(post.id)
+    const signature = btoa(
+      String.fromCharCode(...new Uint8Array(signatureBuff))
+    )
+
+    if (!storedPubKey) {
+      alert("Please go to the login page to generate a key pair")
+      return
+    }
 
     const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/comment", {
       method: "POST",
@@ -63,6 +62,7 @@ export function PostWrapper({ post }: { post: Post }) {
         signature,
         postId: post.id,
         comment: body,
+        id: "",
       }),
     })
     if (res.status === 200) {
@@ -100,7 +100,6 @@ export function PostWrapper({ post }: { post: Post }) {
                 )}
               </div>
             </div>
-            {/* <div className="grid grid-cols-4 items-center gap-4"> */}
             <Input
               id="body"
               value={body}
