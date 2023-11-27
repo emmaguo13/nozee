@@ -98,12 +98,27 @@ export function NewPostButton() {
       setOpen(false)
       setTitle("")
       setBody("")
-      toast({
-        title: "Failure!",
-        description: "Please go to the login page and reauthenticate.",
-      })
       setIsLoading(false)
-      router.refresh()
+
+      const resJson = (await res.json()) as any
+
+      if (resJson.error == "Expired public key") {
+        await localforage.removeItem("proof")
+        await localforage.removeItem("publicSignals")
+        await localforage.removeItem("key")
+        toast({
+          title: "Failure!",
+          description:
+            "Please go to ChatGPT to retrieve a new token, then go to the login page and reauthenticate.",
+        })
+      } else {
+        toast({
+          title: "Failure!",
+          description: "Please go to the login page and reauthenticate.",
+        })
+      }
+
+      router.push("/login")
     }
   }
 

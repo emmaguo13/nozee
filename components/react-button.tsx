@@ -8,6 +8,8 @@ import { ThumbsUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ecdsaSign, retrievePublicKey } from "@/lib/webcrypto"
 
+import { toast } from "./ui/use-toast"
+
 export function ReactButton({
   color,
   postId,
@@ -61,6 +63,23 @@ export function ReactButton({
     if (res.status === 200) {
       setIsLoading(false)
       router.refresh()
+    } else {
+      const resJson = (await res.json()) as any
+      if (resJson.error == "Expired public key") {
+        await localforage.removeItem("proof")
+        await localforage.removeItem("publicSignals")
+        await localforage.removeItem("key")
+        toast({
+          title: "Failure!",
+          description:
+            "Please go to ChatGPT to retrieve a new token, then go to the login page and reauthenticate.",
+        })
+      } else {
+        toast({
+          title: "Failure!",
+          description: "Please go to the login page and reauthenticate.",
+        })
+      }
     }
   }
 

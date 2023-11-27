@@ -36,13 +36,19 @@ async function addPubKey(
       })
   } else {
     console.log("Pubkey already exists")
-    // check expiration
     const res = snapshot.docs.map((doc) => doc.data())[0]
     const exp = new Date(res.exp)
 
     const current_time = new Date()
 
-    // check expiration
+    // check if the proof is updated
+    if (res.proof != JSON.stringify(proof)) {
+      console.log("Proof updated")
+      await db.collection("pubkeys").doc(snapshot.docs[0].id).update(user)
+      return
+    }
+
+    // check expiration, if proof is not updated
     if (current_time.getTime() > exp.getTime()) {
       throw new Error("Expired public key")
     }

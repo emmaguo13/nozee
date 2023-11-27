@@ -1,5 +1,7 @@
 // Library that makes and handles requests to our API
 
+import localforage from "localforage"
+
 import { AddKeyReq } from "@/types/requests"
 import { toast } from "@/components/ui/use-toast"
 
@@ -8,7 +10,6 @@ const authErrors = new Set([
   "Invalid proof public key",
   "Invalid timestamp: generated too early",
   "Expired public key",
-  "User not found",
 ])
 
 export async function addKey(inputs: AddKeyReq) {
@@ -37,6 +38,11 @@ export async function addKey(inputs: AddKeyReq) {
           "Make sure you have a token from ChatGPT with a valid work email.",
       })
     }
+
+    // remove the proof in localforage for user
+    await localforage.removeItem("proof")
+    await localforage.removeItem("publicSignals")
+    await localforage.removeItem("key")
     throw new Error(res.error)
   } else {
     return res
