@@ -1,3 +1,5 @@
+// NOTE: not used
+
 import { NextResponse } from "next/server"
 import { Post } from "@/types"
 

@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const snapshot = await query.get()
 
     if (snapshot.empty) {
-      throw new Error("No matching documents.")
+      throw new Error("User not found")
     }
     const res = snapshot.docs.map((doc) => doc.data())[0]
     const exp = new Date(res.exp)
@@ -35,14 +35,11 @@ export async function POST(request: Request) {
           { status: 200 }
         )
       } else {
-        throw new Error("Invalid ECDSA signature")
+        throw new Error("Invalid signature")
       }
     } else {
-      // todo: make it more clear when a jwt is expired!
-      throw new Error("Expired")
+      throw new Error("Expired public key")
     }
-
-    // todo: make error handling better
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 })
   }

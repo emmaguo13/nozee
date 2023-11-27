@@ -8,9 +8,9 @@ import db from "@/lib/firebase"
 async function addPubKey(
   pubkey: string,
   domain: string,
-  time: Date,
+  time: string,
   proof: Proof,
-  publicSignals: number[]
+  publicSignals: string[]
 ) {
   // Their firebase proof expiration is 2 weeks from when they last generated the proof.
   const new_time = new Date(time)
@@ -36,11 +36,22 @@ async function addPubKey(
       })
   } else {
     console.log("Pubkey already exists")
+    // check expiration
+    const res = snapshot.docs.map((doc) => doc.data())[0]
+    const exp = new Date(res.exp)
+
+    const current_time = new Date()
+
+    // check expiration
+    if (current_time.getTime() > exp.getTime()) {
+      throw new Error("Expired public key")
+    }
   }
 }
 
 export async function POST(request: Request) {
   const req = await request.json()
+  console.log(req)
   const { isVerified, domain, time } = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
     {
@@ -54,16 +65,27 @@ export async function POST(request: Request) {
         key: req.key,
       }),
     }
-  ).then((res) => res.json())
+  ).then((response) => {
+    const res = response.json() as any
+    if (response.status != 200) {
+      return NextResponse.json({ error: res.error }, { status: 500 })
+    } else {
+      console.log(res)
+      return res
+    }
+  })
 
+  console.log(isVerified, domain, time)
+
+  console.log("made it past verify")
   if (!isVerified) {
     return NextResponse.json({ error: "Proof not verified" }, { status: 500 })
   }
 
   try {
     await addPubKey(req.pubkey, domain, time, req.proof, req.publicSignals)
-    return NextResponse.json({ isVerified, domain }, { status: 200 })
+    return NextResponse.json({ domain }, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error }, { status: 501 })
+    return NextResponse.json({ error }, { status: 500 })
   }
 }

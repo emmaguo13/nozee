@@ -36,7 +36,7 @@ export async function comment(
     }
 
     if (matchingComment.pubkey != pubkey) {
-      throw Error("Pubkey doesn't match")
+      throw Error("Public key doesn't match")
     }
 
     newComment = {
@@ -71,13 +71,17 @@ export async function POST(request: Request) {
         msgHash: req.postId,
       }),
     }
-  ).then((res) => res.json())
+  ).then((response) => {
+    if (response.status != 200) {
+      const res = response.json() as any
+      return NextResponse.json({ error: res.error }, { status: 500 })
+    } else {
+      return response.json()
+    }
+  })
 
   if (!isValid) {
-    return NextResponse.json(
-      { error: "Signature not verified" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Invalid signature" }, { status: 500 })
   }
 
   try {

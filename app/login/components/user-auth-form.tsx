@@ -6,7 +6,9 @@ import { useSearchParams } from "next/navigation"
 import { Status, useApp } from "@/contexts/AppProvider"
 import localforage from "localforage"
 
+import { AddKeyReq } from "@/types/requests"
 import { generate_inputs } from "@/lib/generate_input"
+import { addKey } from "@/lib/requests"
 import { cn } from "@/lib/utils"
 import { generateAndStoreKey, retrievePublicKey } from "@/lib/webcrypto"
 import { Button } from "@/components/ui/button"
@@ -45,30 +47,21 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
     if (storedProof && storedPublicSignals?.length && storedKey) {
       console.log("Proof found in local storage. Skipping proof generation.")
-      
-      const res = await fetch(
-        process.env.NEXT_PUBLIC_BASE_URL + "/api/addKey",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            proof: JSON.parse(storedProof),
-            publicSignals: storedPublicSignals,
-            key: storedKey,
-            pubkey: pubKey,
-          }),
-        }
-      )
-      const { domain, isVerified } = await res.json()
-      if (isVerified) {
-        console.log(
-          `Verification successful. Domain: ${domain}. Is verified: ${isVerified}.`
-        )
-        setDomain(domain)
 
+      const addKeyInput = {
+        proof: JSON.parse(storedProof),
+        publicSignals: storedPublicSignals,
+        key: storedKey,
+        pubkey: pubKey,
+      } as AddKeyReq
+
+      try {
+        const { domain } = await addKey(addKeyInput)
+        console.log(`Verification successful. Domain: ${domain}.`)
+        setDomain(domain)
         return
+      } catch (error) {
+        console.log("Error with verification", error)
       }
     } else {
       const splitToken = (token as string).split(".")
@@ -91,25 +84,20 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         await localforage.setItem("proof", JSON.stringify(proof))
         await localforage.setItem("publicSignals", publicSignals)
         await localforage.setItem("key", key)
-        const res = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + "/api/addKey",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              key: key as string,
-              proof,
-              publicSignals,
-              pubkey: pubKey,
-            }),
-          }
-        )
-        const { domain, isVerified } = await res.json()
-        if (isVerified) {
+        const addKeyInput = {
+          proof,
+          publicSignals,
+          key: key as string,
+          pubkey: pubKey,
+        } as AddKeyReq
+
+        try {
+          const { domain } = await addKey(addKeyInput)
+          console.log(`Verification successful. Domain: ${domain}.`)
           setDomain(domain)
           return
+        } catch (error) {
+          console.log("Error with verification", error)
         }
       }
     }

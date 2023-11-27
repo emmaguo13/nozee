@@ -5,8 +5,8 @@ import {
   OPENAI_PUBKEY,
 } from "./constants"
 import { Hash } from "./fast-sha256"
-import { shaHash } from "./shaHash"
 import { domainBlacklist } from "./filterEmail"
+import { shaHash } from "./shaHash"
 
 const pki = require("node-forge").pki
 
@@ -38,8 +38,8 @@ export async function generate_inputs(
 
   // if (signer == "vercel") {
   //   currentKey = JWT_CLIENT_PUBKEY
-  // } else 
-  
+  // } else
+
   if (signer == "openai") {
     currentKey = OPENAI_PUBKEY
   }

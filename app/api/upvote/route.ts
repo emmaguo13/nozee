@@ -71,16 +71,13 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         pubkey: req.pubkey,
         signature: req.signature,
-        msgHash: (req.commentId != "" ? req.commentId :req.postId),
+        msgHash: req.commentId != "" ? req.commentId : req.postId,
       }),
     }
   ).then((res) => res.json())
 
   if (!isValid) {
-    return NextResponse.json(
-      { error: "Signature not verified" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Invalid signature" }, { status: 500 })
   }
 
   try {

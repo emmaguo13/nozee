@@ -16,7 +16,7 @@ function makeStorageClient() {
 async function web3storeFiles(files: File[]) {
   const client = makeStorageClient()
   const cid = await client.put(files)
-  console.log("stored files with cid:", cid)
+  console.log("Stored files in web3.storage with cid:", cid)
   return cid
 }
 
@@ -36,7 +36,7 @@ async function createPost(
     pubkey,
   }
 
-  // check if we're editing or posting
+  // NOTE: this is for editing, unused
   if (id != "") {
     // verify that their pubkey is the same as the pubkey from the post
     const postRef = db.collection("posts").doc(post.id)
@@ -44,11 +44,10 @@ async function createPost(
     if (doc.exists) {
       const postPubkey = (doc.data() as Post).pubkey
       if (postPubkey != pubkey) {
-        throw new Error("pubkeys dont match")
+        throw new Error("Public key doesn't match")
       }
     } else {
-      // todo: better error handling here
-      throw new Error("no such post")
+      throw new Error("Post not found")
     }
 
     post = {
@@ -99,10 +98,7 @@ export async function POST(request: Request) {
   ).then((res) => res.json())
 
   if (!isValid) {
-    return NextResponse.json(
-      { error: "Signature not verified" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Invalid signature" }, { status: 500 })
   }
 
   try {
@@ -115,6 +111,6 @@ export async function POST(request: Request) {
     )
     return NextResponse.json({ ...res, domain }, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error }, { status: 501 })
+    return NextResponse.json({ error }, { status: 500 })
   }
 }

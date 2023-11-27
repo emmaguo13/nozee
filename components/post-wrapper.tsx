@@ -74,6 +74,15 @@ export function PostWrapper({ post }: { post: Post }) {
       })
       setIsLoading(false)
       router.refresh()
+    } else {
+      setOpen(false)
+      setBody("")
+      toast({
+        title: "Failure!",
+        description: "Please go to the login page and reauthenticate.",
+      })
+      setIsLoading(false)
+      router.refresh()
     }
   }
 
