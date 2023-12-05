@@ -62,33 +62,31 @@ export default function AuthenticationPage() {
                   . Our code is open source, and we allow anyone to verify the
                   proof attached to each user.
                 </p>
-                <h3 className="text-lg font-semibold tracking-tight">How?</h3>
+                <p className="text-base"></p>
+                <h3 className="text-lg font-semibold tracking-tight">
+                  How do we verify your email?
+                </h3>
                 <p className="text-base">
-                  <b>1.</b> Start by logging into ChatGPT with your work email.{" "}
-                </p>
-                <p className="text-base">
-                  <b>2.</b> Download the Nozee extension.{" "}
-                </p>
-                <p className="text-base">
-                  <b>3.</b> Use our extension to obtain a JSON Web Token (JWT),
-                  a token representing successful authentication on ChatGPT.
-                </p>
-                <p className="text-base">
-                  <b>4.</b> Click the login button on the extension. Login to
-                  our site after you're redirected to Nozee.
+                  &emsp; After you log into certain websites (such as ChatGPT),
+                  they generate a token, called a JSON Web Token (JWT) that
+                  contains your email and is a "stamp" of your authentication.
                 </p>
 
                 <p className="text-base">
-                  &emsp; The JSON Web Token is a stamp of approval that you were
-                  able to login to ChatGPT with your work email, and is
-                  digitally signed by ChatGPT. We verify the signature on the
-                  token to ensure you you own your work email.
+                  &emsp; The JWT is digitally signed by ChatGPT, meaning that
+                  the site attests to your authentication. We verify the
+                  signature on the token to ensure you you own your work email.
                 </p>
                 <p className="text-base">
-                  &emsp; What's unique about Nozee is that the verification is
+                  &emsp; What's unique about Nozee is the JWT verification is
                   done using <b>zero knowledge proofs</b>, a cryptographic
                   technique that allows us to verify certain properties of the
                   JWT without ever seeing the contents of the JWT.
+                </p>
+                <p className="text-base">
+                  &emsp; This means that we never see, or even get the chance to
+                  store any personally identifiable information, while being
+                  able to verify the validity of your email!
                 </p>
               </div>
               <p className="px-8 text-center text-sm text-muted-foreground">
@@ -126,7 +124,7 @@ export default function AuthenticationPage() {
                       information in a JSON object, and is popularly used for
                       authentication. The information contained in the header
                       and payload is signed, meaning the recipient of the token
-                      can verify integrity using RSA, ECDSA, or HMAC.
+                      can verify integrity using ECDSA.
                     </p>
 
                     <p className="text-base">
@@ -163,10 +161,10 @@ export default function AuthenticationPage() {
                 <AccordionContent>
                   <div className="flex flex-col gap-4">
                     <p className="text-base">
-                      Zero-knowledge proofs are a novel cryptographic technique
-                      that allows a prover to claim to a verifier: "I have these
+                      Zero-knowledge proving is a cryptographic technique that
+                      allows a prover to claim to a verifier: "I have these
                       private inputs x, such that, after doing some defined
-                      computation on x, I will result in y". The verifier
+                      computation on x, it will result in y". The verifier
                       ensures that this claim is valid without ever seeing the
                       private inputs.
                     </p>

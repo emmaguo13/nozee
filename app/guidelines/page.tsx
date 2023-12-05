@@ -1,33 +1,15 @@
 "use client"
 
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
-import { Status, useApp } from "@/contexts/AppProvider"
-import { Command, Heading1 } from "lucide-react"
+import { Command } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { buttonVariants } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Icons } from "@/components/icons"
 
 export default function AuthenticationPage() {
-  const { downloadStatus, downloadProgress } = useApp()
-  const searchParams = useSearchParams()
-  const token = searchParams?.get("msg")
 
   return (
     <>
-      <div className="sm:hidden">
-        <p className="text-sm">
-          Please use a desktop browser to login to nozee.
-        </p>
-      </div>
       <Link
         href="/"
         className={cn(
