@@ -4,7 +4,7 @@ import { Post } from "@/types"
 
 import db from "@/lib/firebase"
 
-export async function comment(
+async function comment(
   postId: string,
   pubkey: string,
   domain: string,

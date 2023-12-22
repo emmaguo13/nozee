@@ -3,7 +3,7 @@ import { Post } from "@/types"
 
 import db from "@/lib/firebase"
 
-export async function upvotePost(
+async function upvotePost(
   postId: string,
   pubkey: string,
   commentId: string
