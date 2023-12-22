@@ -21,13 +21,15 @@ export default async function handler(
     return response.status(500).json({ error: "Proof not verified" })
   }
 
+  console.log("hi proof is verified")
+
   if (
     !verifyPublicKey(request.body.publicSignals, request.body.key || "openai")
   ) {
     return response.status(500).json({ error: "Invalid proof public key" })
   }
 
-  const timestamp = parseInt(request.body.publicSignals[47])
+  const timestamp = parseInt(request.body.publicSignals[30])
   const formatted_timestamp = new Date(timestamp * 1000).toISOString()
   console.log(
     "🚀 ~ file: route.ts:29 ~ POST ~ timestamp:",
@@ -39,10 +41,11 @@ export default async function handler(
     new Date(current_timestamp * 1000).toLocaleString()
   )
 
-  const timeDifference = current_timestamp - timestamp
-  const twentyMinutesInMilliseconds = 20 * 60 * 1000
+  // const timeDifference = current_timestamp - timestamp
+  // const twentyMinutesInMilliseconds = 20 * 60 * 1000
 
-  if (timeDifference > twentyMinutesInMilliseconds) {
+  // check expiration again
+  if (current_timestamp > timestamp) {
     return response
       .status(500)
       .json({ error: "Invalid timestamp: generated too early" })
@@ -51,9 +54,14 @@ export default async function handler(
   console.log("no timestamp issues")
 
   let domain = ""
-  for (var i = 17; i < 47; i++) {
+  for (var i = 0; i < 30; i++) {
     if (b.publicSignals[i] != "0") {
-      domain += String.fromCharCode(parseInt(b.publicSignals[i]))
+      let next_char = String.fromCharCode(parseInt(b.publicSignals[i]))
+      if (next_char != ".") {
+        domain += next_char
+      } else {
+        break
+      }
     }
   }
 

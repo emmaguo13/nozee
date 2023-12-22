@@ -71,7 +71,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         splitToken[2],
         splitToken[0] + "." + splitToken[1],
         // TODO: change this
-        key as string
+        key as string,
+        pubKey
       )
       console.log("Generated inputs", inputs)
 
@@ -80,6 +81,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       worker.postMessage(["fullProve", inputs, zkey])
       worker.onmessage = async function (e) {
         const { proof, publicSignals } = e.data
+
+        console.log("Public Signals", publicSignals)
         console.log("Proof successfully generated", proof)
         await localforage.setItem("proof", JSON.stringify(proof))
         await localforage.setItem("publicSignals", publicSignals)

@@ -83,7 +83,6 @@ export async function POST(request: Request) {
 
   console.log(isVerified, domain, time)
 
-  console.log("made it past verify")
   if (!isVerified) {
     return NextResponse.json({ error: "Proof not verified" }, { status: 500 })
   }

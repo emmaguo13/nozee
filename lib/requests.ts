@@ -40,9 +40,9 @@ export async function addKey(inputs: AddKeyReq) {
     }
 
     // remove the proof in localforage for user
-    await localforage.removeItem("proof")
-    await localforage.removeItem("publicSignals")
-    await localforage.removeItem("key")
+    // await localforage.removeItem("proof")
+    // await localforage.removeItem("publicSignals")
+    // await localforage.removeItem("key")
     throw new Error(res.error)
   } else {
     return res
