@@ -3,11 +3,7 @@ import { Post } from "@/types"
 
 import db from "@/lib/firebase"
 
-async function upvotePost(
-  postId: string,
-  pubkey: string,
-  commentId: string
-) {
+async function upvotePost(postId: string, pubkey: string, commentId: string) {
   const postRef = db.collection("posts").doc(postId)
   const post = (await postRef.get()).data() as Post
 

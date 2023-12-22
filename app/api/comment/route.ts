@@ -85,7 +85,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await comment(req.postId, req.pubkey, domain, req.comment, req.id)
+    await comment(req.postId, req.pubkey, "berkeley", req.comment, req.id)
     return NextResponse.json({ status: 200 })
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 })

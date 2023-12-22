@@ -28,7 +28,7 @@ export function CommentCard({
   return (
     <Card className="min-w-full">
       <CardHeader className="grid grid-cols-[1fr] items-start gap-4 space-y-0">
-        <div className=" space-y-1 break-all">
+        <div className=" space-y-1 break-normal">
           <CardDescription>
             <div className="text-white">{truncatedMessage}</div>
           </CardDescription>

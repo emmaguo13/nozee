@@ -108,19 +108,17 @@ export function PostWrapper({ post }: { post: Post }) {
             <PostCard post={post} key={post.id} preview={true} />
           </div>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[440px]">
           <div className="grid gap-4 py-4">
-            <div>
-              <div className="flex max-h-60 flex-col items-start gap-2 overflow-auto">
-                <PostCard post={post} key={post.id} preview={false} />
-                {post.comments ? (
-                  post.comments.map((comment: Comment) => (
-                    <CommentCard comment={comment} postId={post.id} />
-                  ))
-                ) : (
-                  <div></div>
-                )}
-              </div>
+            <div className="col-span-3 flex max-h-60 w-full flex-col items-start gap-2 overflow-auto">
+              <PostCard post={post} key={post.id} preview={false} />
+              {post.comments ? (
+                post.comments.map((comment: Comment) => (
+                  <CommentCard comment={comment} postId={post.id} />
+                ))
+              ) : (
+                <div></div>
+              )}
             </div>
             <Input
               id="body"
