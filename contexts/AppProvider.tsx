@@ -26,6 +26,7 @@ interface AppContextValue {
   downloadStatus: Status
   downloadProgress?: number
   zkey: ArrayBuffer | undefined
+  proofExists: boolean
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined)
@@ -38,6 +39,8 @@ function AppProvider({ children }: { children?: React.ReactNode }) {
   )
   const [downloadProgress, setDownloadProgress] = useState<number>(0)
   const [zkey, setZkey] = useState<ArrayBuffer>()
+  // todo: do we want to just get the proof here?
+  const [proofExists, setProofExists] = useState<boolean>(false)
   const first = useRef(true)
 
   useEffect(() => {
@@ -45,6 +48,20 @@ function AppProvider({ children }: { children?: React.ReactNode }) {
       setTheme("dark")
     }
   }, [theme, setTheme])
+
+  useEffect(() => {
+    if (proofExists) return
+    const getProof = async () => {
+      const storedProof = await localforage.getItem<string>("proof")
+      const storedPublicSignals = await localforage.getItem<string[]>(
+        "publicSignals"
+      )
+      if (storedProof && storedPublicSignals) {
+        setProofExists(true)
+      }
+    }
+    getProof()
+  }, [proofExists])
 
   useEffect(() => {
     const fetchZkey = async () => {
@@ -113,6 +130,7 @@ function AppProvider({ children }: { children?: React.ReactNode }) {
         downloadProgress,
         downloadStatus,
         zkey,
+        proofExists,
       }}
     >
       {children}

@@ -1,20 +1,9 @@
 import { randomUUID } from "crypto"
 import { NextResponse } from "next/server"
 import { Post } from "@/types"
-import * as admin from "firebase-admin"
 import { File, Web3Storage } from "web3.storage"
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
-    }),
-  })
-}
-
-const db = admin.firestore()
+import db from "@/lib/firebase"
 
 function getAccessToken() {
   return process.env.WEB3_STORAGE_TOKEN
@@ -27,25 +16,60 @@ function makeStorageClient() {
 async function web3storeFiles(files: File[]) {
   const client = makeStorageClient()
   const cid = await client.put(files)
-  console.log("stored files with cid:", cid)
+  console.log("Stored files in web3.storage with cid:", cid)
   return cid
 }
 
-async function createPost({ domain, body, title }: Post) {
-  const post = {
+async function createPost(
+  title: string,
+  domain: string,
+  body: string,
+  pubkey: string,
+  id: string
+) {
+  var post = {
     body,
     domain,
     title,
     id: randomUUID(),
     timestamp: Date.now(),
+    pubkey,
   }
+
+  // NOTE: this is for editing, unused
+  if (id != "") {
+    // verify that their pubkey is the same as the pubkey from the post
+    const postRef = db.collection("posts").doc(post.id)
+    const doc = await postRef.get()
+    if (doc.exists) {
+      const postPubkey = (doc.data() as Post).pubkey
+      if (postPubkey != pubkey) {
+        throw new Error("Public key doesn't match")
+      }
+    } else {
+      throw new Error("Post not found")
+    }
+
+    post = {
+      body,
+      domain,
+      title,
+      id: id,
+      timestamp: Date.now(),
+      pubkey,
+    }
+  }
+
   const buffer = Buffer.from(JSON.stringify(post))
   const files = [new File([buffer], "hello.json")]
   const cid = await web3storeFiles(files)
+
+  const submit = { ...post, web3Id: cid }
+
   return db
     .collection("posts")
     .doc(post.id)
-    .set(post)
+    .set(submit)
     .then((docRef) => {
       return { docRef, cid }
     })
@@ -55,34 +79,36 @@ async function createPost({ domain, body, title }: Post) {
 }
 
 export async function POST(request: Request) {
+  // request: { pubkey: string, signature: string, msgHash: string, title: string, body: string, id: string }
   const req = await request.json()
-  const { isVerified, domain } = await fetch(
-    process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
+
+  const { isValid, domain } = await fetch(
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/verifySig",
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        proof: req.proof,
-        publicSignals: req.publicSignals,
-        key: req.key,
+        pubkey: req.pubkey,
+        signature: req.signature,
+        msgHash: req.body,
       }),
     }
   ).then((res) => res.json())
 
-  if (!isVerified) {
-    return NextResponse.json({ error: "Proof not verified" }, { status: 500 })
+  if (!isValid) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 500 })
   }
 
   try {
-    const res = await createPost({
-      title: req.title,
+    const res = await createPost(
+      req.title,
       domain,
-      body: req.body,
-      id: "",
-      timestamp: "",
-    })
+      req.body,
+      req.pubkey,
+      req.postId
+    )
     return NextResponse.json({ ...res, domain }, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 })

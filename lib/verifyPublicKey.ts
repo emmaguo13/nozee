@@ -13,8 +13,8 @@ export const verifyPublicKey = (publicSignals: string[], key: string) => {
       currentKey = []
       break
   }
-  for (var i = 0; i < 17; i++) {
-    if (publicSignals[i] != currentKey[i]) {
+  for (var i = 31; i < 48; i++) {
+    if (publicSignals[i] != currentKey[i - 31]) {
       return false
     }
   }

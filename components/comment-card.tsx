@@ -1,5 +1,5 @@
-import { Post } from "@/types"
-import { Circle, MessageCircle } from "lucide-react"
+import { Comment } from "@/types"
+import { Circle, ThumbsUp } from "lucide-react"
 
 import { cn, getHashColor } from "@/lib/utils"
 import {
@@ -7,29 +7,28 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { ReactButton } from "@/components/react-button"
 
-export function PostCard({ post, preview }: { post: Post; preview: boolean }) {
-  var MAX_LENGTH = 150
-
-  if (!preview) {
-    MAX_LENGTH = 500
-  }
-
+export function CommentCard({
+  comment,
+  postId,
+}: {
+  comment: Comment
+  postId: string
+}) {
+  const MAX_LENGTH = 200
   const truncatedMessage =
-    post.body?.length > MAX_LENGTH
-      ? post.body.slice(0, MAX_LENGTH) + "..."
-      : post.body
-  const color = getHashColor(post.domain)
+    comment.comment?.length > MAX_LENGTH
+      ? comment.comment.slice(0, MAX_LENGTH) + "..."
+      : comment.comment
+  const color = getHashColor(comment.domain)
   const fillClassName = `fill-${color}-400`
   const textClassName = `text-${color}-400`
   return (
     <Card className="min-w-full">
       <CardHeader className="grid grid-cols-[1fr] items-start gap-4 space-y-0">
         <div className=" space-y-1 break-normal">
-          <CardTitle>{post.title}</CardTitle>
           <CardDescription>
             <div className="text-white">{truncatedMessage}</div>
           </CardDescription>
@@ -41,26 +40,18 @@ export function PostCard({ post, preview }: { post: Post; preview: boolean }) {
             <Circle
               className={cn("mr-1 h-3 w-3", fillClassName, textClassName)}
             />
-            {post.domain}
+            {comment.domain}
           </div>
           <div>
-            {new Date(post.timestamp).toLocaleDateString("en-us", {
+            {new Date(comment.timestamp).toLocaleDateString("en-us", {
               year: "numeric",
               month: "short",
               day: "numeric",
             })}
           </div>
           <div className="flex items-center capitalize">
-            <ReactButton color={color} postId={post.id} commentId={""} />
-            {post.upvotes ? post.upvotes.length : 0}
-          </div>
-
-          <div className="flex items-center capitalize">
-            {/* <EditButton color={color} postId={post.id} commentId={""} body={} /> */}
-            <MessageCircle
-              className={cn("mr-1 h-3 w-3", fillClassName, textClassName)}
-            />
-            {post.comments ? post.comments.length : 0}
+            <ReactButton color={color} postId={postId} commentId={comment.id} />
+            {comment.upvotes ? comment.upvotes.length : 0}
           </div>
         </div>
       </CardContent>

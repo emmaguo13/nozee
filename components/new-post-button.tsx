@@ -4,6 +4,7 @@ import React, { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import localforage from "localforage"
 
+import { ecdsaSign, retrievePublicKey } from "@/lib/webcrypto"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -36,9 +37,14 @@ export function NewPostButton() {
       )
       if (storedPublicSignals && storedPublicSignals.length > 0) {
         let domain = ""
-        for (var i = 17; i < 47; i++) {
+        for (var i = 0; i < 30; i++) {
           if (storedPublicSignals[i] != "0") {
-            domain += String.fromCharCode(parseInt(storedPublicSignals[i]))
+            let next_char = String.fromCharCode(parseInt(storedPublicSignals[i]))
+            if (next_char != ".") {
+              domain += next_char
+            } else {
+              break
+            }
           }
         }
         setDomain(domain)
@@ -54,11 +60,22 @@ export function NewPostButton() {
       "publicSignals"
     )
     const storedKey = await localforage.getItem<string>("key")
-
+    // although we do not need to verify a proof upon posting, we want the user to have prev verified a proof
     if (!storedProof || storedPublicSignals?.length === 0 || !storedKey) {
-      alert("Please generate a proof first")
+      alert("Please go to the login page to generate a proof")
       return
     }
+    // todo: change msgHash to just msgHex, since we're not hashing the message, there's no need
+    const storedPubKey = await retrievePublicKey()
+    if (!storedPubKey) {
+      alert("Please go to the login page to generate a key pair")
+      return
+    }
+    const signatureBuff = await ecdsaSign(body)
+    const signature = btoa(
+      String.fromCharCode(...new Uint8Array(signatureBuff))
+    )
+
     const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/write", {
       method: "POST",
       headers: {
@@ -66,10 +83,10 @@ export function NewPostButton() {
       },
       body: JSON.stringify({
         title,
-        body: body,
-        key: storedKey,
-        proof: JSON.parse(storedProof),
-        publicSignals: storedPublicSignals,
+        pubkey: storedPubKey,
+        body,
+        signature,
+        postId: "",
       }),
     })
     if (res.status === 200) {
@@ -82,6 +99,31 @@ export function NewPostButton() {
       })
       setIsLoading(false)
       router.refresh()
+    } else {
+      setOpen(false)
+      setTitle("")
+      setBody("")
+      setIsLoading(false)
+
+      const resJson = (await res.json()) as any
+
+      if (resJson.error == "Expired public key") {
+        await localforage.removeItem("proof")
+        await localforage.removeItem("publicSignals")
+        await localforage.removeItem("key")
+        toast({
+          title: "Failure!",
+          description:
+            "Please go to ChatGPT to retrieve a new token, then go to the login page and reauthenticate.",
+        })
+      } else {
+        toast({
+          title: "Failure!",
+          description: "Please go to the login page and reauthenticate.",
+        })
+      }
+
+      router.push("/login")
     }
   }
 

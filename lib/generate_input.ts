@@ -1,10 +1,11 @@
-import { toCircomBigIntBytes } from "./binaryFormat"
+import { stringToBytes, toCircomBigIntBytes } from "./binaryFormat"
 import {
   JWT_CLIENT_PUBKEY,
   MAX_MSG_PADDED_BYTES,
   OPENAI_PUBKEY,
 } from "./constants"
 import { Hash } from "./fast-sha256"
+import { domainBlacklist } from "./filterEmail"
 import { shaHash } from "./shaHash"
 
 const pki = require("node-forge").pki
@@ -12,13 +13,18 @@ const pki = require("node-forge").pki
 export async function generate_inputs(
   signature: string,
   msg: string,
-  signer: string
+  signer: string,
+  ecdsa_string: string
 ): Promise<any> {
   const sig = BigInt("0x" + Buffer.from(signature, "base64").toString("hex"))
   const message = Buffer.from(msg)
   const period_idx_num = BigInt(msg.indexOf("."))
 
   const { domain: domainStr, domain_idx: domain_index } = findDomain(msg)
+
+  if (domainBlacklist.includes(domainStr as string)) {
+    alert("Please login to ChatGPT with your work email")
+  }
   const domain = Buffer.from(domainStr ?? "")
   const domain_idx_num = BigInt(domain_index ?? 0)
 
@@ -29,11 +35,33 @@ export async function generate_inputs(
   const timestamp = Math.round(utcMilllisecondsSinceEpoch / 1000)
   const timestamp_idx_num = BigInt(timestamp_idx ?? 0)
 
+  let ecdsa_key = getECDSAXY(ecdsa_string)
+  let ecdsa_x = Array.from(stringToBytes(ecdsa_key.x)).map((byte) =>
+    byte.toString()
+  )
+  let ecdsa_y = Array.from(stringToBytes(ecdsa_key.y)).map((byte) =>
+    byte.toString()
+  )
+
+  // create string arrays -- concatenate every 15 indices in ecdsa_x and ecdsa_y together
+  let ecdsa_x_arr = [] as string[]
+  let ecdsa_y_arr = [] as string[]
+
+  for (let i = 0; i < ecdsa_x.length; i += 15) {
+    ecdsa_x_arr.push(ecdsa_x.slice(i, i + 15).join(""))
+  }
+
+  for (let i = 0; i < ecdsa_y.length; i += 15) {
+    ecdsa_y_arr.push(ecdsa_y.slice(i, i + 15).join(""))
+  }
+
   let currentKey
 
-  if (signer == "vercel") {
-    currentKey = JWT_CLIENT_PUBKEY
-  } else if (signer == "openai") {
+  // if (signer == "vercel") {
+  //   currentKey = JWT_CLIENT_PUBKEY
+  // } else
+
+  if (signer == "openai") {
     currentKey = OPENAI_PUBKEY
   }
 
@@ -42,15 +70,19 @@ export async function generate_inputs(
   const pubKeyData = pki.publicKeyFromPem(currentKey)
 
   const modulus = BigInt(pubKeyData.n.toString())
+
+  // todo: get ecdsa_x and ecdsa_y
   const fin_result = await getCircuitInputs(
     sig,
     modulus,
     message,
     period_idx_num,
     domain_idx_num,
-    domain,
+    // domain,
     timestamp,
-    timestamp_idx_num
+    timestamp_idx_num,
+    ecdsa_x_arr,
+    ecdsa_y_arr
   )
 
   return fin_result.circuitInputs
@@ -66,12 +98,21 @@ export interface ICircuitInputs {
   domain?: string[]
   timestamp?: string
   timestamp_idx?: string
+  ecdsa_x?: string[]
+  ecdsa_y?: string[]
 }
 
 function assert(cond: boolean, errorMessage: string) {
   if (!cond) {
     throw new Error(errorMessage)
   }
+}
+
+function getECDSAXY(ecdsa: string) {
+  const ecdsa_json = JSON.parse(ecdsa)
+  const x = ecdsa_json.x
+  const y = ecdsa_json.y
+  return { x, y }
 }
 
 // Works only on 32 bit sha text lengths
@@ -188,9 +229,11 @@ export async function getCircuitInputs(
   msg: Buffer,
   period_idx_num: BigInt,
   domain_idx_num: BigInt,
-  domain_raw: Buffer,
+  // domain_raw: Buffer,
   timestamp: number,
-  timestamp_idx_num: BigInt
+  timestamp_idx_num: BigInt,
+  ecdsa_x: string[],
+  ecdsa_y: string[]
 ): Promise<{
   valid: {
     validSignatureFormat?: boolean
@@ -217,13 +260,13 @@ export async function getCircuitInputs(
   )
 
   // domain padding
-  const domainUnpadded =
-    typeof domain_raw == "string"
-      ? new TextEncoder().encode(domain_raw)
-      : Uint8Array.from(domain_raw)
+  // const domainUnpadded =
+  //   typeof domain_raw == "string"
+  //     ? new TextEncoder().encode(domain_raw)
+  //     : Uint8Array.from(domain_raw)
 
-  const zerosPadArray = new Uint8Array(30 - domainUnpadded.length)
-  const domainPadded = new Uint8Array([...domainUnpadded, ...zerosPadArray])
+  // const zerosPadArray = new Uint8Array(30 - domainUnpadded.length)
+  // const domainPadded = new Uint8Array([...domainUnpadded, ...zerosPadArray])
 
   // Ensure SHA manual unpadded is running the correct function
   const shaOut = await partialSha(messagePadded, messagePaddedLen)
@@ -241,7 +284,7 @@ export async function getCircuitInputs(
 
   const message_padded_bytes = messagePaddedLen.toString()
   const message = await Uint8ArrayToCharArray(messagePadded) // Packed into 1 byte signals
-  const domain = await Uint8ArrayToCharArray(domainPadded)
+  // const domain = await Uint8ArrayToCharArray(domainPadded)
   const period_idx = period_idx_num.toString()
   const domain_idx = domain_idx_num.toString()
 
@@ -255,9 +298,11 @@ export async function getCircuitInputs(
     message_padded_bytes,
     period_idx,
     domain_idx,
-    domain,
+    // domain,
     time,
     time_idx,
+    ecdsa_x,
+    ecdsa_y,
   }
   return {
     circuitInputs,

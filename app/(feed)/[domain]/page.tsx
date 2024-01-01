@@ -1,7 +1,7 @@
 import { Post } from "@/types"
 import * as admin from "firebase-admin"
 
-import { PostCard } from "@/components/post-card"
+import { PostWrapper } from "@/components/post-wrapper"
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -29,7 +29,7 @@ export default async function Page({
   return (
     <>
       {posts.map((post: Post) => (
-        <PostCard post={post} key={post.id} />
+        <PostWrapper post={post} key={post.id} />
       ))}
     </>
   )

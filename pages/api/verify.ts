@@ -9,7 +9,8 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
-  console.log("CORRECT ROUTE")
+  console.log("verifying proof")
+  console.log(request.body)
   const isVerified = await snarkjs.groth16.verify(
     vkey,
     request.body.publicSignals,
@@ -17,40 +18,57 @@ export default async function handler(
   )
   const b = request.body
   if (!isVerified) {
-    return response.status(500).json({ error: "Invalid proof" })
+    return response.status(500).json({ error: "Proof not verified" })
   }
+
+  console.log("hi proof is verified")
 
   if (
     !verifyPublicKey(request.body.publicSignals, request.body.key || "openai")
   ) {
-    return response.status(501).json({ error: "Invalid public key" })
+    return response.status(500).json({ error: "Invalid proof public key" })
   }
 
-  const timestamp = parseInt(request.body.publicSignals[48])
+  const timestamp = parseInt(request.body.publicSignals[30])
+  const formatted_timestamp = new Date(timestamp * 1000).toISOString()
   console.log(
-    "🚀 ~ file: route.ts:23 ~ POST ~ timestamp:",
+    "🚀 ~ file: route.ts:29 ~ POST ~ timestamp:",
     new Date(timestamp * 1000).toLocaleString()
   )
   const current_timestamp = Math.round(new Date().getTime() / 1000)
   console.log(
-    "🚀 ~ file: route.ts:25 ~ POST ~ current_timestamp:",
+    "🚀 ~ file: route.ts:31 ~ POST ~ current_timestamp:",
     new Date(current_timestamp * 1000).toLocaleString()
   )
 
-  const timeDifference = current_timestamp - timestamp
-  const twentyMinutesInMilliseconds = 20 * 60 * 1000
+  // const timeDifference = current_timestamp - timestamp
+  // const twentyMinutesInMilliseconds = 20 * 60 * 1000
 
-  if (timeDifference > twentyMinutesInMilliseconds) {
+  // check expiration again
+  if (current_timestamp > timestamp) {
     return response
-      .status(502)
+      .status(500)
       .json({ error: "Invalid timestamp: generated too early" })
   }
 
+  console.log("no timestamp issues")
+
   let domain = ""
-  for (var i = 17; i < 47; i++) {
+  for (var i = 0; i < 30; i++) {
     if (b.publicSignals[i] != "0") {
-      domain += String.fromCharCode(parseInt(b.publicSignals[i]))
+      let next_char = String.fromCharCode(parseInt(b.publicSignals[i]))
+      if (next_char != ".") {
+        domain += next_char
+      } else {
+        break
+      }
     }
   }
-  return response.status(200).json({ domain, isVerified })
+
+  console.log("no public signal issues", formatted_timestamp)
+
+  // add the public key to firebase -- this public key is now a verified user
+  return response
+    .status(200)
+    .json({ domain, isVerified, time: formatted_timestamp })
 }

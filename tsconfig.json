@@ -31,6 +31,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/(feed)/[domain]"
-  ],
+, "tests/webcrypto.test.ts"  ],
   "exclude": ["node_modules"]
 }
