@@ -67,7 +67,7 @@ export default function AuthenticationPage() {
               <p className="text-base">
                 <b>3.</b> The proof and public inputs that can be used to verify
                 that you are a part of your organization. Personal information,
-                such as your name, email, or the raw JSON Web Tokn, are private
+                such as your name, email, or the raw JSON Web Token, are private
                 inputs, and are NEVER revealed to our server, or stored in our
                 database.
               </p>
@@ -75,7 +75,7 @@ export default function AuthenticationPage() {
                 How we authenticate
               </h3>
               <p className="text-base">
-                &emsp; We verify JSON Web Tokens (JWTs) signed by the ChatGPT
+                &emsp; We verify JSON Web Tokens (JWTs) signed by Auth0 from the ChatGPT
                 server completely privately using zero-knowledge proofs to prove
                 that you own an email with your workplace's domain.
               </p>

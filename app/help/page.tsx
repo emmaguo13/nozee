@@ -20,12 +20,12 @@ export default function HelpPage() {
       </Link>
 
       <div className="relative hidden h-full flex-col p-10 text-white sm:flex lg:dark:border-r">
-        <div className="absolute inset-0 bg-cover" />
+        {/* <div className="absolute inset-0 bg-cover" /> */}
         <div className="relative z-20 hidden items-center text-lg font-medium lg:flex">
           <Command className="mr-2 h-6 w-6" /> nozee
         </div>
-        <div className="mt-20 hidden sm:flex lg:p-8">
-          <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[800px]">
+        {/* <div className="mt-20 hidden sm:flex lg:p-8"> */}
+          <div className="mt-20 mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[800px]">
             <div className="flex flex-col space-y-3">
               <h1 className="text-2xl font-semibold tracking-tight">
                 Logging into Nozee
@@ -49,12 +49,13 @@ export default function HelpPage() {
 
               <p className="text-base">
                 <b>1. </b>
-                <a
+                <Link
                   className="underline"
                   href="https://chromewebstore.google.com/detail/nozee-jwt-login/kmdecbclihhhlabbacccfggjkjopkgjn?hl=en-GB"
+                  passHref={true}
                 >
-                  Download the Nozee extension.{" "}
-                </a>
+                  Download the Nozee extension.
+                </Link>{" "}
               </p>
               <p className="text-base">
                 <b>2.</b> Log into ChatGPT with your work email.{" "}
@@ -70,7 +71,7 @@ export default function HelpPage() {
               </p>
             </div>
           </div>
-        </div>
+        {/* </div> */}
       </div>
     </>
   )
