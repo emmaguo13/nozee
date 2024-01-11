@@ -40,7 +40,7 @@ export default function AuthenticationPage() {
           </p>
         </div>
         <div className="relative col-span-2 hidden h-full flex-col p-10 text-white sm:flex lg:dark:border-r">
-          <div className="absolute inset-0 bg-cover" />
+          {/* <div className="absolute inset-0 bg-cover" /> */}
           <div className="relative z-20 hidden items-center text-lg font-medium lg:flex">
             <Command className="mr-2 h-6 w-6" /> nozee
           </div>
@@ -73,7 +73,7 @@ export default function AuthenticationPage() {
                 </p>
 
                 <p className="text-base">
-                  &emsp; The JWT is digitally signed by ChatGPT, meaning that
+                  &emsp; The JWT from ChatGPT is digitally signed by Auth0, meaning that
                   the site attests to your authentication. We verify the
                   signature on the token to ensure you you own your work email.
                 </p>
