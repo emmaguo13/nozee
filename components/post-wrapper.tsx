@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Icons } from "@/components/icons"
+import { ReportButton } from "@/components/report-button"
 
 import { CommentCard } from "./comment-card"
 import { PostCard } from "./post-card"
@@ -129,6 +130,7 @@ export function PostWrapper({ post }: { post: Post }) {
             {/* </div> */}
           </div>
           <DialogFooter>
+            <ReportButton postId={post.id} />
             <Button disabled={isLoading} onClick={() => handleSubmit()}>
               {isLoading && (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
