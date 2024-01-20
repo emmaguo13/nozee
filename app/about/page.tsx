@@ -24,7 +24,7 @@ export default function AuthenticationPage() {
   return (
     <>
       {/* <div className="container relative grid h-[800px] flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0"> */}
-      <div className="container relative grid h-[800px] flex-col items-center justify-center lg:grid-cols-3  lg:px-0">
+      <div className="container relative grid h-[800px] items-center justify-center justify-items-center sm:flex-row md:flex-row lg:max-w-none lg:grid-cols-3 lg:flex-col  lg:px-0">
         <Link
           href="/"
           className={cn(
@@ -34,17 +34,17 @@ export default function AuthenticationPage() {
         >
           Home
         </Link>
-        <div className="sm:hidden">
+        {/* <div className="sm:hidden">
           <p className="text-sm">
             Please use a desktop browser to login to nozee.
           </p>
-        </div>
-        <div className="relative col-span-2 hidden h-full flex-col p-10 text-white sm:flex lg:dark:border-r">
+        </div> */}
+        <div className="relative col-span-2  h-full flex-col p-10 text-white sm:flex lg:dark:border-r">
           {/* <div className="absolute inset-0 bg-cover" /> */}
           <div className="relative z-20 hidden items-center text-lg font-medium lg:flex">
             <Command className="mr-2 h-6 w-6" /> nozee
           </div>
-          <div className="mt-20 hidden sm:flex lg:p-8">
+          <div className="mt-20 sm:flex lg:p-8">
             <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[700px]">
               <div className="flex flex-col space-y-3">
                 <h1 className="text-2xl font-semibold tracking-tight">
@@ -73,9 +73,10 @@ export default function AuthenticationPage() {
                 </p>
 
                 <p className="text-base">
-                  &emsp; The JWT from ChatGPT is digitally signed by Auth0, meaning that
-                  the site attests to your authentication. We verify the
-                  signature on the token to ensure you you own your work email.
+                  &emsp; The JWT from ChatGPT is digitally signed by Auth0,
+                  meaning that the site attests to your authentication. We
+                  verify the signature on the token to ensure you you own your
+                  work email.
                 </p>
                 <p className="text-base">
                   &emsp; What's unique about Nozee is the JWT verification is
@@ -109,7 +110,7 @@ export default function AuthenticationPage() {
             </div>
           </div>
         </div>
-        <div className="col-span-1 hidden sm:flex lg:p-8">
+        <div className="col-span-1 m-auto sm:flex lg:p-8">
           <div className="relative z-20 m-auto">
             <Accordion type="single" collapsible className="w-96">
               <AccordionItem value="item-1">

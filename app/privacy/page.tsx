@@ -2,24 +2,14 @@
 
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { Status, useApp } from "@/contexts/AppProvider"
-import { Command, Heading1 } from "lucide-react"
+import { useApp } from "@/contexts/AppProvider"
+import { Command } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { buttonVariants } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Icons } from "@/components/icons"
 
 export default function AuthenticationPage() {
-  const { downloadStatus, downloadProgress } = useApp()
   const searchParams = useSearchParams()
-  const token = searchParams?.get("msg")
 
   return (
     <>
@@ -32,52 +22,70 @@ export default function AuthenticationPage() {
       >
         Home
       </Link>
-      <div className="sm:hidden">
-        <p className="text-sm">
-          Please use a desktop browser to login to nozee.
-        </p>
-      </div>
-      <div className="relative hidden h-full flex-col p-10 text-white sm:flex lg:dark:border-r">
+      <div className="relative h-full flex-col p-10 text-white sm:flex lg:dark:border-r">
         <div className="absolute inset-0 bg-cover" />
         <div className="relative z-20 hidden items-center text-lg font-medium lg:flex">
           <Command className="mr-2 h-6 w-6" /> nozee
         </div>
-        <div className="mt-20 hidden sm:flex lg:p-8">
+        <div className="mt-20 sm:flex lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[870px]">
             <div className="flex flex-col space-y-3">
               <h1 className="text-2xl font-semibold tracking-tight">
-                Your privacy is of utmost importance to us.
+                Our Privacy Policy
               </h1>
-              <h3 className="text-lg font-semibold tracking-tight">
-                Storage of personal information
-              </h3>
               <p className="text-base">
-                &emsp; We do not store any personally identifiable information
-                in our database. In addition,{" "}
-                <b>no sensitive information gets revealed to our servers</b>.
-              </p>
-              <p>We only store:</p>
-              <p className="text-base">
-                <b>1.</b> Your ECDSA public key that is used to verify all
-                actions made by you. This key is never tied to your identity.
+                &emsp; Privacy is at the core of Nozee. Our site's purpose is to
+                provide users a completely private, but verified messaging board
+                for honest conversations.
               </p>
               <p className="text-base">
-                <b>2.</b> Your organization's domain.
-              </p>
-              <p className="text-base">
-                <b>3.</b> The proof and public inputs that can be used to verify
-                that you are a part of your organization. Personal information,
-                such as your name, email, or the raw JSON Web Token, are private
-                inputs, and are NEVER revealed to our server, or stored in our
-                database.
+                &emsp; We do not collect any personally identifiable
+                information, such as name or email address, in our database
+                through our authentication process. In addition,{" "}
+                <b>no sensitive information gets revealed to our servers</b>,
+                unless you voluntarily post sensitive or personally identifiable
+                information through your posts/comments. We do not collect IP or
+                device information, and do not store cookies for user
+                preferences. We do not host advertisements, and do not use any
+                third party analytics tools. We also do not use any of the
+                content stored in our database for purposes other than
+                displaying it to you.
               </p>
               <h3 className="text-lg font-semibold tracking-tight">
-                How we authenticate
+                What information we collect
+              </h3>
+              <p>
+                <em>Account information</em>
+              </p>
+              <p className="text-base">
+                &emsp;<b>1.</b> Your ECDSA public key that is used to verify all
+                actions made by you is stored in our database. This key is never
+                tied to your identity, and only your organization.
+              </p>
+              <p className="text-base">
+                &emsp;<b>2.</b> Your organization's domain.
+              </p>
+              <p className="text-base">
+                &emsp;<b>3.</b> The proof that can be used to verify that you
+                are a part of your organization. Personal information, such as
+                your name, email, or the raw JSON Web Token, are private inputs,
+                and are NEVER revealed to our server, or stored in our database.
+              </p>
+              <p>
+                <em>Content you submit</em>
+              </p>
+              <p className="text-base">
+                &emsp;The posts, comments, and likes you submit to Nozee are
+                stored in our database, and are tied to your public key and your
+                organization's domain.
+              </p>
+              <h3 className="text-lg font-semibold tracking-tight">
+                How we authenticate completely privately
               </h3>
               <p className="text-base">
-                &emsp; We verify JSON Web Tokens (JWTs) signed by Auth0 from the ChatGPT
-                server completely privately using zero-knowledge proofs to prove
-                that you own an email with your workplace's domain.
+                &emsp; We verify JSON Web Tokens (JWTs) signed by Auth0 from the
+                ChatGPT server completely privately using zero-knowledge proofs
+                to prove that you own an email with your workplace's domain.
               </p>
               <p className="text-base">
                 &emsp; Our extension extracts your JWT from ChatGPT network

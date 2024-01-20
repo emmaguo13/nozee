@@ -39,7 +39,9 @@ export function NewPostButton() {
         let domain = ""
         for (var i = 0; i < 30; i++) {
           if (storedPublicSignals[i] != "0") {
-            let next_char = String.fromCharCode(parseInt(storedPublicSignals[i]))
+            let next_char = String.fromCharCode(
+              parseInt(storedPublicSignals[i])
+            )
             if (next_char != ".") {
               domain += next_char
             } else {
