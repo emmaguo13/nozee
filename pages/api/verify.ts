@@ -9,8 +9,6 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
-  console.log("verifying proof")
-  console.log(request.body)
   const isVerified = await snarkjs.groth16.verify(
     vkey,
     request.body.publicSignals,
@@ -20,8 +18,6 @@ export default async function handler(
   if (!isVerified) {
     return response.status(500).json({ error: "Proof not verified" })
   }
-
-  console.log("hi proof is verified")
 
   if (
     !verifyPublicKey(request.body.publicSignals, request.body.key || "openai")
@@ -51,8 +47,6 @@ export default async function handler(
       .json({ error: "Invalid timestamp: generated too early" })
   }
 
-  console.log("no timestamp issues")
-
   let domain = ""
   for (var i = 0; i < 30; i++) {
     if (b.publicSignals[i] != "0") {
@@ -64,8 +58,6 @@ export default async function handler(
       }
     }
   }
-
-  console.log("no public signal issues", formatted_timestamp)
 
   // add the public key to firebase -- this public key is now a verified user
   return response

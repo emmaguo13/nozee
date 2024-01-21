@@ -57,7 +57,6 @@ async function addPubKey(
 
 export async function POST(request: Request) {
   const req = await request.json()
-  console.log(req)
   const { isVerified, domain, time } = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/verify",
     {
@@ -76,12 +75,10 @@ export async function POST(request: Request) {
     if (response.status != 200) {
       return NextResponse.json({ error: res.error }, { status: 500 })
     } else {
-      console.log(res)
       return res
     }
   })
 
-  console.log(isVerified, domain, time)
 
   if (!isVerified) {
     return NextResponse.json({ error: "Proof not verified" }, { status: 500 })

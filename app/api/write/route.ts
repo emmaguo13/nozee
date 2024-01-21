@@ -1,24 +1,24 @@
 import { randomUUID } from "crypto"
 import { NextResponse } from "next/server"
 import { Post } from "@/types"
-import { File, Web3Storage } from "web3.storage"
+// import { File, Web3Storage } from "web3.storage"
 
 import db from "@/lib/firebase"
 
-function getAccessToken() {
-  return process.env.WEB3_STORAGE_TOKEN
-}
+// function getAccessToken() {
+//   return process.env.WEB3_STORAGE_TOKEN
+// }
 
-function makeStorageClient() {
-  return new Web3Storage({ token: getAccessToken() as string })
-}
+// function makeStorageClient() {
+//   return new Web3Storage({ token: getAccessToken() as string })
+// }
 
-async function web3storeFiles(files: File[]) {
-  const client = makeStorageClient()
-  const cid = await client.put(files)
-  console.log("Stored files in web3.storage with cid:", cid)
-  return cid
-}
+// async function web3storeFiles(files: File[]) {
+//   const client = makeStorageClient()
+//   const cid = await client.put(files)
+//   console.log("Stored files in web3.storage with cid:", cid)
+//   return cid
+// }
 
 async function createPost(
   title: string,
@@ -61,17 +61,19 @@ async function createPost(
   }
 
   const buffer = Buffer.from(JSON.stringify(post))
-  const files = [new File([buffer], "hello.json")]
-  const cid = await web3storeFiles(files)
+  // const files = [new File([buffer], "hello.json")]
+  // const cid = await web3storeFiles(files)
 
-  const submit = { ...post, web3Id: cid }
+  // const submit = { ...post, web3Id: cid }
+  const submit = { ...post}
 
   return db
     .collection("posts")
     .doc(post.id)
     .set(submit)
     .then((docRef) => {
-      return { docRef, cid }
+      // return { docRef, cid }
+      return {docRef}
     })
     .catch((error) => {
       throw new Error(error)
@@ -81,6 +83,7 @@ async function createPost(
 export async function POST(request: Request) {
   // request: { pubkey: string, signature: string, msgHash: string, title: string, body: string, id: string }
   const req = await request.json()
+  console.log(req)
 
   const { isValid, domain } = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/verifySig",
