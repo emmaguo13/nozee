@@ -50,7 +50,14 @@ function AppProvider({ children }: { children?: React.ReactNode }) {
   }, [theme, setTheme])
 
   useEffect(() => {
-    if (proofExists) return
+    // if (proofExists) {
+    //   // TODO: how long does this toast last for
+    //   toast({
+    //     title: "Proof found, try logging in"
+    //   })
+    //   return
+    // }
+
     const getProof = async () => {
       const storedProof = await localforage.getItem<string>("proof")
       const storedPublicSignals = await localforage.getItem<string[]>(

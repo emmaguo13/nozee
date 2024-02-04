@@ -13,13 +13,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { buttonVariants } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Icons } from "@/components/icons"
 
-export default function AuthenticationPage() {
-  const { downloadStatus, downloadProgress } = useApp()
+export default function AboutPage() {
   const searchParams = useSearchParams()
-  const token = searchParams?.get("msg")
 
   return (
     <>

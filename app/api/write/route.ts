@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto"
 import { NextResponse } from "next/server"
 import { Post } from "@/types"
+
 // import { File, Web3Storage } from "web3.storage"
 
 import db from "@/lib/firebase"
@@ -65,7 +66,7 @@ async function createPost(
   // const cid = await web3storeFiles(files)
 
   // const submit = { ...post, web3Id: cid }
-  const submit = { ...post}
+  const submit = { ...post }
 
   return db
     .collection("posts")
@@ -73,7 +74,7 @@ async function createPost(
     .set(submit)
     .then((docRef) => {
       // return { docRef, cid }
-      return {docRef}
+      return { docRef }
     })
     .catch((error) => {
       throw new Error(error)

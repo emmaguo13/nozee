@@ -77,6 +77,34 @@ export const Icons = {
       ></path>
     </svg>
   ),
+  loggedIn: (props: LucideProps) => (
+    <svg
+      viewBox="0 0 24 24"
+      fill="green"
+      stroke="green"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="3"></circle>
+    </svg>
+  ),
+
+  notLoggedIn: (props: LucideProps) => (
+    <svg
+      viewBox="0 0 24 24"
+      fill="red"
+      stroke="red"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="3"></circle>
+    </svg>
+  ),
+
   radix: (props: LucideProps) => (
     <svg viewBox="0 0 25 25" fill="none" {...props}>
       <path

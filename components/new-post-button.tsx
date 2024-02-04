@@ -77,55 +77,63 @@ export function NewPostButton() {
     const signature = btoa(
       String.fromCharCode(...new Uint8Array(signatureBuff))
     )
-
-    const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/write", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        pubkey: storedPubKey,
-        body,
-        signature,
-        postId: "",
-      }),
-    })
-    if (res.status === 200) {
-      setOpen(false)
-      setTitle("")
-      setBody("")
-      toast({
-        title: "Success!",
-        description: "Your post has been created",
+    try {
+      const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/write", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          pubkey: storedPubKey,
+          body,
+          signature,
+          postId: "",
+        }),
       })
-      setIsLoading(false)
-      router.refresh()
-    } else {
-      setOpen(false)
-      setTitle("")
-      setBody("")
-      setIsLoading(false)
-
-      const resJson = (await res.json()) as any
-
-      if (resJson.error == "Expired public key") {
-        await localforage.removeItem("proof")
-        await localforage.removeItem("publicSignals")
-        await localforage.removeItem("key")
+      if (res.status === 200) {
+        setOpen(false)
+        setTitle("")
+        setBody("")
         toast({
-          title: "Failure!",
-          description:
-            "Please go to ChatGPT to retrieve a new token, then go to the login page and reauthenticate.",
+          title: "Success!",
+          description: "Your post has been created",
         })
+        setIsLoading(false)
+        router.refresh()
       } else {
-        toast({
-          title: "Failure!",
-          description: "Please go to the login page and reauthenticate.",
-        })
-      }
+        setOpen(false)
+        setTitle("")
+        setBody("")
+        setIsLoading(false)
 
-      router.push("/login")
+        const resJson = (await res.json()) as any
+
+        if (resJson.error == "Expired public key") {
+          await localforage.removeItem("proof")
+          await localforage.removeItem("publicSignals")
+          await localforage.removeItem("key")
+          toast({
+            title: "Posting failed!",
+            description:
+              "Please go to ChatGPT to retrieve a new token, then go to the login page and reauthenticate.",
+          })
+        } else {
+          toast({
+            title: "Posting failed!",
+            description: "Please go to the login page and reauthenticate.",
+          })
+        }
+
+        router.push("/login")
+      }
+    } catch (error) {
+      console.log("Error with posting", error)
+      setIsLoading(false)
+      toast({
+        title: "Posting failed!",
+        description: "Network connection errors. Please try again.",
+      })
     }
   }
 

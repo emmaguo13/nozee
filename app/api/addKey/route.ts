@@ -79,7 +79,6 @@ export async function POST(request: Request) {
     }
   })
 
-
   if (!isVerified) {
     return NextResponse.json({ error: "Proof not verified" }, { status: 500 })
   }

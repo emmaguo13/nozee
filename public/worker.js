@@ -4,13 +4,18 @@ self.addEventListener('message', async ({ data }) => {
   switch (fn) {
     case 'fullProve':
       const [_, input, zkeyFastFile] = data
-      const result = await snarkjs.groth16.fullProve(
-        input,
-        '/jwt.wasm',
-        zkeyFastFile
-      )
-      postMessage(result)
-      break
+      try {
+        const result = await snarkjs.groth16.fullProve(
+          input,
+          '/jwt.wasm',
+          zkeyFastFile
+        )
+        postMessage(result)
+        break
+      } catch (e) {
+        postMessage("Error: Couldn't prove the circuit")
+        break
+      }
     case 'exportSolidityCallData':
       const [__, proof, publicSignals] = data
       const rawCallData = await snarkjs.groth16.exportSolidityCallData(

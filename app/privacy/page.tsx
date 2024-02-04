@@ -2,15 +2,12 @@
 
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { useApp } from "@/contexts/AppProvider"
 import { Command } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
-export default function AuthenticationPage() {
-  const searchParams = useSearchParams()
-
+export default function PrivacyPage() {
   return (
     <>
       <Link

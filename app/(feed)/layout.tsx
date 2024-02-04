@@ -39,6 +39,7 @@ export default async function MarketingLayout({
     title: "All",
     href: "/",
   })
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
