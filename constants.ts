@@ -5,7 +5,7 @@ export const BASE_URL = "http://localhost:3000"
 export const uncompressedZkey =
   "https://zkjwt-zkey-chunks.s3.amazonaws.com/jwt_single-real.zkey"
 export const compressedZkey =
-  "https://zkjwt-zkey-chunks.s3.us-west-2.amazonaws.com/jwt_single1.zkey.gz"
+  "https://storage.googleapis.com/zk-jwt-artifacts/jwt_single1.zkey.gz"
 export const isCompressed = true
 export const localZkeyKey = "jwt.zkey"
 

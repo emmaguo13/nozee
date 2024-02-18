@@ -132,8 +132,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       ) : (
         <Button
           disabled={
-            (!token || isLoading || downloadStatus !== Status.DOWNLOADED) &&
-            !proofExists
+            (!token || isLoading || downloadStatus !== Status.DOWNLOADED) 
           }
           onClick={onSubmit}
         >
