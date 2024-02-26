@@ -1,25 +1,50 @@
 import { randomUUID } from "crypto"
 import { NextResponse } from "next/server"
 import { Post } from "@/types"
+import * as Client from '@web3-storage/w3up-client'
+import { StoreMemory } from '@web3-storage/w3up-client/stores/memory'
+import { importDAG } from '@ucanto/core/delegation'
+import { CarReader } from '@ipld/car'
+import * as Signer from '@ucanto/principal/ed25519'
 
-// import { File, Web3Storage } from "web3.storage"
+// import { File } from 'fetch-blob/file.js'
+
 
 import db from "@/lib/firebase"
 
-// function getAccessToken() {
-//   return process.env.WEB3_STORAGE_TOKEN
-// }
 
-// function makeStorageClient() {
-//   return new Web3Storage({ token: getAccessToken() as string })
-// }
+/** @param {string} data Base64 encoded CAR file */
+async function parseProof (data: string) {
+  const blocks = []
+  const reader = await CarReader.fromBytes(Buffer.from(data, 'base64'))
+  for await (const block of reader.blocks()) {
+    blocks.push(block)
+  }
+  return importDAG(blocks as any)
+}
 
-// async function web3storeFiles(files: File[]) {
-//   const client = makeStorageClient()
-//   const cid = await client.put(files)
-//   console.log("Stored files in web3.storage with cid:", cid)
-//   return cid
-// }
+async function makeStorageClient() {
+  // return new Web3Storage({ token: getAccessToken() as string })
+    // Load client with specific private key
+    const principal = Signer.parse(process.env.WEB3_STORAGE_KEY as string)
+    const store = new StoreMemory()
+    const client = await Client.create({ principal, store })
+    return client
+}
+
+async function web3storeFiles(file: Blob) {
+  const client = await makeStorageClient()
+  console.log("Uploading file to web3.storage", client)
+  // Add proof that this agent has been delegated capabilities on the space
+  const proof = await parseProof(process.env.WEB3_STORAGE_PROOF as string)
+  const space = await client.addSpace(proof)
+  await client.setCurrentSpace(space.did())
+
+  const cid = await client.uploadFile(file)
+
+  console.log("Stored files in web3.storage with cid:", cid.toString())
+  return cid.toString()
+}
 
 async function createPost(
   title: string,
@@ -62,19 +87,18 @@ async function createPost(
   }
 
   const buffer = Buffer.from(JSON.stringify(post))
-  // const files = [new File([buffer], "hello.json")]
-  // const cid = await web3storeFiles(files)
+  const file = new Blob([buffer])
 
-  // const submit = { ...post, web3Id: cid }
-  const submit = { ...post }
+  const cid = await web3storeFiles(file)
+
+  const submit = { ...post, cid }
 
   return db
     .collection("posts")
     .doc(post.id)
     .set(submit)
     .then((docRef) => {
-      // return { docRef, cid }
-      return { docRef }
+      return { docRef, cid}
     })
     .catch((error) => {
       throw new Error(error)
@@ -84,7 +108,6 @@ async function createPost(
 export async function POST(request: Request) {
   // request: { pubkey: string, signature: string, msgHash: string, title: string, body: string, id: string }
   const req = await request.json()
-  console.log(req)
 
   const { isValid, domain } = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/verifySig",
@@ -102,7 +125,7 @@ export async function POST(request: Request) {
   ).then((res) => res.json())
 
   if (!isValid) {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 500 })
+    return NextResponse.json({ error: "Invalid signature in write" }, { status: 500 })
   }
 
   try {

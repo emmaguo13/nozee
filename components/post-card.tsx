@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import { Post } from "@/types"
 import { Circle, MessageCircle } from "lucide-react"
 
@@ -36,6 +38,7 @@ export function PostCard({ post, preview }: { post: Post; preview: boolean }) {
         </div>
       </CardHeader>
       <CardContent>
+        <div className="flex justify-between">
         <div className="flex  space-x-4 text-sm text-muted-foreground">
           <div className="flex items-center capitalize">
             <Circle
@@ -61,6 +64,19 @@ export function PostCard({ post, preview }: { post: Post; preview: boolean }) {
               className={cn("mr-1 h-3 w-3", fillClassName, textClassName)}
             />
             {post.comments ? post.comments.length : 0}
+          </div>
+        </div>
+        <div className="flex  space-x-4 text-sm text-muted-foreground">
+          {preview && post.cid ? <Link
+              href={`https://ipfs.io/ipfs/${post.cid}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div>View in IPFS</div>
+            </Link> :
+            <div></div>
+          }
+          
           </div>
         </div>
       </CardContent>

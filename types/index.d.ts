@@ -16,6 +16,7 @@ export type Comment = {
 }
 
 export type Post = {
+  cid: string
   title: string
   domain: string
   body: string
