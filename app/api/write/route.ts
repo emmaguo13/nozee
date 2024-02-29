@@ -34,7 +34,6 @@ async function makeStorageClient() {
 
 async function web3storeFiles(file: Blob) {
   const client = await makeStorageClient()
-  console.log("Uploading file to web3.storage", client)
   // Add proof that this agent has been delegated capabilities on the space
   const proof = await parseProof(process.env.WEB3_STORAGE_PROOF as string)
   const space = await client.addSpace(proof)

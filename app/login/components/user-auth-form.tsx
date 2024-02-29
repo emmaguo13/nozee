@@ -147,6 +147,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             ? "No JWT loaded"
             : !zkey
             ? "No proving key loaded"
+            : proofExists
+            ? "You are logged in"
             : "Authenticate"}
         </Button>
       )}
