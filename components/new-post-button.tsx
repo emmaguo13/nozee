@@ -121,7 +121,7 @@ export function NewPostButton() {
         } else {
           toast({
             title: "Posting failed!",
-            description: "Please go to the login page and reauthenticate.",
+            description: "There was an error with posting.",
           })
         }
 
