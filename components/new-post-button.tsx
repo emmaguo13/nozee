@@ -109,7 +109,7 @@ export function NewPostButton() {
 
         const resJson = (await res.json()) as any
 
-        if (resJson.error == "Expired public key") {
+        if (resJson.error == "Invalid signature in write") {
           await localforage.removeItem("proof")
           await localforage.removeItem("publicSignals")
           await localforage.removeItem("key")
@@ -118,21 +118,20 @@ export function NewPostButton() {
             description:
               "Please go to ChatGPT to retrieve a new token, then go to the login page and reauthenticate.",
           })
+          router.push("/login")
         } else {
           toast({
             title: "Posting failed!",
             description: "There was an error with posting.",
           })
         }
-
-        router.push("/login")
       }
     } catch (error) {
       console.log("Error with posting", error)
       setIsLoading(false)
       toast({
         title: "Posting failed!",
-        description: "Network connection errors. Please try again.",
+        description: "There was an error with posting. Please try again.",
       })
     }
   }

@@ -81,22 +81,22 @@ export function PostWrapper({ post }: { post: Post }) {
       setIsLoading(false)
 
       const resJson = (await res.json()) as any
-      if (resJson.error == "Expired public key") {
+      if (resJson.error == "Invalid signature") {
         await localforage.removeItem("proof")
         await localforage.removeItem("publicSignals")
         await localforage.removeItem("key")
         toast({
-          title: "Failure!",
+          title: "Comment failed!",
           description:
             "Please go to ChatGPT to retrieve a new token, then go to the login page and reauthenticate.",
         })
+        router.push("/login")
       } else {
         toast({
-          title: "Failure!",
-          description: "Please go to the login page and reauthenticate.",
+          title: "Comment failed!",
+          description: "There was an error with commenting. Please try again.",
         })
       }
-      router.push("/login")
     }
   }
 

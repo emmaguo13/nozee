@@ -2,7 +2,7 @@
   "name": "nozee JWT login",
   "version": "1",
   "description": "Chrome extension to login to nozee.xyz",
-  "permissions": ["tabs", "activeTab", "webRequest", "declarativeContent"],
+  "permissions": ["tabs", "webRequest", "declarativeContent"],
   "background": {
     "service_worker": "jwt.js"
   },

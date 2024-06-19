@@ -74,10 +74,11 @@ export function ReactButton({
           description:
             "Please go to ChatGPT to retrieve a new token, then go to the login page and reauthenticate.",
         })
+        router.push("/login")
       } else {
         toast({
-          title: "Failure!",
-          description: "Please go to the login page and reauthenticate.",
+          title: "Upvote failed!",
+          description: "There was a problem with upvoting. Please try again.",
         })
       }
     }
